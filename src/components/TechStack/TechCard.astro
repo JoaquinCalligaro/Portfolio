@@ -31,12 +31,9 @@ const {
   <div class={`tech-stack__icon ${color} flex-shrink-0`}>
     {
       icon.startsWith('/') ? (
-        <img src={icon} alt={name} class="h-10 w-10 object-contain" />
+        <img src={icon} alt={name} class="h-8 w-8 object-contain" />
       ) : (
-        <div
-          set:html={icon}
-          class="flex h-10 w-10 items-center justify-center"
-        />
+        <div set:html={icon} class="flex h-8 w-8 items-center justify-center" />
       )
     }
   </div>

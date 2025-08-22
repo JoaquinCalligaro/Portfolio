@@ -3,6 +3,7 @@
 // Imports `stacks` (data) from src/data/techs.ts — keep UI logic here only.
 import TechStackSection from './TechStackSection.astro';
 import { stacks } from '../../data/techs';
+import '../../styles/components/techstack.css';
 
 interface Props {
   className?: string;
@@ -17,7 +18,6 @@ const splitClasses = className.split(' ');
   class="tech-stack-card w-full rounded-2xl border border-gray-300 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-gray-950/30"
   class:list={splitClasses}
 >
-  <link rel="stylesheet" href="/src/styles/components/techstack.css" />
   <div class="mb-4 flex flex-col gap-4">
     <div class="mb-2 flex items-center gap-3">
       <div
