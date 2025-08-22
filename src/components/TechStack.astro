@@ -136,9 +136,6 @@ const stacks = [
   },
 ];
 
-// Conteo total de tecnologías
-const totalCount = stacks.reduce((acc, s) => acc + s.items.length, 0);
-
 const splitClasses = className.split(' ');
 ---
 
@@ -187,7 +184,7 @@ const splitClasses = className.split(' ');
       // Efecto interactivo adicional para los iconos de tecnologías
       document.addEventListener('DOMContentLoaded', () => {
         const techIcons = document.querySelectorAll(
-          '.tech-icon-container'
+          '.tech-stack__item'
         ) as NodeListOf<HTMLElement>;
 
         techIcons.forEach((icon) => {

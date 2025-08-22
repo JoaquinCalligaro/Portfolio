@@ -20,12 +20,12 @@ const {
 ---
 
 <div
-  class={`tech-icon-container glow-hover group relative flex flex-col items-center justify-center p-3 ${rounded} transition-all duration-300 cursor-pointer bg-white/50 dark:bg-gray-900/30 border border-gray-200 dark:border-gray-700`}
+  class={`tech-stack__item tech-stack__item--glow group ${rounded} transition-all duration-300 cursor-pointer bg-white/50 dark:bg-gray-900/30 border border-gray-200 dark:border-gray-700`}
   data-tech-name={name}
   style={`--tech-color: ${hex}; --tech-color-alpha: ${hexAlpha}; --tech-color-alpha-hover: ${hex}40; --tech-color-border: ${hex}4D; --tech-color-border-hover: ${hex}CC`}
 >
   <!-- Propiedades de los iconos -->
-  <div class={`tech-icon ${color} flex-shrink-0`}>
+  <div class={`tech-stack__icon ${color} flex-shrink-0`}>
     {
       icon.startsWith('/') ? (
         <img src={icon} alt={name} class="h-10 w-10 object-contain" />
@@ -38,7 +38,7 @@ const {
     }
   </div>
   <span
-    class="tech-label mt-2 text-center text-xs font-medium text-gray-700 dark:text-gray-300"
+    class="tech-stack__label mt-2 text-center text-xs font-medium text-gray-700 dark:text-gray-300"
   >
     {name}
   </span>

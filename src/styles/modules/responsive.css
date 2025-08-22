@@ -10,7 +10,7 @@
 
 /* Responsive tweaks - mobile first */
 @media (max-width: 767px) {
-  .tech-icon-container .tech-label {
+  .tech-stack__item .tech-stack__label {
     opacity: 0;
     transform: translateX(-50%) translateY(8px);
     pointer-events: none;
@@ -19,7 +19,7 @@
     left: 50%;
   }
 
-  .tech-icon-container:hover .tech-label {
+  .tech-stack__item:hover .tech-stack__label {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
     pointer-events: auto;
@@ -27,7 +27,7 @@
 }
 
 @media (min-width: 768px) {
-  .tech-icon-container .tech-label {
+  .tech-stack__item .tech-stack__label {
     opacity: 1;
     transform: none;
     pointer-events: auto;
@@ -36,7 +36,7 @@
     white-space: normal;
   }
 
-  .tech-icon-container {
+  .tech-stack__item {
     min-height: 100px;
     padding: 1.5rem 1rem;
   }

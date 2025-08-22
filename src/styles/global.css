@@ -1,9 +1,11 @@
 @import './modules/base.css';
+@import './modules/utilities.css';
 @import './modules/components.css';
 @import './modules/responsive.css';
 
-/* 
-  Aquí van utilidades, animaciones y estilos compartidos por componentes. */
+/* Component styles (BEM) */
+@import './components/navbar.css';
+@import './components/techstack.css';
 
 /* Importa Tailwind (no mover) */
 @import 'tailwindcss';

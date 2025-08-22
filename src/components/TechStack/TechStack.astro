@@ -17,6 +17,7 @@ const splitClasses = className.split(' ');
   class="tech-stack-card w-full rounded-2xl border border-gray-300 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-gray-950/30"
   class:list={splitClasses}
 >
+  <link rel="stylesheet" href="/src/styles/components/techstack.css" />
   <div class="mb-4 flex flex-col gap-4">
     <div class="mb-2 flex items-center gap-3">
       <div
@@ -53,7 +54,7 @@ const splitClasses = className.split(' ');
       // Efecto interactivo adicional para los iconos de tecnologías
       document.addEventListener('DOMContentLoaded', () => {
         const techIcons = document.querySelectorAll(
-          '.tech-icon-container'
+          '.tech-stack__item'
         ) as NodeListOf<HTMLElement>;
 
         techIcons.forEach((icon) => {
