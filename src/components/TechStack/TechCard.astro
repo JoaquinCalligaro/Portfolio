@@ -1,4 +1,7 @@
 ---
+// Sección: TechCard
+// Propósito: tarjeta individual de tecnología (icono + label).
+// Props: name, hex, hexAlpha, icon, color?, rounded?
 interface Props {
   name: string;
   hex: string;
@@ -8,7 +11,7 @@ interface Props {
   rounded?: string;
 }
 
-// Tarjeta individual de tecnología. `icon` puede ser ruta (/svg/...) o SVG inline.
+// Valores por defecto y lectura de props
 const {
   name,
   hex,

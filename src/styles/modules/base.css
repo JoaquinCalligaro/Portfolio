@@ -1,9 +1,10 @@
-/* base.css - keyframes, glow basics, utilities */
+/* Sección: base.css
+  Propósito: keyframes y utilidades base (glow, overlays, backdrops)
+*/
 
-/* ==========================================================================
-  EFECTO DE BRILLO HOVER
-  ========================================================================== */
-/* Efecto glow reutilizable para botones y tarjetas. Ajusta colores en pseudo-elementos. */
+/* ======================================================================
+  EFECTOS GLOBE/UTILIDADES (simplificado)
+  ====================================================================== */
 
 .glow-hover {
   position: relative;

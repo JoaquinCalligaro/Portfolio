@@ -1,13 +1,16 @@
+/* Sección: global.css
+   Propósito: importar módulos y estilos de componentes (BEM)
+*/
 @import './modules/base.css';
 @import './modules/utilities.css';
 @import './modules/components.css';
 @import './modules/responsive.css';
 
-/* Component styles (BEM) */
+/* Componentes */
 @import './components/navbar.css';
 @import './components/techstack.css';
 
-/* Importa Tailwind (no mover) */
+/* Tailwind v4 at-rules (mantener) */
 @import 'tailwindcss';
 @custom-variant dark (&:where(.dark, .dark *));
 @theme {
