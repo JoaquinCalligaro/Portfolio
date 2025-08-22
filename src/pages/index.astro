@@ -1,7 +1,244 @@
 ---
+import Card from '../components/Card.astro';
+import Layout from '../layouts/Layout.astro';
+import TimelineItem from '../components/TimelineItem.astro';
+import Project from '../components/Project.astro';
+import CardService from '../components/CardService.astro';
+import TechStack from '../components/TechStack/TechStack.astro';
+import EXPERIENCES from '../assets/collections/experiences.json';
+import PROJECTS from '../assets/collections/projects.json';
+import SERVICES from '../assets/collections/services.json';
+import HireServiceModal from '../components/HireServiceModal.astro';
+import meImage from '../assets/me.webp';
 import '../styles/global.css';
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
 ---
 
-<h1 class="bg-red-400 text-3xl font-bold underline">Hello world!</h1>
+<Layout>
+  <section id="home" class="flex flex-col py-20">
+    <article class="mx-auto text-pretty text-gray-950 dark:text-white">
+      <div class="mb-12 flex flex-col items-center gap-8 md:flex-row">
+        <img
+          src={meImage.src}
+          alt="Joaquin Calligaro"
+          class="h-48 w-48 rounded-full sm:h-72 sm:w-72 md:h-56 md:w-56"
+        />
+        <div class="flex flex-col gap-4 text-center md:text-left">
+          <h1 class="text-4xl font-bold md:text-6xl">Joaquin Calligaro</h1>
+          <p class="max-w-3xl text-lg text-gray-600 dark:text-gray-300">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Vel
+            laudantium reiciendis impedit voluptatum! Harum aliquid, sint vero
+            officia molestiae tempore voluptates, corporis expedita facere
+            deserunt iure magni ratione quidem veniam?
+          </p>
+        </div>
+      </div>
+
+      <!-- Tech Stack Section - Separado del contenido personal -->
+      <div class="mt-12 w-full">
+        <TechStack className="card techstack-container w-full" />
+      </div>
+      <div class="mt-30 flex flex-col gap-6">
+        <h2 class="text-xl font-bold sm:text-2xl">Mis Proyectos</h2>
+        <div class="relative flex flex-col gap-4 overflow-hidden sm:flex-row">
+          <Card className="card">
+            <div
+              class="grid w-fit place-content-center rounded-full bg-blue-50 p-4 text-blue-500 dark:bg-blue-950/30 dark:text-blue-700"
+            >
+              <svg
+                class="size-8"
+                fill="currentColor"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 640 512"
+                ><path
+                  d="M128 32C92.7 32 64 60.7 64 96l0 256 64 0 0-256 384 0 0 256 64 0 0-256c0-35.3-28.7-64-64-64L128 32zM19.2 384C8.6 384 0 392.6 0 403.2C0 445.6 34.4 480 76.8 480l486.4 0c42.4 0 76.8-34.4 76.8-76.8c0-10.6-8.6-19.2-19.2-19.2L19.2 384z"
+                ></path></svg
+              >
+            </div>
+            <h2 class="text-lg font-semibold sm:text-xl md:text-2xl">
+              Proyecto 1
+            </h2>
+            <p class="text-sm text-gray-600 sm:text-base dark:text-gray-400">
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quas
+              iusto tempore ratione. Deserunt ratione eligendi saepe.
+              Voluptatibus in odit maxime asperiores ipsum vitae, illum, neque,
+              veniam consequuntur earum ab! Perspiciatis!
+              <span class="text-blue-700 dark:text-blue-500"
+                >Angular and Astro</span
+              >. Lorem, ipsum dolor sit amet consectetur adipisicing elit.
+              Reiciendis amet, qui molestias dicta quos quae architecto dolore,
+              sed minima asperiores quas, earum consequuntur repudiandae enim
+              delectus quod exercitationem voluptatem distinctio?e.
+            </p>
+          </Card>
+          <Card className="card">
+            <div
+              class="grid w-fit place-content-center rounded-full bg-yellow-50 p-4 text-yellow-500 dark:bg-yellow-950/30 dark:text-yellow-700"
+            >
+              <svg
+                class="size-8"
+                fill="currentColor"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 512 512"
+                ><path
+                  d="M64 32C28.7 32 0 60.7 0 96l0 64c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-64c0-35.3-28.7-64-64-64L64 32zm280 72a24 24 0 1 1 0 48 24 24 0 1 1 0-48zm48 24a24 24 0 1 1 48 0 24 24 0 1 1 -48 0zM64 288c-35.3 0-64 28.7-64 64l0 64c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-64c0-35.3-28.7-64-64-64L64 288zm280 72a24 24 0 1 1 0 48 24 24 0 1 1 0-48zm56 24a24 24 0 1 1 48 0 24 24 0 1 1 -48 0z"
+                ></path></svg
+              >
+            </div>
+            <h2 class="text-lg font-semibold sm:text-xl md:text-2xl">
+              Proyecto 2
+            </h2>
+            <p class="text-sm text-gray-600 sm:text-base dark:text-gray-400">
+              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Illo,
+              enim, alias quis sed iure sapiente vitae quibusdam cum a dolores
+              tenetur error. Repudiandae aliquid, officiis ullam architecto
+              eligendi beatae unde. <span
+                class="text-yellow-700 dark:text-yellow-500"
+                >NestJS and Express</span
+              >. Lorem ipsum dolor sit amet consectetur adipisicing elit. Sint
+              recusandae voluptate sit odio vero numquam quod praesentium
+              excepturi quos quis rem ea maxime commodi ipsa illum, repellat
+              nisi quisquam perferendis.
+            </p>
+          </Card>
+        </div>
+      </div>
+    </article>
+  </section>
+  <section id="about" class="flex flex-col">
+    <h2
+      class="mb-8 text-2xl font-bold text-gray-950 md:text-4xl dark:text-white"
+    >
+      Sobre Mi
+    </h2>
+    <article class="flex flex-col gap-4 p-4 md:flex-row">
+      <Card className="h-fit text-gray-600 dark:text-gray-400">
+        <div class="flex flex-col gap-2 text-sm sm:text-base">
+          <h3
+            class="text-lg font-semibold text-gray-950 sm:text-xl dark:text-white"
+          >
+            Short Bio 🧬
+          </h3>
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure illo
+            distinctio inventore illum consequuntur eveniet nobis officiis sequi
+            aspernatur optio nulla, quisquam sit voluptatibus velit cum, minima
+            excepturi, numquam explicabo.
+          </p>
+          <p>
+            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Enim
+            molestias adipisci illum quam eaque perspiciatis saepe rerum
+            voluptates cum consectetur? Accusantium reiciendis adipisci error
+            corrupti pariatur exercitationem quaerat porro eveniet!
+          </p>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel animi
+            enim rerum perferendis. Distinctio itaque dolores mollitia id, vitae
+            necessitatibus earum sed maxime illum sequi impedit nihil. Minus,
+            quos non!
+          </p>
+        </div>
+        <div class="flex flex-col gap-2">
+          <h3
+            class="text-lg font-semibold text-gray-950 sm:text-xl dark:text-white"
+          >
+            Informacion CV
+          </h3>
+          <a
+            href="/docs/cv.pdf"
+            role="button"
+            aria-label="Descargar CV"
+            download
+            class="w-fit rounded-md bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 focus:outline-hidden dark:bg-blue-700 dark:hover:bg-blue-800 dark:focus:ring-blue-950"
+            >Descargar CV</a
+          >
+        </div>
+      </Card>
+      <Card className="p-8">
+        <ol class="relative border-s border-gray-300 dark:border-neutral-800">
+          {
+            EXPERIENCES.map((experience) => (
+              <TimelineItem
+                title={experience.company}
+                description={experience.description}
+                date={experience.dates}
+              >
+                <div
+                  slot="icon"
+                  class="size-full p-1"
+                  set:html={experience.svgIcon}
+                />
+              </TimelineItem>
+            ))
+          }
+        </ol>
+      </Card>
+    </article>
+  </section>
+  <section id="projects" class="flex flex-col">
+    <h2
+      class="ms-auto mb-8 text-end text-2xl font-bold text-gray-950 md:text-4xl dark:text-white"
+    >
+      Titulo
+    </h2>
+    <div class="grid grid-cols-1 gap-6 p-4 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        PROJECTS.filter((__, i) => i < 3).map((project) => (
+          <Project project={project} />
+        ))
+      }
+    </div>
+    <div class="mt-6 flex justify-center">
+      <a
+        role="button"
+        href="/projects"
+        class="rounded-3xl bg-blue-600 px-4 py-2 text-base font-semibold text-white transition-colors duration-300 hover:border hover:border-blue-600 hover:bg-transparent hover:text-blue-600 dark:bg-blue-800 dark:hover:border-blue-800 dark:hover:bg-transparent dark:hover:text-blue-800"
+        >Ver todos los proyectos</a
+      >
+    </div>
+  </section>
+  <section id="services" class="flex flex-col overflow-hidden">
+    <h2
+      class="mb-8 text-2xl font-bold text-gray-950 md:text-4xl dark:text-white"
+    >
+      Titulo
+    </h2>
+    <article class="grid grid-cols-1 gap-6 p-4 sm:grid-cols-2 lg:grid-cols-3">
+      {SERVICES.map((service) => <CardService service={service} />)}
+    </article>
+  </section>
+  <HireServiceModal />
+</Layout>
+
+<script>
+  import { animate, inView, stagger } from 'motion';
+
+  window.addEventListener('DOMContentLoaded', () => {
+    inView('#services', () => {
+      animate(
+        '.card-service',
+        {
+          transform: ['translateY(100%)', 'translateY(0)'],
+        },
+        {
+          delay: stagger(0.2),
+          duration: 0.6,
+        }
+      );
+    });
+
+    // Animación para las tecnologías
+    inView('.tech-stack-card', () => {
+      animate(
+        '.tech-icon-container',
+        {
+          opacity: [0, 1],
+          transform: ['translateY(30px)', 'translateY(0px)'],
+        },
+        {
+          delay: stagger(0.1),
+          duration: 0.5,
+        }
+      );
+    });
+  });
+</script>

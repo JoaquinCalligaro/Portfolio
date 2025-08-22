@@ -1,0 +1,45 @@
+---
+interface Props {
+  name: string;
+  hex: string;
+  hexAlpha: string;
+  icon: string;
+  color?: string;
+  rounded?: string;
+}
+
+// Tarjeta individual de tecnología. `icon` puede ser ruta (/svg/...) o SVG inline.
+const {
+  name,
+  hex,
+  hexAlpha,
+  icon,
+  color = '',
+  rounded = 'rounded-2xl',
+} = Astro.props as Props;
+---
+
+<div
+  class={`tech-icon-container glow-hover group relative flex flex-col items-center justify-center p-3 ${rounded} transition-all duration-300 cursor-pointer bg-white/50 dark:bg-gray-900/30 border border-gray-200 dark:border-gray-700`}
+  data-tech-name={name}
+  style={`--tech-color: ${hex}; --tech-color-alpha: ${hexAlpha}; --tech-color-alpha-hover: ${hex}40; --tech-color-border: ${hex}4D; --tech-color-border-hover: ${hex}CC`}
+>
+  <!-- Propiedades de los iconos -->
+  <div class={`tech-icon ${color} flex-shrink-0`}>
+    {
+      icon.startsWith('/') ? (
+        <img src={icon} alt={name} class="h-10 w-10 object-contain" />
+      ) : (
+        <div
+          set:html={icon}
+          class="flex h-10 w-10 items-center justify-center"
+        />
+      )
+    }
+  </div>
+  <span
+    class="tech-label mt-2 text-center text-xs font-medium text-gray-700 dark:text-gray-300"
+  >
+    {name}
+  </span>
+</div>

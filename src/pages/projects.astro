@@ -1,0 +1,29 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PROJECTS from '../assets/collections/projects.json';
+import Project from '../components/Project.astro';
+
+export const prerender = true;
+---
+
+<Layout>
+  <section class="flex flex-col gap-2">
+    <h1
+      class="text-2xl font-bold text-gray-950 sm:text-3xl lg:text-4xl dark:text-white"
+    >
+      Titulo
+    </h1>
+    <p
+      class="text-base text-pretty text-gray-600 sm:w-3/4 md:text-lg dark:text-gray-400"
+    >
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque nulla
+      quidem ea corrupti consectetur modi dignissimos cum quae, eos et eligendi
+      dolor totam expedita ipsam harum odio perspiciatis reiciendis ipsum?
+    </p>
+  </section>
+  <section
+    class="mx-auto grid max-w-screen-md grid-cols-1 gap-6 sm:grid-cols-2"
+  >
+    {PROJECTS.map((project) => <Project project={project} />)}
+  </section>
+</Layout>

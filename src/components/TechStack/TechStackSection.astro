@@ -1,0 +1,33 @@
+---
+// Sección de una categoría (p.ej. Front-end). No tocar la lógica, solo el diseño si hace falta.
+import TechCard from './TechCard.astro';
+import type { TechItem } from '../../data/techs';
+
+interface Props {
+  title: string;
+  items: TechItem[];
+}
+
+const { title, items } = Astro.props as Props;
+---
+
+<div>
+  <h4 class="mb-3 text-sm font-semibold text-gray-800 dark:text-gray-200">
+    {title}
+  </h4>
+  <div
+    class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-6"
+  >
+    {
+      items.map((tech) => (
+        <TechCard
+          name={tech.name}
+          hex={tech.hex}
+          hexAlpha={tech.hexAlpha}
+          icon={tech.icon}
+          color={tech.color}
+        />
+      ))
+    }
+  </div>
+</div>

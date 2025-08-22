@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Proyecto 1",
+    "description": "E-commerce for selling remittances, mobile recharges and gift cards.",
+    "urlImg": "/projects/gotosend.webp",
+    "link": "#"
+  },
+  {
+    "name": "Proyecto 2",
+    "description": "E-commerce website for selling technological products.",
+    "urlImg": "/projects/d-kanto.webp",
+    "link": "#"
+  },
+  {
+    "name": "Proyecto 3",
+    "description": "Admin Dashboard for an E-commerce website",
+    "urlImg": "/projects/d-kanto-admin.webp",
+    "link": "#"
+  },
+  {
+    "name": "Amazon Redesign Thinking",
+    "description": "Amazon Clon",
+    "urlImg": "/projects/amazon-redesign-thinking.webp",
+    "link": "#"
+  }
+]
