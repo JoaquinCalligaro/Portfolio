@@ -1,28 +1,18 @@
 ---
-import { Image } from 'astro:assets';
 import SpanishIcon from '../assets/spanish.svg';
 import EnglishIcon from '../assets/english.svg';
 import MoonIcon from '../assets/moon.svg';
 import SunIcon from '../assets/sun.svg';
-const { pathname } = Astro.url;
-
-let links: string[];
-const linkNamesES = ['Inicio', 'Sobre mí', 'Proyectos', 'Servicios'];
-const linkNamesEN = ['Home', 'About', 'Projects', 'Services'];
-
-if (pathname == '/') {
-  links = ['#home', '#about', '#projects', '#services'];
-} else {
-  links = ['/', '/#about', '/projects', '/#services'];
-}
 ---
 
 <header
   id="navbar-header"
-  class="dark:navbar-glow header-backdrop-blur dark:header-backdrop-blur header-backdrop-blur fixed top-0 right-0 left-0 z-50 mx-auto flex max-w-xl flex-wrap items-center justify-between border-2 border-gray-400/30 bg-gray-400/10 px-5 py-4 transition-transform duration-300 ease-in-out sm:rounded-2xl md:rounded-2xl xl:rounded-2xl dark:border-black/40 dark:bg-black/20"
+  class="dark:navbar-glow header-backdrop-blur dark:header-backdrop-blur header-backdrop-blur fixed top-0 right-0 left-0 z-50 mx-auto flex max-w-4xl flex-wrap items-center justify-between border-2 border-gray-400/30 bg-gray-400/10 px-5 py-4 transition-transform duration-300 ease-in-out sm:rounded-2xl md:rounded-2xl xl:rounded-2xl dark:border-black/40 dark:bg-black/20"
 >
   <div></div>
-  <div class="flex items-center gap-3 px-3 text-gray-900 sm:order-1">
+  <div
+    class="flex min-w-0 items-center justify-end gap-2 px-2 text-gray-900 sm:order-1"
+  >
     <button
       title="Theme Toggle"
       aria-label="Theme Toggle"
@@ -40,10 +30,16 @@ if (pathname == '/') {
       title="Idioma"
       aria-label="Idioma"
       id="lang-toggle"
-      class="flex cursor-pointer items-center px-3 py-1 dark:text-white"
+      class="flex cursor-pointer items-center justify-center px-3 py-1 dark:text-white"
     >
-      <span id="icon-es"><SpanishIcon /></span>
-      <span id="icon-en" style="display:none;"><EnglishIcon /></span></button
+      <span id="icon-es" class="flex items-center justify-center"
+        ><SpanishIcon /></span
+      >
+      <span
+        id="icon-en"
+        class="flex items-center justify-center"
+        style="display:none;"><EnglishIcon /></span
+      ></button
     >
     <button
       title="Navbar Toggle"
@@ -83,7 +79,7 @@ if (pathname == '/') {
   >
     <ul
       id="navbar-links"
-      class="flex flex-col items-center gap-8 font-semibold sm:flex-row md:gap-7 lg:gap-7 xl:gap-7"
+      class="flex flex-col items-center gap-4 font-semibold sm:flex-row sm:gap-4 md:gap-6 lg:gap-8 xl:gap-8"
     >
       <!-- Los links se renderizan por JS -->
     </ul>
@@ -97,7 +93,6 @@ if (pathname == '/') {
   const links = ['#home', '#about', '#projects', '#services'];
   const navbarLinks = document.getElementById('navbar-links');
   const langToggle = document.getElementById('lang-toggle');
-  const langLabel = document.getElementById('lang-label');
   const iconES = document.getElementById('icon-es');
   const iconEN = document.getElementById('icon-en');
 
@@ -114,10 +109,10 @@ if (pathname == '/') {
       const a = document.createElement('a');
       a.href = link;
 
-      // Usar clases específicas según el tema
+      // Usar clases específicas según el tema con mejor espaciado
       let classes = isDark
-        ? ' nav-hover-dark xl:text-sm xl:px-3 xl:py-1.2 md:text-md md:px-3 md:py-1.5 sm:text-md sm:px-3 md sm:py-2'
-        : ' nav-hover-light xl:text-sm xl:px-3 xl:py-1.2 md:text-md md:px-3 md:py-1.5 sm:text-md  sm:px-3  sm:py-3';
+        ? 'nav-hover-dark text-sm px-2 py-1 rounded transition-all duration-200 whitespace-nowrap'
+        : 'nav-hover-light text-sm px-2 py-1 rounded transition-all duration-200 whitespace-nowrap';
 
       // Marca como activo si el hash o pathname coincide
       if (link === currentHash) {
