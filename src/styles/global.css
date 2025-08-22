@@ -1,25 +1,16 @@
 /* ==========================================================================
-  ESTILOS GLOBALES Y ANIMACIONES - Tailwind CSS v4
+  ESTILOS GLOBALES Y ANIMACIONES
   ========================================================================== */
 
-/* Archivo principal de estilos compatible con Tailwind CSS v4.
-   Aquí van utilidades, animaciones y estilos compartidos por componentes.
-   Si vuelves al proyecto, mira estas secciones para entender el layout. */
+/* Archivo principal de estilos.
+  Aquí van utilidades, animaciones y estilos compartidos por componentes.
+  Si vuelves al proyecto, mira estas secciones para entender el layout. */
 
-/* Importa Tailwind (no mover) - v4 syntax */
+/* Importa Tailwind (no mover) */
 @import 'tailwindcss';
-
-/* ==========================================================================
-  VARIABLES PERSONALIZADAS Y TEMA
-  ========================================================================== */
-
-:root {
+@custom-variant dark (&:where(.dark, .dark *));
+@theme {
   --breakpoint-xs: 32rem;
-}
-
-/* Modo oscuro personalizado */
-.dark {
-  color-scheme: dark;
 }
 
 /* ==========================================================================

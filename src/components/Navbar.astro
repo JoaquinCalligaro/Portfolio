@@ -1,18 +1,17 @@
 ---
-import SpanishIcon from '../assets/spanish.svg';
-import EnglishIcon from '../assets/english.svg';
-import MoonIcon from '../assets/moon.svg';
-import SunIcon from '../assets/sun.svg';
+import SpanishIcon from "../assets/spanish.svg"
+import EnglishIcon from "../assets/english.svg"
+import MoonIcon from  "../assets/moon.svg"
+import SunIcon from "../assets/sun.svg"
+---
 ---
 
 <header
   id="navbar-header"
-  class="dark:navbar-glow header-backdrop-blur dark:header-backdrop-blur header-backdrop-blur fixed top-0 right-0 left-0 z-50 mx-auto flex max-w-4xl flex-wrap items-center justify-between border-2 border-gray-400/30 bg-gray-400/10 px-5 py-4 transition-transform duration-300 ease-in-out sm:rounded-2xl md:rounded-2xl xl:rounded-2xl dark:border-black/40 dark:bg-black/20"
+  class="fixed top-0 right-0 left-0 z-50 mx-auto flex max-w-4xl flex-wrap items-center justify-between border-2 border-gray-400/30 bg-gray-400/10 px-5 py-4 transition-transform duration-300 ease-in-out sm:rounded-2xl md:rounded-2xl xl:rounded-2xl dark:border-black/40 dark:bg-black/20 dark:navbar-glow header-backdrop-blur dark:header-backdrop-blur"
 >
   <div></div>
-  <div
-    class="flex min-w-0 items-center justify-end gap-2 px-2 text-gray-900 sm:order-1"
-  >
+  <div class="flex items-center justify-end gap-2 px-2 text-gray-900 sm:order-1 min-w-0">
     <button
       title="Theme Toggle"
       aria-label="Theme Toggle"
@@ -20,11 +19,7 @@ import SunIcon from '../assets/sun.svg';
       class="flex cursor-pointer items-center"
     >
       <SunIcon id="theme-sun-icon" class="mx-2 size-6" aria-label="Sun Icon" />
-      <MoonIcon
-        id="theme-moon-icon"
-        class="mx-2 size-6"
-        aria-label="Moon Icon"
-      />
+      <MoonIcon id="theme-moon-icon" class="mx-2 size-6" aria-label="Moon Icon" />
     </button>
     <button
       title="Idioma"
@@ -32,15 +27,9 @@ import SunIcon from '../assets/sun.svg';
       id="lang-toggle"
       class="flex cursor-pointer items-center justify-center px-3 py-1 dark:text-white"
     >
-      <span id="icon-es" class="flex items-center justify-center"
-        ><SpanishIcon /></span
-      >
-      <span
-        id="icon-en"
-        class="flex items-center justify-center"
-        style="display:none;"><EnglishIcon /></span
-      ></button
-    >
+      <span id="icon-es" class="flex items-center justify-center"><SpanishIcon /></span>
+      <span id="icon-en" class="flex items-center justify-center" style="display:none;"><EnglishIcon /></span>
+    </button>
     <button
       title="Navbar Toggle"
       aria-label="Navbar Toggle"
@@ -50,7 +39,7 @@ import SunIcon from '../assets/sun.svg';
       <svg
         aria-label="Menu Icon"
         id="navbar-menu-icon"
-        class="mx-3 size-6"
+        class="size-6 mx-3" 
         fill="currentColor"
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 448 512"
@@ -62,7 +51,7 @@ import SunIcon from '../assets/sun.svg';
       <svg
         aria-label="Close Menu Icon"
         id="navbar-x-icon"
-        class="mx-3 hidden size-6"
+        class="hidden size-6 mx-3"
         fill="currentColor"
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 384 512"
@@ -75,7 +64,7 @@ import SunIcon from '../assets/sun.svg';
   </div>
   <nav
     id="navbar"
-    class="dark:navbar-glow hidden w-full -translate-y-[200%] rounded-sm p-4 text-sm transition-transform sm:static sm:top-auto sm:right-auto sm:left-auto sm:mt-0 sm:block sm:w-auto sm:translate-y-0 sm:border-none sm:p-0 lg:text-base"
+    class="hidden -translate-y-[200%] transition-transform p-4 sm:block sm:translate-y-0 sm:static sm:p-0 w-full sm:w-auto text-sm lg:text-base sm:top-auto sm:left-auto sm:right-auto sm:mt-0   dark:navbar-glow  sm:border-none rounded-sm "
   >
     <ul
       id="navbar-links"
@@ -87,36 +76,32 @@ import SunIcon from '../assets/sun.svg';
 </header>
 <script is:inline>
   // Toggle idioma y renderizado dinámico de links
-  let lang = localStorage.getItem('lang') || 'ES';
-  const linkNamesES = ['Inicio', 'Sobre mí', 'Proyectos', 'Servicios'];
-  const linkNamesEN = ['Home', 'About', 'Projects', 'Services'];
-  const links = ['#home', '#about', '#projects', '#services'];
-  const navbarLinks = document.getElementById('navbar-links');
-  const langToggle = document.getElementById('lang-toggle');
-  const iconES = document.getElementById('icon-es');
-  const iconEN = document.getElementById('icon-en');
+  let lang = localStorage.getItem("lang") || "ES";
+  const linkNamesES = ["Inicio", "Sobre mí", "Proyectos", "Servicios"];
+  const linkNamesEN = ["Home", "About", "Projects", "Services"];
+  const links = ["#home", "#about", "#projects", "#services"];
+  const navbarLinks = document.getElementById("navbar-links");
+  const langToggle = document.getElementById("lang-toggle");
+  const iconES = document.getElementById("icon-es");
+  const iconEN = document.getElementById("icon-en");
 
   function renderLinks() {
-    navbarLinks.innerHTML = '';
-    const names = lang === 'ES' ? linkNamesES : linkNamesEN;
-    const currentHash =
-      window.location.hash ||
-      (window.location.pathname === '/' ? '#home' : window.location.pathname);
+    navbarLinks.innerHTML = "";
+    const names = lang === "ES" ? linkNamesES : linkNamesEN;
+    const currentHash = window.location.hash || (window.location.pathname === "/" ? "#home" : window.location.pathname);
     const isDark = document.documentElement.classList.contains('dark');
-
+    
     links.forEach((link, i) => {
-      const li = document.createElement('li');
-      const a = document.createElement('a');
+      const li = document.createElement("li");
+      const a = document.createElement("a");
       a.href = link;
-
-      // Usar clases específicas según el tema con mejor espaciado
-      let classes = isDark
-        ? 'nav-hover-dark text-sm px-2 py-1 rounded transition-all duration-200 whitespace-nowrap'
-        : 'nav-hover-light text-sm px-2 py-1 rounded transition-all duration-200 whitespace-nowrap';
-
+      
+      // Usar clases específicas según el tema
+      let classes = isDark ? " nav-hover-dark xl:text-sm xl:px-3 xl:py-1.2 md:text-md md:px-3 md:py-1.5 sm:text-md sm:px-3 md sm:py-2" : " nav-hover-light xl:text-sm xl:px-3 xl:py-1.2 md:text-md md:px-3 md:py-1.5 sm:text-md  sm:px-3  sm:py-3";
+      
       // Marca como activo si el hash o pathname coincide
       if (link === currentHash) {
-        classes += ' active';
+        classes += " active";
       }
       a.className = classes;
       a.textContent = names[i];
@@ -126,70 +111,70 @@ import SunIcon from '../assets/sun.svg';
   }
 
   // Actualiza el link activo al navegar por hash
-  window.addEventListener('hashchange', () => {
+  window.addEventListener("hashchange", () => {
     renderLinks();
   });
 
   function updateLangIcon() {
-    if (lang === 'ES') {
-      iconES.style.display = '';
-      iconEN.style.display = 'none';
+    if (lang === "ES") {
+      iconES.style.display = "";
+      iconEN.style.display = "none";
     } else {
-      iconES.style.display = 'none';
-      iconEN.style.display = '';
+      iconES.style.display = "none";
+      iconEN.style.display = "";
     }
   }
 
   renderLinks();
   updateLangIcon();
 
-  langToggle.addEventListener('click', () => {
-    lang = lang === 'ES' ? 'EN' : 'ES';
-    localStorage.setItem('lang', lang);
+  langToggle.addEventListener("click", () => {
+    lang = lang === "ES" ? "EN" : "ES";
+    localStorage.setItem("lang", lang);
     renderLinks();
     updateLangIcon();
   });
 
   // Toggle menú responsive
-  const navbar = document.getElementById('navbar');
-  const navbarToggle = document.getElementById('navbar-toggle');
-  const navbarXIcon = document.getElementById('navbar-x-icon');
-  const navbarMenuIcon = document.getElementById('navbar-menu-icon');
+  const navbar = document.getElementById("navbar");
+  const navbarToggle = document.getElementById("navbar-toggle");
+  const navbarXIcon = document.getElementById("navbar-x-icon");
+  const navbarMenuIcon = document.getElementById("navbar-menu-icon");
 
   if (navbarToggle instanceof HTMLButtonElement) {
-    navbarToggle.addEventListener('click', () => {
-      navbarXIcon.classList.toggle('hidden');
-      navbarMenuIcon.classList.toggle('hidden');
-      navbar.classList.toggle('hidden');
-
+    navbarToggle.addEventListener("click", () => {
+      navbarXIcon.classList.toggle("hidden");
+      navbarMenuIcon.classList.toggle("hidden");
+      navbar.classList.toggle("hidden");
+      
       // Añadir transición suave al body
-      document.body.style.transition = 'padding-top 0.6s ease-in-out 0.4s';
-
+      document.body.style.transition = "padding-top 0.6s ease-in-out 0.4s";
+      
       // Añadir o quitar margen superior al body para hacer espacio al menú
-      const isMenuOpen = !navbar.classList.contains('hidden');
+      const isMenuOpen = !navbar.classList.contains("hidden");
       if (isMenuOpen) {
-        document.body.style.paddingTop = '250px'; // Ajustar según la altura del menú
+        document.body.style.paddingTop = "250px"; // Ajustar según la altura del menú
       } else {
-        document.body.style.paddingTop = '20px'; // Margen normal para el navbar fijo
+        document.body.style.paddingTop = "20px"; // Margen normal para el navbar fijo
       }
-
+      
       setTimeout(() => {
-        navbar.classList.toggle('-translate-y-[200%]');
+        navbar.classList.toggle("-translate-y-[200%]");
       });
     });
   }
 
   // Toggle tema oscuro/claro
-  const themeToggle = document.getElementById('theme-toggle');
-  const themeMoonIcon = document.getElementById('theme-moon-icon');
-  const themeSunIcon = document.getElementById('theme-sun-icon');
+  const themeToggle = document.getElementById("theme-toggle");
+  const themeMoonIcon = document.getElementById("theme-moon-icon");
+  const themeSunIcon = document.getElementById("theme-sun-icon");
 
   const isDarkColorThemeSet =
-    'color-theme' in localStorage &&
-    localStorage.getItem('color-theme') === 'dark';
+    "color-theme" in localStorage &&
+    localStorage.getItem("color-theme") === "dark";
   const userPrefersDarkTheme =
-    window.matchMedia('(prefers-color-scheme: dark)').matches &&
-    !('color-theme' in localStorage);
+    window.matchMedia("(prefers-color-scheme: dark)").matches &&
+    !("color-theme" in localStorage);
 
   if (isDarkColorThemeSet || userPrefersDarkTheme) {
     setDarkTheme();
@@ -198,9 +183,9 @@ import SunIcon from '../assets/sun.svg';
   }
 
   if (themeToggle instanceof HTMLButtonElement) {
-    themeToggle.addEventListener('click', () => {
-      const colorTheme = localStorage.getItem('color-theme');
-      if (colorTheme === 'dark') {
+    themeToggle.addEventListener("click", () => {
+      const colorTheme = localStorage.getItem("color-theme");
+      if (colorTheme === "dark") {
         setLightTheme();
       } else {
         setDarkTheme();
@@ -209,48 +194,47 @@ import SunIcon from '../assets/sun.svg';
   }
 
   function setLightTheme() {
-    document.documentElement.classList.remove('dark');
-    localStorage.setItem('color-theme', 'light');
-    themeMoonIcon.classList.remove('hidden');
-    themeSunIcon.classList.add('hidden');
+    document.documentElement.classList.remove("dark");
+    localStorage.setItem("color-theme", "light");
+    themeMoonIcon.classList.remove("hidden");
+    themeSunIcon.classList.add("hidden");
     // Re-renderizar links para aplicar las clases correctas
     renderLinks();
   }
 
   function setDarkTheme() {
-    localStorage.setItem('color-theme', 'dark');
-    document.documentElement.classList.add('dark');
-    themeMoonIcon.classList.add('hidden');
-    themeSunIcon.classList.remove('hidden');
+    localStorage.setItem("color-theme", "dark");
+    document.documentElement.classList.add("dark");
+    themeMoonIcon.classList.add("hidden");
+    themeSunIcon.classList.remove("hidden");
     // Re-renderizar links para aplicar las clases correctas
     renderLinks();
   }
 
   // Navbar scroll behavior
   let lastScrollTop = 0;
-  const navbarHeader = document.getElementById('navbar-header');
+  const navbarHeader = document.getElementById("navbar-header");
 
-  window.addEventListener('scroll', () => {
-    const currentScrollTop =
-      window.pageYOffset || document.documentElement.scrollTop;
+  window.addEventListener("scroll", () => {
+    const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
     if (currentScrollTop > lastScrollTop && currentScrollTop > 100) {
       // Scrolling hacia abajo - ocultar navbar
-      navbarHeader.classList.add('-translate-y-full');
-
+      navbarHeader.classList.add("-translate-y-full");
+      
       // Si el menú móvil está abierto, cerrarlo
-      if (!navbar.classList.contains('hidden')) {
-        navbarXIcon.classList.add('hidden');
-        navbarMenuIcon.classList.remove('hidden');
-        navbar.classList.add('hidden');
-        navbar.classList.add('-translate-y-[200%]');
+      if (!navbar.classList.contains("hidden")) {
+        navbarXIcon.classList.add("hidden");
+        navbarMenuIcon.classList.remove("hidden");
+        navbar.classList.add("hidden");
+        navbar.classList.add("-translate-y-[200%]");
         // Añadir transición suave al cerrar
-        document.body.style.transition = 'padding-top 0.5s ease-in-out';
-        document.body.style.paddingTop = '80px';
+        document.body.style.transition = "padding-top 0.5s ease-in-out";
+        document.body.style.paddingTop = "80px";
       }
     } else if (currentScrollTop < lastScrollTop) {
       // Scrolling hacia arriba - mostrar navbar
-      navbarHeader.classList.remove('-translate-y-full');
+      navbarHeader.classList.remove("-translate-y-full");
     }
 
     lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop; // Evitar valores negativos
