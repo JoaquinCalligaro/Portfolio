@@ -1,3 +1,5 @@
+/* stylelint-disable at-rule-no-unknown */
+/* vscode-disable */
 /* ==========================================================================
   ESTILOS GLOBALES Y ANIMACIONES
   ========================================================================== */
@@ -12,6 +14,7 @@
 @theme {
   --breakpoint-xs: 32rem;
 }
+/* stylelint-enable */
 
 /* ==========================================================================
   EFECTO DE BRILLO HOVER
