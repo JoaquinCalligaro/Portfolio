@@ -21,17 +21,17 @@ const {
 
 <div
   class={`tech-card tech-card-enter group ${rounded} 
-          flex flex-col items-center justify-center gap-2 p-2 cursor-pointer
+          flex flex-col items-center justify-center gap-1 p-2   cursor-pointer
           transition-all duration-300 
           bg-white/50 dark:bg-gray-900/30
           hover:transform hover:-translate-y-1 hover:scale-105
-          md:min-h-24 md:p-1`}
+          md:min-h-20 md:min-w-30 md:p-1`}
   data-tech-name={name}
   style={`--tech-color: ${hex}; --tech-color-alpha: ${hexAlpha}; --tech-color-alpha-hover: ${hex}40; --tech-color-border: ${hex}4D; --tech-color-border-hover: ${hex}CC`}
 >
   <!-- Icono -->
   <div
-    class={`${color} flex-shrink-0 w-10 h-10 flex items-center justify-center transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-105`}
+    class={`${color} flex-shrink-0 w-8 h-8 flex items-center justify-center transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-105`}
   >
     {
       icon.startsWith('/') ? (

@@ -1,0 +1,80 @@
+@layer techstack {
+  /* ==========================================================================
+     TECH STACK - Variables CSS complejas
+     ========================================================================== */
+
+  .tech-card {
+    --tech-color: #ffbf00;
+    --tech-color-alpha: rgba(255, 191, 0, 0.12);
+    --tech-color-alpha-hover: rgba(255, 191, 0, 0.25);
+    --tech-color-border: rgba(255, 191, 0, 0.3);
+    --tech-color-border-hover: rgba(255, 191, 0, 0.8);
+
+    @apply relative rounded-2xl border transition-all duration-700;
+    border-color: var(--tech-color-border);
+    background: linear-gradient(135deg, var(--tech-color-alpha), transparent);
+  }
+
+  .tech-card::before {
+    content: '';
+    @apply absolute -inset-px -z-10 rounded-2xl opacity-0 transition-all duration-700;
+    background: linear-gradient(
+      45deg,
+      var(--tech-color),
+      var(--tech-color-alpha-hover),
+      var(--tech-color)
+    );
+    background-size: 300%;
+    filter: blur(8px);
+    animation: glowing 8s ease-in-out infinite;
+    transition-timing-function: theme(ease.spring);
+  }
+
+  .tech-card:hover::before {
+    @apply scale-105 opacity-70;
+    filter: blur(12px);
+  }
+
+  .tech-card:hover {
+    border-color: var(--tech-color-border-hover);
+    background: linear-gradient(
+      135deg,
+      var(--tech-color-alpha-hover),
+      rgba(255, 255, 255, 0.05)
+    );
+    box-shadow: 0 8px 24px var(--tech-color-alpha-hover);
+  }
+
+  .tech-enter {
+    @apply translate-y-7 opacity-0;
+    animation: fadeInUp 0.6s ease-out forwards;
+  }
+
+  .tech-enter:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+  .tech-enter:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  .tech-enter:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  .tech-enter:nth-child(4) {
+    animation-delay: 0.4s;
+  }
+  .tech-enter:nth-child(5) {
+    animation-delay: 0.5s;
+  }
+  .tech-enter:nth-child(6) {
+    animation-delay: 0.6s;
+  }
+  .tech-enter:nth-child(7) {
+    animation-delay: 0.7s;
+  }
+  .tech-enter:nth-child(8) {
+    animation-delay: 0.8s;
+  }
+  .tech-enter:nth-child(9) {
+    animation-delay: 0.9s;
+  }
+}
