@@ -1,588 +1,277 @@
-/* vscode-disable */
-/* 
-  Aquí van utilidades, animaciones y estilos compartidos por componentes. */
-
 /* Importa Tailwind (no mover) */
 @import 'tailwindcss';
 @custom-variant dark (&:where(.dark, .dark *));
+
+/* ==========================================================================
+   TEMA PERSONALIZADO 
+   ========================================================================== */
 @theme {
   --breakpoint-xs: 32rem;
+  --color-amber-950: oklch(0.15 0.05 45);
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 /* ==========================================================================
-  EFECTO DE BRILLO HOVER
-  ========================================================================== */
-/* Efecto glow reutilizable para botones y tarjetas. Ajusta colores en pseudo-elementos. */
+   ANIMACIONES KEYFRAME 
+   ========================================================================== */
 
-.glow-hover {
-  position: relative;
-  z-index: 1;
-  background: transparent;
-  transition: all 1000ms ease;
-}
-
-.glow-hover:not(.tech-icon-container):before {
-  content: '';
-  background: linear-gradient(
-    45deg,
-    #673e00 0%,
-    #9a5f00 25%,
-    #b8860b 50%,
-    #daa520aa 75%,
-    #f4e4bc69 100%
-  );
-  position: absolute;
-  top: -1px;
-  left: -1px;
-  background-size: 300%;
-  z-index: -10;
-  filter: blur(8px);
-  width: calc(100% + 2px);
-  height: calc(100% + 2px);
-  animation: glowing 8s ease-in-out infinite;
-  opacity: 0;
-  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 12px;
-}
-
-.glow-hover:not(.tech-icon-container):hover:before {
-  opacity: 0.7;
-  filter: blur(12px);
-  transform: scale(1.05);
-}
-
-/* Efecto minimalista de background en hover que respeta el contenedor */
-.glow-hover:hover::after {
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.15),
-    inset 0 0 12px rgba(245, 158, 11, 0.08);
-}
-
-.glow-hover:hover {
-  transform: translateY(-2px) scale(1.02);
-  filter: brightness(1.1);
-}
-
-.glow-hover:after {
-  z-index: -1;
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: transparent;
-  left: 0;
-  top: 0;
-  border-radius: 10px;
-}
-
-/* ==========================================================================
-  ANIMACIONES KEYFRAME
-  ========================================================================== */
-
-/* Animaciones reutilizables (entradas y brillo). Cambia duración aquí si hace falta. */
-
-/* Efecto de brillo respiratorio con escalado sutil */
 @keyframes glowing {
-  0% {
-    background-position: 0% 0%;
+  0%,
+  100% {
+    background-position: 0% 50%;
     transform: scale(1) rotate(0deg);
   }
-  25% {
+  50% {
     background-position: 100% 50%;
     transform: scale(1.02) rotate(1deg);
   }
-  50% {
-    background-position: 200% 100%;
-    transform: scale(1.05) rotate(0deg);
-  }
-  75% {
-    background-position: 100% 50%;
-    transform: scale(1.02) rotate(-1deg);
-  }
-  100% {
-    background-position: 0% 0%;
-    transform: scale(1) rotate(0deg);
-  }
 }
 
-/* Animación de entrada para iconos del tech stack */
 @keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-/*! ==========================================================================
-  CAPA DE COMPONENTES - CSS ESTÁNDAR (Sin @apply)
-  ========================================================================== */
-
-/* Estilos de componentes (botones, navbar, tech-stack). CSS estándar compatible con Tailwind v4. */
-
 /* ==========================================================================
-   COMPONENTES UTILITARIOS
+   PROPIEDADES CSS QUE NO EXISTEN EN TAILWIND
    ========================================================================== */
 
-/* Fondo overlay de modal */
-.backdrop {
-  position: fixed;
-  inset: 0;
-  top: 0;
-  left: 0;
-  z-index: 40;
-  background-color: rgb(3 7 18 / 0.5);
-}
-
-/* Efecto de brillo de navbar para modo oscuro */
-.navbar-glow {
-  box-shadow: 0px 0px 47px -19px #ffab2a;
-}
-
-.dark .navbar-glow {
-  box-shadow: 0px 0px 47px -19px #ffab2a;
-}
-
-/* Backdrop blur personalizado para header del navbar */
+/* Backdrop blur personalizado - No disponible como utility en Tailwind */
 .header-backdrop-blur {
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
 }
 
 /* ==========================================================================
-  BOTONES DE NAVEGACIÓN - MODO CLARO
-  Optimizados para fondos claros con tonos ámbar cálidos
-  ========================================================================== */
+   COMPONENTES COMPLEJOS - @layer components
+   ========================================================================== */
 
-.nav-hover-light {
-  /* Estilo base */
-  position: relative;
-  border-radius: 0.5rem;
-  padding: 0.5rem 1rem;
-  color: rgb(146 64 14);
-  transition: all 400ms ease;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 226, 183, 0.6),
-    rgba(255, 255, 255, 0.4)
-  );
-  border: 1px solid rgba(240, 169, 89, 0.2);
-  position: relative;
-  overflow: hidden;
-}
+@layer components {
+  /* ==========================================================================
+     BOTONES DE ACCIÓN - Solo hover/active effects
+     ========================================================================== */
 
-/* Estado activo/presionado */
-.nav-hover-light:active {
-  transform: scale(0.98);
-  color: rgb(120 53 15);
-  background: linear-gradient(
-    135deg,
-    rgba(255, 219, 142, 0.8),
-    rgba(255, 251, 235, 0.7)
-  );
-  border-color: rgba(217, 119, 6, 0.4);
-  box-shadow: inset 0 1px 3px rgba(217, 119, 6, 0.25);
-}
+  .action-button {
+    @apply cursor-pointer rounded-lg p-2 transition-all duration-300;
+  }
 
-/* Estado hover con efecto de elevación */
-.nav-hover-light:hover {
-  transform: scale(1.02);
-  color: rgb(120 53 15);
-  background: linear-gradient(
-    135deg,
-    rgba(254, 252, 232, 0.7),
-    rgba(255, 251, 235, 0.5)
-  );
-  border-color: rgba(248, 134, 3, 0.554);
-  box-shadow:
-    0 2px 8px rgba(255, 229, 195, 0.377),
-    0 4px 12px rgba(254, 254, 254, 0.15);
-}
+  .action-button:hover {
+    @apply scale-110 brightness-110;
+  }
 
-/* Estado active (clase) para página actual - modo claro */
-.nav-hover-light.active {
-  transform: scale(0.98);
-  color: rgb(120 53 15);
-  background: linear-gradient(
-    135deg,
-    rgba(255, 193, 85, 0.414),
-    rgba(255, 226, 183, 0.8)
-  );
-  border: 1px solid rgba(217, 119, 6, 0.5);
-  box-shadow:
-    inset 0 2px 4px rgba(221, 121, 8, 0.3),
-    0 1px 3px rgba(217, 119, 6, 0.2);
-}
+  .action-button:active {
+    @apply scale-95;
+  }
 
-/* ==========================================================================
-  BOTONES DE NAVEGACIÓN - MODO OSCURO
-  Optimizados para fondos oscuros con tonos dorados 
-  ========================================================================== */
-
-.nav-hover-dark {
-  /* Estilo base */
-  position: relative;
-  border-radius: 0.5rem;
-  padding: 0.5rem 1rem;
-  color: rgb(254 243 199);
-  transition: all 400ms ease;
-  background: linear-gradient(
-    135deg,
-    rgba(120, 53, 15, 0.3),
-    rgba(146, 64, 14, 0.2)
-  );
-  border: 1px solid rgba(184, 134, 11, 0.2);
-  position: relative;
-  overflow: hidden;
-}
-
-/* Estado activo/presionado */
-.nav-hover-dark:active {
-  transform: scale(0.98);
-  color: rgb(254 215 170);
-  background: linear-gradient(
-    135deg,
-    rgba(120, 53, 15, 0.6),
-    rgba(146, 64, 14, 0.5)
-  );
-  border-color: rgba(184, 134, 11, 0.4);
-  box-shadow: inset 0 1px 4px rgba(184, 134, 11, 0.3);
-}
-
-/* Estado hover con efecto de elevación */
-.nav-hover-dark:hover {
-  transform: scale(1.02);
-  color: rgb(254 215 170);
-  background: linear-gradient(
-    135deg,
-    rgba(120, 53, 15, 0.4),
-    rgba(146, 64, 14, 0.3)
-  );
-  border-color: rgba(184, 134, 11, 0.3);
-  box-shadow:
-    0 2px 12px rgba(184, 134, 11, 0.3),
-    0 4px 16px rgba(184, 134, 11, 0.15);
-}
-
-/* Estado active (clase) para página actual - modo oscuro */
-.nav-hover-dark.active {
-  transform: scale(0.98);
-  color: rgb(255 251 235);
-  background: linear-gradient(
-    135deg,
-    rgba(184, 134, 11, 0.7),
-    rgba(146, 64, 14, 0.6)
-  );
-  border: 1px solid rgba(184, 134, 11, 0.6);
-  box-shadow:
-    inset 0 2px 4px rgba(184, 134, 11, 0.4),
-    0 2px 8px rgba(184, 134, 11, 0.3);
-}
-
-/* ==========================================================================
-  BOTONES DE NAVEGACIÓN LEGACY
-  Compatibilidad hacia atrás - será deprecado en futuras versiones
-  ========================================================================== */
-
-.nav-hover {
-  position: relative;
-  border-radius: 0.5rem;
-  padding: 0.5rem 1rem;
-  color: rgb(51 65 85);
-  transition: all 400ms ease;
-  background: transparent;
-  border: 1px solid transparent;
-  position: relative;
-  overflow: hidden;
-}
-
-.nav-hover:active {
-  transform: scale(0.98);
-  background-color: rgb(255 251 235);
-  color: rgb(146 64 14);
-  border-color: rgba(218, 165, 32, 0.3);
-  box-shadow: inset 0 1px 3px rgba(218, 165, 32, 0.2);
-}
-
-.nav-hover:hover {
-  transform: scale(1.02);
-  background-color: rgb(255 251 235 / 0.8);
-  color: rgb(146 64 14);
-  border-color: rgba(218, 165, 32, 0.2);
-  box-shadow:
-    0 2px 8px rgba(218, 165, 32, 0.2),
-    0 4px 12px rgba(218, 165, 32, 0.1);
-}
-
-/* Sobrescrituras de modo oscuro para botones legacy */
-.dark .nav-hover {
-  color: rgb(254 243 199);
-}
-
-.dark .nav-hover.active {
-  transform: scale(0.98);
-  background-color: rgb(120 53 15 / 0.3);
-  color: rgb(254 215 170);
-  border-color: rgba(184, 134, 11, 0.4);
-  box-shadow: inset 0 1px 4px rgba(184, 134, 11, 0.3);
-}
-
-.dark .nav-hover:hover {
-  transform: scale(1.02);
-  background-color: rgb(120 53 15 / 0.2);
-  color: rgb(254 215 170);
-  border-color: rgba(184, 134, 11, 0.3);
-  box-shadow:
-    0 2px 12px rgba(184, 134, 11, 0.3),
-    0 4px 16px rgba(184, 134, 11, 0.15);
-}
-
-/* Ajuste para evitar interferencias de pseudo-elementos */
-.glow-hover:before,
-.glow-hover:after {
-  position: absolute;
-  z-index: -10;
-  pointer-events: none;
-}
-
-/* Asegurar que el gap funcione correctamente */
-.nav-hover {
-  display: flex;
-  gap: 1.5rem;
-}
-
-/* ==========================================================================
-    TECH STACK COMPONENT STYLES
-    Estilos específicos para el componente de tecnologías
+  /* ==========================================================================
+    BOTONES DE NAVEGACIÓN - MODO CLARO
+    Optimizados para fondos claros con tonos ámbar cálidos
     ========================================================================== */
-/* Cada tarjeta usa variables CSS (--tech-color...) para controlar su color. */
+  /* Botones para fondos claros. Ajusta gradientes y border-color aquí. */
 
-/* Tech Stack Component Styles - Mejorados para desktop */
-.tech-icon-container {
-  min-height: 80px;
-  min-width: 80px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 1rem;
-  cursor: pointer;
-}
-
-/* En desktop, mostrar el texto siempre */
-@media (min-width: 768px) {
-  .tech-icon-container .tech-label {
-    opacity: 1;
-    transform: none;
-    pointer-events: auto;
-    position: static;
-    margin-top: 0.5rem;
-    white-space: normal;
+  .nav-hover-light {
+    /* Estilo base */
+    @apply relative rounded-lg px-4 py-2 text-amber-800 transition-all duration-400;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 226, 183, 0.6),
+      rgba(255, 255, 255, 0.4)
+    );
+    border: 1px solid rgba(240, 169, 89, 0.2);
+    position: relative;
+    overflow: hidden;
   }
 
-  .tech-icon-container {
-    min-height: 100px;
-    padding: 1.5rem 1rem;
+  /* Estado activo/presionado */
+  .nav-hover-light:active {
+    @apply scale-98 text-amber-700;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 219, 142, 0.8),
+      rgba(255, 251, 235, 0.7)
+    );
+    border-color: rgba(217, 119, 6, 0.4);
+    box-shadow: inset 0 1px 3px rgba(217, 119, 6, 0.25);
   }
 
-  /* Mejor espaciado en desktop */
-  .tech-stack-card {
-    max-width: 100%;
-    width: 100%;
-  }
-}
-
-/* Móvil: mantener labels en hover */
-@media (max-width: 767px) {
-  .tech-icon-container .tech-label {
-    opacity: 0;
-    transform: translateX(-50%) translateY(8px);
-    transition:
-      opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    pointer-events: none;
-    position: absolute;
-    bottom: 6px;
-    left: 50%;
-    white-space: nowrap;
+  /* Estado hover con efecto de elevación */
+  .nav-hover-light:hover {
+    @apply scale-102 text-amber-700;
+    background: linear-gradient(
+      135deg,
+      rgba(254, 252, 232, 0.7),
+      rgba(255, 251, 235, 0.5)
+    );
+    border-color: rgba(248, 134, 3, 0.554);
+    box-shadow:
+      0 2px 8px rgba(255, 229, 195, 0.377),
+      0 4px 12px rgba(254, 254, 254, 0.15);
   }
 
-  .tech-icon-container:hover .tech-label {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-    pointer-events: auto;
-  }
-}
-
-.tech-icon-container:hover {
-  transform: translateY(-4px);
-}
-
-/* Mejora del efecto glow para los iconos de tecnologías */
-.tech-icon-container.glow-hover:before {
-  content: '';
-  background: linear-gradient(
-    45deg,
-    var(--tech-color),
-    var(--tech-color-alpha-hover),
-    var(--tech-color),
-    var(--tech-color-alpha-hover),
-    var(--tech-color-alpha)
-  );
-  position: absolute;
-  top: -1px;
-  left: -1px;
-  background-size: 300%;
-  z-index: -10;
-  filter: blur(8px);
-  width: calc(100% + 2px);
-  height: calc(100% + 2px);
-  animation: glowing 8s ease-in-out infinite;
-  opacity: 0;
-  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 16px;
-}
-
-.tech-icon-container.glow-hover:hover:before {
-  opacity: 0.7;
-  filter: blur(12px);
-  transform: scale(1.05);
-}
-
-/* Animación de entrada para los iconos */
-.tech-icon-container {
-  opacity: 0;
-  transform: translateY(30px);
-  animation: fadeInUp 0.6s ease-out forwards;
-}
-
-.tech-icon-container:nth-child(1) {
-  animation-delay: 0.1s;
-}
-.tech-icon-container:nth-child(2) {
-  animation-delay: 0.2s;
-}
-.tech-icon-container:nth-child(3) {
-  animation-delay: 0.3s;
-}
-.tech-icon-container:nth-child(4) {
-  animation-delay: 0.4s;
-}
-.tech-icon-container:nth-child(5) {
-  animation-delay: 0.5s;
-}
-.tech-icon-container:nth-child(6) {
-  animation-delay: 0.6s;
-}
-.tech-icon-container:nth-child(7) {
-  animation-delay: 0.7s;
-}
-.tech-icon-container:nth-child(8) {
-  animation-delay: 0.8s;
-}
-.tech-icon-container:nth-child(9) {
-  animation-delay: 0.9s;
-}
-
-/* Usar variables CSS definidas por cada tarjeta para colores personalizados */
-.tech-icon-container {
-  --tech-color: #ffbf00; /* fallback */
-  --tech-color-alpha: rgba(255, 191, 0, 0.12);
-  --tech-color-alpha-hover: rgba(255, 191, 0, 0.25);
-  --tech-color-border: rgba(255, 191, 0, 0.3);
-  --tech-color-border-hover: rgba(255, 191, 0, 0.8);
-  border: 1px solid var(--tech-color-border);
-  background: linear-gradient(135deg, var(--tech-color-alpha), transparent);
-  transition: all 0.3s ease;
-}
-
-.tech-icon-container:hover {
-  box-shadow: 0 8px 24px var(--tech-color-alpha-hover);
-  border-color: var(--tech-color-border-hover);
-  background: linear-gradient(
-    135deg,
-    var(--tech-color-alpha-hover),
-    rgba(255, 255, 255, 0.05)
-  );
-  transform: translateY(-4px) scale(1.05);
-}
-
-/* Animación de ícono y texto en tech stack - Mejorado para desktop */
-.tech-icon-container .tech-icon {
-  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: translateY(0);
-  will-change: transform;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
-}
-
-.tech-icon-container .tech-icon img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.tech-icon-container .tech-icon svg {
-  width: 2.5rem;
-  height: 2.5rem;
-}
-
-.tech-icon-container:hover .tech-icon {
-  transform: translateY(-4px) scale(1.05);
-}
-
-.tech-icon-container .tech-label {
-  transition:
-    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  white-space: nowrap;
-  text-align: center;
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-/* Estados por defecto móvil */
-@media (max-width: 767px) {
-  .tech-icon-container .tech-label {
-    opacity: 0;
-    transform: translateX(-50%) translateY(8px);
-    pointer-events: none;
-    position: absolute;
-    bottom: 6px;
-    left: 50%;
+  /* Estado active (clase) para página actual - modo claro */
+  .nav-hover-light.active {
+    @apply scale-98 text-amber-900;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 193, 85, 0.414),
+      rgba(255, 226, 183, 0.8)
+    );
+    border: 1px solid rgba(217, 119, 6, 0.5);
+    box-shadow:
+      inset 0 2px 4px rgba(221, 121, 8, 0.3),
+      0 1px 3px rgba(217, 119, 6, 0.2);
   }
 
-  .tech-icon-container:hover .tech-label {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-    pointer-events: auto;
-  }
-}
+  /* ==========================================================================
+    BOTONES DE NAVEGACIÓN - MODO OSCURO
+    Optimizados para fondos oscuros con tonos dorados 
+    ========================================================================== */
+  /* Botones para modo oscuro. Mantén contrastes altos para accesibilidad. */
 
-/* Estados por defecto desktop */
-@media (min-width: 768px) {
-  .tech-icon-container .tech-label {
-    opacity: 1;
-    transform: none;
-    pointer-events: auto;
-    position: static;
-    margin-top: 0.5rem;
-    white-space: normal;
-  }
-
-  .tech-icon-container {
-    min-height: 100px;
-    padding: 1.5rem 1rem;
+  .nav-hover-dark {
+    /* Estilo base */
+    @apply relative rounded-lg px-4 py-2 text-amber-100 transition-all duration-400;
+    background: linear-gradient(
+      135deg,
+      rgba(120, 53, 15, 0.3),
+      rgba(146, 64, 14, 0.2)
+    );
+    border: 1px solid rgba(184, 134, 11, 0.2);
+    position: relative;
+    overflow: hidden;
   }
 
-  /* Mejor espaciado en desktop */
-  .tech-stack-card {
-    max-width: 100%;
-    width: 100%;
+  /* Estado activo/presionado */
+  .nav-hover-dark:active {
+    @apply scale-98 text-amber-200;
+    background: linear-gradient(
+      135deg,
+      rgba(120, 53, 15, 0.6),
+      rgba(146, 64, 14, 0.5)
+    );
+    border-color: rgba(184, 134, 11, 0.4);
+    box-shadow: inset 0 1px 4px rgba(184, 134, 11, 0.3);
+  }
+
+  /* Estado hover con efecto de elevación */
+  .nav-hover-dark:hover {
+    @apply scale-102 text-amber-200;
+    background: linear-gradient(
+      135deg,
+      rgba(120, 53, 15, 0.4),
+      rgba(146, 64, 14, 0.3)
+    );
+    border-color: rgba(184, 134, 11, 0.3);
+    box-shadow:
+      0 2px 12px rgba(184, 134, 11, 0.3),
+      0 4px 16px rgba(184, 134, 11, 0.15);
+  }
+
+  /* Estado active (clase) para página actual - modo oscuro */
+  .nav-hover-dark.active {
+    @apply scale-98 text-amber-50;
+    background: linear-gradient(
+      135deg,
+      rgba(184, 134, 11, 0.7),
+      rgba(146, 64, 14, 0.6)
+    );
+    border: 1px solid rgba(184, 134, 11, 0.6);
+    box-shadow:
+      inset 0 2px 4px rgba(184, 134, 11, 0.4),
+      0 2px 8px rgba(184, 134, 11, 0.3);
+  }
+
+  /* ==========================================================================
+     TECH STACK - Variables CSS complejas
+     ========================================================================== */
+
+  .tech-card {
+    --tech-color: #ffbf00;
+    --tech-color-alpha: rgba(255, 191, 0, 0.12);
+    --tech-color-alpha-hover: rgba(255, 191, 0, 0.25);
+    --tech-color-border: rgba(255, 191, 0, 0.3);
+    --tech-color-border-hover: rgba(255, 191, 0, 0.8);
+
+    @apply relative rounded-2xl border transition-all duration-700;
+    border-color: var(--tech-color-border);
+    background: linear-gradient(135deg, var(--tech-color-alpha), transparent);
+  }
+
+  .tech-card::before {
+    content: '';
+    @apply absolute -inset-px -z-10 rounded-2xl opacity-0 transition-all duration-700;
+    background: linear-gradient(
+      45deg,
+      var(--tech-color),
+      var(--tech-color-alpha-hover),
+      var(--tech-color)
+    );
+    background-size: 300%;
+    filter: blur(8px);
+    animation: glowing 8s ease-in-out infinite;
+    transition-timing-function: theme(ease.spring);
+  }
+
+  .tech-card:hover::before {
+    @apply scale-105 opacity-70;
+    filter: blur(12px);
+  }
+
+  .tech-card:hover {
+    border-color: var(--tech-color-border-hover);
+    background: linear-gradient(
+      135deg,
+      var(--tech-color-alpha-hover),
+      rgba(255, 255, 255, 0.05)
+    );
+    box-shadow: 0 8px 24px var(--tech-color-alpha-hover);
+  }
+
+  /* ==========================================================================
+     UTILIDADES ESPECÍFICAS
+     ========================================================================== */
+
+  .navbar-glow {
+    @apply dark:shadow-[0px_0px_47px_-19px_#ffab2a];
+  }
+
+  /* Tech stack staggered animations */
+  .tech-enter {
+    @apply translate-y-7 opacity-0;
+    animation: fadeInUp 0.6s ease-out forwards;
+  }
+
+  .tech-enter:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+  .tech-enter:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  .tech-enter:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  .tech-enter:nth-child(4) {
+    animation-delay: 0.4s;
+  }
+  .tech-enter:nth-child(5) {
+    animation-delay: 0.5s;
+  }
+  .tech-enter:nth-child(6) {
+    animation-delay: 0.6s;
+  }
+  .tech-enter:nth-child(7) {
+    animation-delay: 0.7s;
+  }
+  .tech-enter:nth-child(8) {
+    animation-delay: 0.8s;
+  }
+  .tech-enter:nth-child(9) {
+    animation-delay: 0.9s;
   }
 }

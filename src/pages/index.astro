@@ -1,4 +1,5 @@
 ---
+// index.astro - Refactorizado usando principalmente Tailwind
 import Card from '../components/Cards/Card.astro';
 import Layout from '../layouts/Layout.astro';
 import TimelineItem from '../components/TimelineItem.astro';
@@ -14,17 +15,25 @@ import '../styles/global.css';
 ---
 
 <Layout>
+  <!-- Sección Hero -->
   <section id="home" class="flex flex-col py-20">
     <article class="mx-auto text-pretty text-gray-950 dark:text-white">
+      <!-- Presentación personal -->
       <div class="mb-12 flex flex-col items-center gap-8 md:flex-row">
         <img
           src={meImage.src}
           alt="Joaquin Calligaro"
-          class="h-48 w-48 rounded-full sm:h-72 sm:w-72 md:h-56 md:w-56"
+          class="h-48 w-48 rounded-full object-cover shadow-lg ring-4 ring-amber-200 transition-all duration-300 hover:scale-105 hover:shadow-xl sm:h-72 sm:w-72 md:h-56 md:w-56 dark:ring-amber-800"
         />
         <div class="flex flex-col gap-4 text-center md:text-left">
-          <h1 class="text-4xl font-bold md:text-6xl">Joaquin Calligaro</h1>
-          <p class="max-w-3xl text-lg text-gray-600 dark:text-gray-300">
+          <h1
+            class="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-4xl font-bold tracking-tight text-transparent md:text-6xl dark:from-white dark:to-gray-300"
+          >
+            Joaquin Calligaro
+          </h1>
+          <p
+            class="max-w-3xl text-lg leading-relaxed text-gray-600 dark:text-gray-300"
+          >
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Vel
             laudantium reiciendis impedit voluptatum! Harum aliquid, sint vero
             officia molestiae tempore voluptates, corporis expedita facere
@@ -33,128 +42,182 @@ import '../styles/global.css';
         </div>
       </div>
 
-      <!-- Tech Stack Section - Separado del contenido personal -->
-      <div class="mt-12 w-full">
-        <TechStack className="card techstack-container w-full" />
+      <!-- Tech Stack Section -->
+      <div class="mb-16 w-full">
+        <TechStack className="w-full" />
       </div>
-      <div class="mt-30 flex flex-col gap-6">
-        <h2 class="text-xl font-bold sm:text-2xl">Mis Proyectos</h2>
-        <div class="relative flex flex-col gap-4 overflow-hidden sm:flex-row">
-          <Card className="card">
+
+      <!-- Preview de Proyectos -->
+      <div class="flex flex-col gap-6">
+        <h2
+          class="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-white"
+        >
+          Mis Proyectos Destacados
+        </h2>
+        <div class="grid gap-6 sm:grid-cols-2">
+          <!-- Proyecto 1 -->
+          <Card
+            className="group transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+          >
             <div
-              class="grid w-fit place-content-center rounded-full bg-blue-50 p-4 text-blue-500 dark:bg-blue-950/30 dark:text-blue-700"
+              class="mb-4 grid w-fit place-content-center rounded-full bg-blue-50 p-4 text-blue-500 transition-all duration-300 group-hover:scale-110 group-hover:bg-blue-100 dark:bg-blue-950/30 dark:text-blue-400 dark:group-hover:bg-blue-900/50"
             >
               <svg
-                class="size-8"
+                class="h-8 w-8"
                 fill="currentColor"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 640 512"
-                ><path
-                  d="M128 32C92.7 32 64 60.7 64 96l0 256 64 0 0-256 384 0 0 256 64 0 0-256c0-35.3-28.7-64-64-64L128 32zM19.2 384C8.6 384 0 392.6 0 403.2C0 445.6 34.4 480 76.8 480l486.4 0c42.4 0 76.8-34.4 76.8-76.8c0-10.6-8.6-19.2-19.2-19.2L19.2 384z"
-                ></path></svg
               >
+                <path
+                  d="M128 32C92.7 32 64 60.7 64 96l0 256 64 0 0-256 384 0 0 256 64 0 0-256c0-35.3-28.7-64-64-64L128 32zM19.2 384C8.6 384 0 392.6 0 403.2C0 445.6 34.4 480 76.8 480l486.4 0c42.4 0 76.8-34.4 76.8-76.8c0-10.6-8.6-19.2-19.2-19.2L19.2 384z"
+                ></path>
+              </svg>
             </div>
-            <h2 class="text-lg font-semibold sm:text-xl md:text-2xl">
+            <h3
+              class="mb-3 text-lg font-semibold text-gray-900 transition-colors duration-300 group-hover:text-blue-600 sm:text-xl md:text-2xl dark:text-white dark:group-hover:text-blue-400"
+            >
               Proyecto 1
-            </h2>
-            <p class="text-sm text-gray-600 sm:text-base dark:text-gray-400">
+            </h3>
+            <p
+              class="text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-400"
+            >
               Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quas
               iusto tempore ratione. Deserunt ratione eligendi saepe.
               Voluptatibus in odit maxime asperiores ipsum vitae, illum, neque,
               veniam consequuntur earum ab! Perspiciatis!
-              <span class="text-blue-700 dark:text-blue-500"
+              <span class="font-medium text-blue-600 dark:text-blue-400"
                 >Angular and Astro</span
-              >. Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-              Reiciendis amet, qui molestias dicta quos quae architecto dolore,
-              sed minima asperiores quas, earum consequuntur repudiandae enim
-              delectus quod exercitationem voluptatem distinctio?e.
+              >.
             </p>
           </Card>
-          <Card className="card">
+
+          <!-- Proyecto 2 -->
+          <Card
+            className="group transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+          >
             <div
-              class="grid w-fit place-content-center rounded-full bg-yellow-50 p-4 text-yellow-500 dark:bg-yellow-950/30 dark:text-yellow-700"
+              class="mb-4 grid w-fit place-content-center rounded-full bg-yellow-50 p-4 text-yellow-500 transition-all duration-300 group-hover:scale-110 group-hover:bg-yellow-100 dark:bg-yellow-950/30 dark:text-yellow-400 dark:group-hover:bg-yellow-900/50"
             >
               <svg
-                class="size-8"
+                class="h-8 w-8"
                 fill="currentColor"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 512 512"
-                ><path
-                  d="M64 32C28.7 32 0 60.7 0 96l0 64c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-64c0-35.3-28.7-64-64-64L64 32zm280 72a24 24 0 1 1 0 48 24 24 0 1 1 0-48zm48 24a24 24 0 1 1 48 0 24 24 0 1 1 -48 0zM64 288c-35.3 0-64 28.7-64 64l0 64c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-64c0-35.3-28.7-64-64-64L64 288zm280 72a24 24 0 1 1 0 48 24 24 0 1 1 0-48zm56 24a24 24 0 1 1 48 0 24 24 0 1 1 -48 0z"
-                ></path></svg
               >
+                <path
+                  d="M64 32C28.7 32 0 60.7 0 96l0 64c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-64c0-35.3-28.7-64-64-64L64 32zm280 72a24 24 0 1 1 0 48 24 24 0 1 1 0-48zm48 24a24 24 0 1 1 48 0 24 24 0 1 1 -48 0zM64 288c-35.3 0-64 28.7-64 64l0 64c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-64c0-35.3-28.7-64-64-64L64 288zm280 72a24 24 0 1 1 0 48 24 24 0 1 1 0-48zm56 24a24 24 0 1 1 48 0 24 24 0 1 1 -48 0z"
+                ></path>
+              </svg>
             </div>
-            <h2 class="text-lg font-semibold sm:text-xl md:text-2xl">
+            <h3
+              class="mb-3 text-lg font-semibold text-gray-900 transition-colors duration-300 group-hover:text-yellow-600 sm:text-xl md:text-2xl dark:text-white dark:group-hover:text-yellow-400"
+            >
               Proyecto 2
-            </h2>
-            <p class="text-sm text-gray-600 sm:text-base dark:text-gray-400">
+            </h3>
+            <p
+              class="text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-400"
+            >
               Lorem ipsum dolor sit amet consectetur, adipisicing elit. Illo,
               enim, alias quis sed iure sapiente vitae quibusdam cum a dolores
               tenetur error. Repudiandae aliquid, officiis ullam architecto
-              eligendi beatae unde. <span
-                class="text-yellow-700 dark:text-yellow-500"
+              eligendi beatae unde.
+              <span class="font-medium text-yellow-600 dark:text-yellow-400"
                 >NestJS and Express</span
-              >. Lorem ipsum dolor sit amet consectetur adipisicing elit. Sint
-              recusandae voluptate sit odio vero numquam quod praesentium
-              excepturi quos quis rem ea maxime commodi ipsa illum, repellat
-              nisi quisquam perferendis.
+              >.
             </p>
           </Card>
         </div>
       </div>
     </article>
   </section>
-  <section id="about" class="flex flex-col">
+
+  <!-- Sección Sobre Mí -->
+  <section id="about" class="flex flex-col py-16">
     <h2
-      class="mb-8 text-2xl font-bold text-gray-950 md:text-4xl dark:text-white"
+      class="mb-8 text-2xl font-bold tracking-tight text-gray-950 md:text-4xl dark:text-white"
     >
-      Sobre Mi
+      Sobre Mí
     </h2>
-    <article class="flex flex-col gap-4 p-4 md:flex-row">
-      <Card className="h-fit text-gray-600 dark:text-gray-400">
-        <div class="flex flex-col gap-2 text-sm sm:text-base">
-          <h3
-            class="text-lg font-semibold text-gray-950 sm:text-xl dark:text-white"
-          >
-            Short Bio 🧬
-          </h3>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure illo
-            distinctio inventore illum consequuntur eveniet nobis officiis sequi
-            aspernatur optio nulla, quisquam sit voluptatibus velit cum, minima
-            excepturi, numquam explicabo.
-          </p>
-          <p>
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Enim
-            molestias adipisci illum quam eaque perspiciatis saepe rerum
-            voluptates cum consectetur? Accusantium reiciendis adipisci error
-            corrupti pariatur exercitationem quaerat porro eveniet!
-          </p>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel animi
-            enim rerum perferendis. Distinctio itaque dolores mollitia id, vitae
-            necessitatibus earum sed maxime illum sequi impedit nihil. Minus,
-            quos non!
-          </p>
-        </div>
-        <div class="flex flex-col gap-2">
-          <h3
-            class="text-lg font-semibold text-gray-950 sm:text-xl dark:text-white"
-          >
-            Informacion CV
-          </h3>
-          <a
-            href="/docs/cv.pdf"
-            role="button"
-            aria-label="Descargar CV"
-            download
-            class="w-fit rounded-md bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 focus:outline-hidden dark:bg-blue-700 dark:hover:bg-blue-800 dark:focus:ring-blue-950"
-            >Descargar CV</a
-          >
+    <article class="flex flex-col gap-6 md:flex-row">
+      <!-- Bio y CV -->
+      <Card
+        className="flex-1 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+      >
+        <div class="flex flex-col gap-6">
+          <div class="flex flex-col gap-4">
+            <h3
+              class="flex items-center gap-2 text-lg font-semibold text-gray-950 sm:text-xl dark:text-white"
+            >
+              Short Bio
+              <span class="text-2xl">🧬</span>
+            </h3>
+            <div
+              class="space-y-4 text-sm text-gray-600 sm:text-base dark:text-gray-400"
+            >
+              <p class="leading-relaxed">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure
+                illo distinctio inventore illum consequuntur eveniet nobis
+                officiis sequi aspernatur optio nulla, quisquam sit voluptatibus
+                velit cum, minima excepturi, numquam explicabo.
+              </p>
+              <p class="leading-relaxed">
+                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Enim
+                molestias adipisci illum quam eaque perspiciatis saepe rerum
+                voluptates cum consectetur? Accusantium reiciendis adipisci
+                error corrupti pariatur exercitationem quaerat porro eveniet!
+              </p>
+              <p class="leading-relaxed">
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel
+                animi enim rerum perferendis. Distinctio itaque dolores mollitia
+                id, vitae necessitatibus earum sed maxime illum sequi impedit
+                nihil. Minus, quos non!
+              </p>
+            </div>
+          </div>
+
+          <!-- CV Download -->
+          <div class="flex flex-col gap-3">
+            <h3
+              class="text-lg font-semibold text-gray-950 sm:text-xl dark:text-white"
+            >
+              Información CV
+            </h3>
+            <a
+              href="/docs/cv.pdf"
+              role="button"
+              aria-label="Descargar CV"
+              download
+              class="inline-flex w-fit items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-lg focus:ring-4 focus:ring-blue-200 focus:outline-none dark:bg-blue-700 dark:hover:bg-blue-800 dark:focus:ring-blue-900"
+            >
+              <svg
+                class="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                ></path>
+              </svg>
+              Descargar CV
+            </a>
+          </div>
         </div>
       </Card>
-      <Card className="p-8">
-        <ol class="relative border-s border-gray-300 dark:border-neutral-800">
+
+      <!-- Timeline de Experiencia -->
+      <Card
+        className="flex-1 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+      >
+        <h3
+          class="mb-6 text-lg font-semibold text-gray-950 sm:text-xl dark:text-white"
+        >
+          Experiencia Profesional
+        </h3>
+        <ol class="relative border-s-2 border-gray-300 dark:border-neutral-700">
           {
             EXPERIENCES.map((experience) => (
               <TimelineItem
@@ -164,7 +227,7 @@ import '../styles/global.css';
               >
                 <div
                   slot="icon"
-                  class="size-full p-1"
+                  class="flex h-full w-full items-center justify-center p-1 transition-all duration-300 group-hover:scale-110"
                   set:html={experience.svgIcon}
                 />
               </TimelineItem>
@@ -174,62 +237,91 @@ import '../styles/global.css';
       </Card>
     </article>
   </section>
-  <section id="projects" class="flex flex-col">
+
+  <!-- Sección Proyectos -->
+  <section id="projects" class="flex flex-col py-16">
     <h2
-      class="ms-auto mb-8 text-end text-2xl font-bold text-gray-950 md:text-4xl dark:text-white"
+      class="ms-auto mb-8 text-end text-2xl font-bold tracking-tight text-gray-950 md:text-4xl dark:text-white"
     >
-      Titulo
+      Mis Proyectos
     </h2>
-    <div class="grid grid-cols-1 gap-6 p-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {
         PROJECTS.filter((__, i) => i < 3).map((project) => (
-          <Project project={project} />
+          <div class="transition-all duration-300 hover:-translate-y-1">
+            <Project project={project} />
+          </div>
         ))
       }
     </div>
-    <div class="mt-6 flex justify-center">
+    <div class="mt-8 flex justify-center">
       <a
         role="button"
         href="/projects"
-        class="rounded-3xl bg-blue-600 px-4 py-2 text-base font-semibold text-white transition-colors duration-300 hover:border hover:border-blue-600 hover:bg-transparent hover:text-blue-600 dark:bg-blue-800 dark:hover:border-blue-800 dark:hover:bg-transparent dark:hover:text-blue-800"
-        >Ver todos los proyectos</a
+        class="inline-flex items-center gap-2 rounded-full border-2 border-transparent bg-blue-600 px-6 py-3 text-base font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-600 hover:bg-transparent hover:text-blue-600 hover:shadow-lg dark:bg-blue-800 dark:hover:border-blue-400 dark:hover:bg-transparent dark:hover:text-blue-400"
       >
+        Ver todos los proyectos
+        <svg
+          class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 5l7 7-7 7"></path>
+        </svg>
+      </a>
     </div>
   </section>
-  <section id="services" class="flex flex-col overflow-hidden">
+
+  <!-- Sección Servicios -->
+  <section id="services" class="flex flex-col overflow-hidden py-16">
     <h2
-      class="mb-8 text-2xl font-bold text-gray-950 md:text-4xl dark:text-white"
+      class="mb-8 text-2xl font-bold tracking-tight text-gray-950 md:text-4xl dark:text-white"
     >
-      Titulo
+      Mis Servicios
     </h2>
-    <article class="grid grid-cols-1 gap-6 p-4 sm:grid-cols-2 lg:grid-cols-3">
-      {SERVICES.map((service) => <CardService service={service} />)}
+    <article class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        SERVICES.map((service) => (
+          <div class="transition-all duration-300 hover:-translate-y-1">
+            <CardService service={service} />
+          </div>
+        ))
+      }
     </article>
   </section>
+
   <HireServiceModal />
 </Layout>
 
 <script>
   import { animate, inView, stagger } from 'motion';
 
-  window.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', () => {
+    // Animación para servicios
     inView('#services', () => {
       animate(
         '.card-service',
         {
-          transform: ['translateY(100%)', 'translateY(0)'],
+          opacity: [0, 1],
+          transform: ['translateY(50px)', 'translateY(0px)'],
         },
         {
-          delay: stagger(0.2),
+          delay: stagger(0.15),
           duration: 0.6,
+          easing: [0.4, 0, 0.2, 1],
         }
       );
     });
 
-    // Animación para las tecnologías
+    // Animación para tech stack
     inView('.tech-stack-card', () => {
       animate(
-        '.tech-stack__item',
+        '.tech-card-enter',
         {
           opacity: [0, 1],
           transform: ['translateY(30px)', 'translateY(0px)'],
@@ -237,6 +329,23 @@ import '../styles/global.css';
         {
           delay: stagger(0.1),
           duration: 0.5,
+          easing: [0.4, 0, 0.2, 1],
+        }
+      );
+    });
+
+    // Animación para proyectos
+    inView('#projects', () => {
+      animate(
+        '#projects .grid > div',
+        {
+          opacity: [0, 1],
+          transform: ['translateY(40px)', 'translateY(0px)'],
+        },
+        {
+          delay: stagger(0.2),
+          duration: 0.6,
+          easing: [0.4, 0, 0.2, 1],
         }
       );
     });

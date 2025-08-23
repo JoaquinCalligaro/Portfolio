@@ -1,7 +1,5 @@
 ---
-// Sección: TechCard
-// Propósito: tarjeta individual de tecnología (icono + label).
-// Props: name, hex, hexAlpha, icon, color?, rounded?
+// TechCard - Refactorizado usando principalmente Tailwind
 interface Props {
   name: string;
   hex: string;
@@ -11,7 +9,6 @@ interface Props {
   rounded?: string;
 }
 
-// Valores por defecto y lectura de props
 const {
   name,
   hex,
@@ -23,22 +20,34 @@ const {
 ---
 
 <div
-  class={`tech-stack__item tech-stack__item--glow group ${rounded} transition-all duration-300 cursor-pointer bg-white/50 dark:bg-gray-900/30 border border-gray-200 dark:border-gray-700`}
+  class={`tech-card tech-card-enter group ${rounded} 
+          flex flex-col items-center justify-center gap-2 p-4 cursor-pointer
+          transition-all duration-300 
+          bg-white/50 dark:bg-gray-900/30
+          hover:transform hover:-translate-y-1 hover:scale-105
+          md:min-h-[100px] md:p-6`}
   data-tech-name={name}
   style={`--tech-color: ${hex}; --tech-color-alpha: ${hexAlpha}; --tech-color-alpha-hover: ${hex}40; --tech-color-border: ${hex}4D; --tech-color-border-hover: ${hex}CC`}
 >
-  <!-- Propiedades de los iconos -->
-  <div class={`tech-stack__icon ${color} flex-shrink-0`}>
+  <!-- Icono -->
+  <div
+    class={`${color} flex-shrink-0 w-10 h-10 flex items-center justify-center transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-105`}
+  >
     {
       icon.startsWith('/') ? (
-        <img src={icon} alt={name} class="h-8 w-8 object-contain" />
+        <img src={icon} alt={name} class="h-full w-full object-contain" />
       ) : (
-        <div set:html={icon} class="flex h-8 w-8 items-center justify-center" />
+        <div
+          set:html={icon}
+          class="flex h-full w-full items-center justify-center"
+        />
       )
     }
   </div>
+
+  <!-- Label -->
   <span
-    class="tech-stack__label mt-2 text-center text-xs font-medium text-gray-700 dark:text-gray-300"
+    class="text-center text-xs font-medium whitespace-nowrap text-gray-700 transition-all duration-300 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 max-md:pointer-events-none max-md:absolute max-md:bottom-1.5 max-md:left-1/2 max-md:-translate-x-1/2 max-md:translate-y-2 max-md:opacity-0 md:static md:mt-2 md:transform-none md:opacity-100 dark:text-gray-300"
   >
     {name}
   </span>

@@ -1,26 +1,23 @@
 ---
-// Sección: Navbar
-// Propósito: barra superior con toggles de idioma y tema (comentarios simplificados)
 import SpanishIcon from '../assets/spanish.svg';
 import EnglishIcon from '../assets/english.svg';
 import MoonIcon from '../assets/moon.svg';
 import SunIcon from '../assets/sun.svg';
-import '../styles/components/navbar.css';
 ---
 
 <header
   id="navbar-header"
-  class="dark:navbar-glow header-backdrop-blur dark:header-backdrop-blur fixed top-0 right-0 left-0 z-50 mx-auto flex max-w-4xl flex-wrap items-center justify-between border-2 border-gray-400/30 bg-gray-400/10 px-5 py-4 transition-transform duration-300 ease-in-out sm:rounded-2xl md:rounded-2xl xl:rounded-2xl dark:border-black/40 dark:bg-black/20"
+  class="header-backdrop-blur dark:navbar-glow fixed top-0 right-0 left-0 z-50 mx-auto flex max-w-4xl flex-wrap items-center justify-between rounded-2xl border-2 border-gray-400/30 bg-gray-400/10 px-5 py-4 transition-transform duration-300 ease-in-out dark:border-black/40 dark:bg-black/20"
 >
   <div></div>
-  <div
-    class="flex min-w-0 items-center justify-end gap-2 px-2 text-gray-900 sm:order-1"
-  >
+
+  <div class="flex items-center gap-3 px-3 text-gray-900 sm:order-1">
+    <!-- Theme Toggle Button -->
     <button
       title="Theme Toggle"
       aria-label="Theme Toggle"
       id="theme-toggle"
-      class="flex cursor-pointer items-center"
+      class="glow-hover action-button flex items-center"
     >
       <SunIcon id="theme-sun-icon" class="mx-2 size-6" aria-label="Sun Icon" />
       <MoonIcon
@@ -29,26 +26,24 @@ import '../styles/components/navbar.css';
         aria-label="Moon Icon"
       />
     </button>
+
+    <!-- Language Toggle Button -->
     <button
       title="Idioma"
       aria-label="Idioma"
       id="lang-toggle"
-      class="flex cursor-pointer items-center justify-center px-3 py-1 dark:text-white"
+      class="glow-hover action-button flex items-center px-3 py-1 dark:text-white"
     >
-      <span id="icon-es" class="flex items-center justify-center"
-        ><SpanishIcon /></span
-      >
-      <span
-        id="icon-en"
-        class="flex items-center justify-center"
-        style="display:none;"><EnglishIcon /></span
-      >
+      <span id="icon-es"><SpanishIcon /></span>
+      <span id="icon-en" style="display:none;"><EnglishIcon /></span>
     </button>
+
+    <!-- Mobile Menu Toggle -->
     <button
       title="Navbar Toggle"
       aria-label="Navbar Toggle"
       id="navbar-toggle"
-      class="sm:hidden dark:text-white"
+      class="glow-hover action-button sm:hidden dark:text-white"
     >
       <svg
         aria-label="Menu Icon"
@@ -60,8 +55,8 @@ import '../styles/components/navbar.css';
       >
         <path
           d="M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l384 0c17.7 0 32 14.3 32 32z"
-        ></path></svg
-      >
+        ></path>
+      </svg>
       <svg
         aria-label="Close Menu Icon"
         id="navbar-x-icon"
@@ -72,22 +67,24 @@ import '../styles/components/navbar.css';
       >
         <path
           d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
-        ></path></svg
-      >
+        ></path>
+      </svg>
     </button>
   </div>
+
   <nav
     id="navbar"
-    class="dark:navbar-glow hidden w-full -translate-y-[200%] rounded-sm p-4 text-sm transition-transform sm:static sm:top-auto sm:right-auto sm:left-auto sm:mt-0 sm:block sm:w-auto sm:translate-y-0 sm:border-none sm:p-0 lg:text-base"
+    class="dark:navbar-glow hidden w-full -translate-y-[200%] rounded-sm p-4 text-sm transition-transform sm:static sm:mt-0 sm:block sm:w-auto sm:translate-y-0 sm:border-none sm:p-0 lg:text-base"
   >
     <ul
       id="navbar-links"
-      class="flex flex-col items-center gap-4 font-semibold sm:flex-row sm:gap-4 md:gap-6 lg:gap-8 xl:gap-8"
+      class="flex flex-col items-center gap-4 font-semibold sm:flex-row sm:gap-6 md:gap-7 lg:gap-8 xl:gap-8"
     >
       <!-- Los links se renderizan por JS -->
     </ul>
   </nav>
 </header>
+
 <script is:inline>
   // Toggle idioma y renderizado dinámico de links
   let lang = localStorage.getItem('lang') || 'ES';
@@ -112,15 +109,14 @@ import '../styles/components/navbar.css';
       const a = document.createElement('a');
       a.href = link;
 
-      // Usar clases específicas (BEM) según el tema
-      let classes = isDark
-        ? ' navbar__link navbar__link--theme-dark xl:text-sm xl:px-3 xl:py-1.2 md:text-md md:px-3 md:py-1.5 sm:text-md sm:px-3 md sm:py-2'
-        : ' navbar__link navbar__link--theme-light xl:text-sm xl:px-3 xl:py-1.2 md:text-md md:px-3 md:py-1.5 sm:text-md  sm:px-3  sm:py-3';
+      // Usar clases optimizadas según el tema
+      let classes = isDark ? 'nav-hover-dark' : 'nav-hover-light';
 
       // Marca como activo si el hash o pathname coincide
       if (link === currentHash) {
-        classes += ' navbar__link--active';
+        classes += ' active';
       }
+
       a.className = classes;
       a.textContent = names[i];
       li.appendChild(a);
@@ -129,9 +125,7 @@ import '../styles/components/navbar.css';
   }
 
   // Actualiza el link activo al navegar por hash
-  window.addEventListener('hashchange', () => {
-    renderLinks();
-  });
+  window.addEventListener('hashchange', renderLinks);
 
   function updateLangIcon() {
     if (lang === 'ES') {
@@ -143,9 +137,11 @@ import '../styles/components/navbar.css';
     }
   }
 
+  // Inicialización
   renderLinks();
   updateLangIcon();
 
+  // Event listener para cambio de idioma
   langToggle.addEventListener('click', () => {
     lang = lang === 'ES' ? 'EN' : 'ES';
     localStorage.setItem('lang', lang);
@@ -159,26 +155,22 @@ import '../styles/components/navbar.css';
   const navbarXIcon = document.getElementById('navbar-x-icon');
   const navbarMenuIcon = document.getElementById('navbar-menu-icon');
 
-  if (navbarToggle instanceof HTMLButtonElement) {
+  if (navbarToggle) {
     navbarToggle.addEventListener('click', () => {
-      navbarXIcon.classList.toggle('hidden');
-      navbarMenuIcon.classList.toggle('hidden');
-      navbar.classList.toggle('hidden');
+      if (navbarXIcon) navbarXIcon.classList.toggle('hidden');
+      if (navbarMenuIcon) navbarMenuIcon.classList.toggle('hidden');
+      if (navbar) navbar.classList.toggle('hidden');
 
-      // Añadir transición suave al body
+      // Transición suave para el body
       document.body.style.transition = 'padding-top 0.6s ease-in-out 0.4s';
 
-      // Añadir o quitar margen superior al body para hacer espacio al menú
-      const isMenuOpen = !navbar.classList.contains('hidden');
-      if (isMenuOpen) {
-        document.body.style.paddingTop = '250px'; // Ajustar según la altura del menú
-      } else {
-        document.body.style.paddingTop = '20px'; // Margen normal para el navbar fijo
-      }
+      // Ajustar padding del body según estado del menú
+      const isMenuOpen = navbar && !navbar.classList.contains('hidden');
+      document.body.style.paddingTop = isMenuOpen ? '250px' : '20px';
 
       setTimeout(() => {
-        navbar.classList.toggle('-translate-y-[200%]');
-      });
+        if (navbar) navbar.classList.toggle('-translate-y-[200%]');
+      }, 10);
     });
   }
 
@@ -187,20 +179,21 @@ import '../styles/components/navbar.css';
   const themeMoonIcon = document.getElementById('theme-moon-icon');
   const themeSunIcon = document.getElementById('theme-sun-icon');
 
-  const isDarkColorThemeSet =
-    'color-theme' in localStorage &&
-    localStorage.getItem('color-theme') === 'dark';
+  // Detectar preferencias del usuario
+  const isDarkColorThemeSet = localStorage.getItem('color-theme') === 'dark';
   const userPrefersDarkTheme =
     window.matchMedia('(prefers-color-scheme: dark)').matches &&
-    !('color-theme' in localStorage);
+    !localStorage.getItem('color-theme');
 
+  // Aplicar tema inicial
   if (isDarkColorThemeSet || userPrefersDarkTheme) {
     setDarkTheme();
   } else {
     setLightTheme();
   }
 
-  if (themeToggle instanceof HTMLButtonElement) {
+  // Event listener para toggle de tema
+  if (themeToggle) {
     themeToggle.addEventListener('click', () => {
       const colorTheme = localStorage.getItem('color-theme');
       if (colorTheme === 'dark') {
@@ -216,7 +209,6 @@ import '../styles/components/navbar.css';
     localStorage.setItem('color-theme', 'light');
     themeMoonIcon.classList.remove('hidden');
     themeSunIcon.classList.add('hidden');
-    // Re-renderizar links para aplicar las clases correctas
     renderLinks();
   }
 
@@ -225,7 +217,6 @@ import '../styles/components/navbar.css';
     document.documentElement.classList.add('dark');
     themeMoonIcon.classList.add('hidden');
     themeSunIcon.classList.remove('hidden');
-    // Re-renderizar links para aplicar las clases correctas
     renderLinks();
   }
 
@@ -241,13 +232,11 @@ import '../styles/components/navbar.css';
       // Scrolling hacia abajo - ocultar navbar
       navbarHeader.classList.add('-translate-y-full');
 
-      // Si el menú móvil está abierto, cerrarlo
-      if (!navbar.classList.contains('hidden')) {
-        navbarXIcon.classList.add('hidden');
-        navbarMenuIcon.classList.remove('hidden');
-        navbar.classList.add('hidden');
-        navbar.classList.add('-translate-y-[200%]');
-        // Añadir transición suave al cerrar
+      // Cerrar menú móvil si está abierto
+      if (navbar && !navbar.classList.contains('hidden')) {
+        if (navbarXIcon) navbarXIcon.classList.add('hidden');
+        if (navbarMenuIcon) navbarMenuIcon.classList.remove('hidden');
+        navbar.classList.add('hidden', '-translate-y-[200%]');
         document.body.style.transition = 'padding-top 0.5s ease-in-out';
         document.body.style.paddingTop = '80px';
       }
@@ -256,6 +245,6 @@ import '../styles/components/navbar.css';
       navbarHeader.classList.remove('-translate-y-full');
     }
 
-    lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop; // Evitar valores negativos
+    lastScrollTop = Math.max(currentScrollTop, 0); // Evitar valores negativos
   });
 </script>
