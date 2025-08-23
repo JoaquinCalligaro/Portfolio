@@ -1,0 +1,34 @@
+---
+import Card from './Card.astro';
+
+interface Service {
+  id: number;
+  title: string;
+  price: number;
+  benefits: string[];
+}
+
+interface Props {
+  service: Service;
+}
+
+const { id, title, benefits, price } = Astro.props.service;
+---
+
+<Card className="card-service h-fit">
+  <div class="flex flex-col gap-2">
+    <h3 class="mb-4 text-xl font-semibold text-gray-950 dark:text-gray-100">
+      {title}
+    </h3>
+    <p class="text-2xl font-bold text-gray-950 dark:text-white">${price}</p>
+    <ul class="mb-4 list-inside list-disc text-gray-600 dark:text-gray-400">
+      {benefits.map((benefit) => <li>{benefit}</li>)}
+    </ul>
+  </div>
+  <button
+    data-service-id={id}
+    class="hireServiceButton w-full rounded-md bg-gradient-to-r from-blue-500 to-blue-600 p-2 font-semibold text-white transition-all duration-300 hover:from-blue-600 hover:to-blue-700 focus:ring-4 focus:ring-blue-300 focus:outline-hidden dark:bg-blue-700 dark:hover:bg-blue-800 dark:focus:ring-blue-950"
+  >
+    Get Started
+  </button>
+</Card>
