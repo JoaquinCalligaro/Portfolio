@@ -8,7 +8,12 @@ const {
   description = 'Background Generator',
   img = '',
   href = '#',
+  repo = 'https://github.com/JoaquinCalligaro/Background-Generator',
+  live = 'https://www.google.com/',
 } = Astro.props;
+
+// compatibilidad: priorizamos `repo` si está presente, sino `href`
+const repoUrl = repo || href;
 ---
 
 <!-- Contenedor principal: glassmorphism con Tailwind (incluye variantes dark) -->
@@ -48,12 +53,32 @@ const {
   </div>
 
   <!-- Botón centrado -->
-  <div class="flex items-center justify-center pt-3 pb-4">
+  <div class="flex items-center justify-center gap-20 pt-6 pb-6">
     <a
-      href={href}
+      href={repoUrl}
       class="inline-block rounded-md bg-slate-800 px-4 py-2 text-sm text-white transition hover:bg-slate-700"
       target="_blank"
       rel="noopener noreferrer">Ver Repositorio</a
     >
+
+    {
+      live ? (
+        <a
+          href={live}
+          class="inline-block rounded-md border border-slate-300 px-4 py-2 text-sm text-slate-800 transition hover:bg-slate-800 hover:text-white"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Ver en vivo
+        </a>
+      ) : (
+        <button
+          class="inline-block cursor-not-allowed rounded-md border border-slate-200 px-4 py-2 text-sm text-slate-400"
+          disabled
+        >
+          Ver en vivo
+        </button>
+      )
+    }
   </div>
 </article>
