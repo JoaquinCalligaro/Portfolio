@@ -5,36 +5,38 @@
  */
 const {
   title = 'Background Generator',
-  description = 'Background Generator',
-  img = '',
-  href = '#',
+  description = 'Un background re loco',
+  img = '../../public/svg/Bg-Generator-Prueba.png',
   repo = 'https://github.com/JoaquinCalligaro/Background-Generator',
-  live = 'https://www.google.com/',
+  live = 'https://background-generator-final.netlify.app/',
 } = Astro.props;
 
-// compatibilidad: priorizamos `repo` si está presente, sino `href`
-const repoUrl = repo || href;
+// usamos `repo` directamente (eliminamos `href` para simplificar)
+const repoUrl = repo;
 ---
 
 <!-- Contenedor principal: glassmorphism con Tailwind (incluye variantes dark) -->
 <article
-  class={`w-full  rounded-xl overflow-hidden transition-transform duration-150 transform  shadow-sm bg-white/60 dark:bg-gray-900/50 backdrop-blur-md dark:backdrop-blur-sm border border-white/20 dark:border-white/10`}
+  class={`w-auto inline-block px-5 py-5 transition-transform duration-150 transform shadow-sm bg-white/60 dark:bg-gray-900/50 backdrop-blur-md dark:backdrop-blur-sm border border-white/20 dark:border-white/10 rounded-2xl `}
   aria-labelledby="card-title"
 >
-  <!-- Media: imagen o placeholder -->
-  <div class="relative min-h-20">
-    {
-      img ? (
-        <img src={img} alt={title} class="h-56 w-full object-cover" />
-      ) : (
-        <div class="h-56 w-full bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-700" />
-      )
-    }
-    <!-- Overlay sutil para contraste -->
+  <!-- Media: imagen o placeholder (mostrar completa, sin recorte) -->
+  <div class="relative flex justify-center py-2">
+    <!-- Contenedor que adapta su ancho al contenedor padre (sin max-w en px) -->
     <div
-      class="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent to-black/10 dark:to-black/20"
-      aria-hidden
+      class="flex w-full items-center justify-center overflow-hidden bg-transparent"
     >
+      {
+        img ? (
+          <img
+            src={img}
+            alt={title}
+            class="h-full w-full rounded-xl object-contain"
+          />
+        ) : (
+          <div class="h-full w-full border border-white/5 bg-transparent dark:border-white/3" />
+        )
+      }
     </div>
   </div>
 
@@ -65,7 +67,7 @@ const repoUrl = repo || href;
       live ? (
         <a
           href={live}
-          class="inline-block rounded-md border border-slate-300 px-4 py-2 text-sm text-slate-800 transition hover:bg-slate-800 hover:text-white"
+          class="inline-block rounded-md border border-slate-300 px-4 py-2 text-sm text-slate-800 transition hover:bg-slate-800 hover:text-white dark:text-slate-100"
           target="_blank"
           rel="noopener noreferrer"
         >
