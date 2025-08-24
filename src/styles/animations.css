@@ -60,6 +60,4 @@
   .tech-enter:nth-child(9) {
     animation-delay: 0.9s;
   }
-
-  /* glow-effect moved to src/styles/icon-effects.css to keep icon-specific styles isolated */
 }

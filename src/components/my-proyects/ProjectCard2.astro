@@ -6,14 +6,30 @@ import CssIcon from '../icons/CssIcon.astro';
 import JavascriptIcon from '../icons/JavascriptIcon.astro';
 import TailwindIcon from '../icons/TailwindIcon.astro';
 import ReactIcon from '../icons/ReactIcon.astro';
+import AstroIcon from '../icons/AstroIcon.astro';
+import FigmaIcon from '../icons/FigmaIcon.astro';
 import GitIcon from '../icons/GitIcon.astro';
+import MySQLIcon from '../icons/MySQLIcon.astro';
+import PostmanIcon from '../icons/PostmanIcon.astro';
 import TypescriptIcon from '../icons/TypescriptIcon.astro';
 /** GlassProjectCard - componente reutilizable con estilo glassmorphism */
 const {
   title = 'Background Generator',
   // technologies puede pasarse como array de componentes, objetos o strings (keys de iconMap).
   // Por defecto usamos keys para que los iconos nuevos se muestren con el mismo estilo.
-  technologies = ['html', 'css', 'js', 'tailwind', 'react', 'typescript'],
+  technologies = [
+    'html',
+    'css',
+    'js',
+    'tailwind',
+    'react',
+    'astro',
+    'figma',
+    'git',
+    'mysql',
+    'postman',
+    'typescript',
+  ],
   description = 'Generador de fondos animados con 8 diseños y más de 25 animaciones personalizables en tiempo real (colores, velocidad e intensidad).',
   img = defaultImg,
   repo = 'https://github.com/JoaquinCalligaro/Background-Generator',
@@ -26,7 +42,11 @@ const iconMap = {
   js: JavascriptIcon,
   tailwind: TailwindIcon,
   react: ReactIcon,
+  astro: AstroIcon,
+  figma: FigmaIcon,
   git: GitIcon,
+  mysql: MySQLIcon,
+  postman: PostmanIcon,
   typescript: TypescriptIcon,
 };
 
@@ -85,8 +105,8 @@ const resolveTechnology = (item) => {
     </div>
   </div>
 
-  <!-- título -->
-  <div class="mb-4 p-4">
+  <!-- Contenido: título y descripción -->
+  <div class="p-4">
     <div class="flex items-center">
       <h3
         id="card-title"
@@ -99,7 +119,7 @@ const resolveTechnology = (item) => {
     <!-- Tecnologías: mostrar iconos SVG debajo del título -->
     {
       technologies && technologies.length > 0 ? (
-        <div class="my-4 mt-4 flex flex-wrap items-center gap-2">
+        <div class="mt-3 flex flex-wrap items-center gap-2">
           {technologies.map((item) => {
             const resolved = resolveTechnology(item);
             if (!resolved) return null;
@@ -110,7 +130,7 @@ const resolveTechnology = (item) => {
       ) : null
     }
     <!-- descripción -->
-    <p class="text-md mt-6 px-1 text-slate-600 dark:text-slate-300">
+    <p class="text-md my-5 mt-6 text-slate-600 dark:text-slate-300">
       {description}
     </p>
   </div>
