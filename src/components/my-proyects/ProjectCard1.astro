@@ -1,9 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-/**
- * GlassProjectCard
- * Componente reutilizable para mostrar un proyecto con estilo glassmorphism.
- */
+/** GlassProjectCard - componente reutilizable con estilo glassmorphism */
 const {
   title = 'Background Generator',
   description = 'Un background re loco',
@@ -11,14 +8,11 @@ const {
   repo = 'https://github.com/JoaquinCalligaro/Background-Generator',
   live = 'https://background-generator-final.netlify.app/',
 } = Astro.props;
-
-// usamos `repo` directamente (eliminamos `href` para simplificar)
-const repoUrl = repo;
 ---
 
 <!-- Contenedor principal: glassmorphism con Tailwind (incluye variantes dark) -->
 <article
-  class={`w-auto inline-block px-5 py-5 transition-transform duration-150 transform shadow-sm bg-white/60 dark:bg-gray-900/50 backdrop-blur-md dark:backdrop-blur-sm border border-white/20 dark:border-white/10 rounded-2xl `}
+  class={`w-auto inline-block px-5 py-5 transition-transform duration-150 transform shadow-sm bg-white/60 dark:bg-gray-900/50 backdrop-blur-md dark:backdrop-blur-sm border border-white/20 dark:border-white/10 rounded-2xl`}
   aria-labelledby="card-title"
 >
   <!-- Media: imagen o placeholder (mostrar completa, sin recorte) -->
@@ -30,20 +24,16 @@ const repoUrl = repo;
       {
         img ? (
           typeof img === 'string' ? (
-            /* fallback for public/static paths in /public: use plain <img> */
             <img
               src={img}
               alt={title}
               loading="lazy"
               class="h-full w-full rounded-xl object-contain"
-              decoding="async"
             />
           ) : (
-            /* imported image modules: use Astro Image for optimization */
             <Image
               src={img}
               alt={title}
-              loading="lazy"
               class="h-full w-full rounded-xl object-contain"
               sizes="(max-width:640px) 90vw, 480px"
             />
@@ -72,7 +62,7 @@ const repoUrl = repo;
   <!-- Botón centrado -->
   <div class="flex items-center justify-center gap-20 pt-6 pb-6">
     <a
-      href={repoUrl}
+      href={repo}
       class="inline-block rounded-md bg-slate-800 px-4 py-2 text-sm text-white transition hover:bg-slate-700"
       target="_blank"
       rel="noopener noreferrer">Ver Repositorio</a
