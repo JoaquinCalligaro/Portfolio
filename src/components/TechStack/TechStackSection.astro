@@ -19,15 +19,27 @@ const { title, items } = Astro.props as Props;
     class="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-6"
   >
     {
-      items.map((tech) => (
-        <TechCard
-          name={tech.name}
-          hex={tech.hex}
-          hexAlpha={tech.hexAlpha}
-          icon={tech.icon}
-          color={tech.color}
-        />
-      ))
+      items.map((tech) => {
+        const lazyNames = new Set([
+          'Git',
+          'VSCode',
+          'Postman',
+          'Figma',
+          'Adobe Photoshop',
+          'Canva',
+        ]);
+        const loading = lazyNames.has(tech.name) ? 'lazy' : 'eager';
+        return (
+          <TechCard
+            name={tech.name}
+            hex={tech.hex}
+            hexAlpha={tech.hexAlpha}
+            icon={tech.icon}
+            color={tech.color}
+            loading={loading}
+          />
+        );
+      })
     }
   </div>
 </div>

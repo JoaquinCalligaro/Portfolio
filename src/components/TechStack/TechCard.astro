@@ -7,6 +7,7 @@ interface Props {
   icon: string;
   color?: string;
   rounded?: string;
+  loading?: 'eager' | 'lazy';
 }
 
 const {
@@ -16,6 +17,7 @@ const {
   icon,
   color = '',
   rounded = 'rounded-2xl',
+  loading = 'lazy',
 } = Astro.props as Props;
 ---
 
@@ -35,7 +37,13 @@ const {
   >
     {
       icon.startsWith('/') ? (
-        <img src={icon} alt={name} class="h-full w-full object-contain" />
+        <img
+          src={icon}
+          alt={name}
+          loading={loading}
+          decoding="async"
+          class="h-full w-full object-contain"
+        />
       ) : (
         <div
           set:html={icon}
