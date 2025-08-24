@@ -6,6 +6,7 @@ export interface TechItem {
   hexAlpha: string;
   icon: string;
   color?: string;
+  loading?: 'lazy' | 'eager';
 }
 
 export interface TechStackGroup {
@@ -96,6 +97,7 @@ export const stacks: TechStackGroup[] = [
         hexAlpha: '#F1502F33',
         icon: '/svg/Git.svg',
         color: 'text-red-600',
+        loading: 'lazy',
       },
       {
         name: 'VSCode',
@@ -103,6 +105,7 @@ export const stacks: TechStackGroup[] = [
         hexAlpha: '#007ACC33',
         icon: '/svg/VSCode.svg',
         color: 'text-blue-500',
+        loading: 'lazy',
       },
       {
         name: 'Postman',
@@ -110,6 +113,7 @@ export const stacks: TechStackGroup[] = [
         hexAlpha: '#FF6C3733',
         icon: '/svg/Postman.svg',
         color: 'text-orange-500',
+        loading: 'lazy',
       },
     ],
   },
@@ -122,6 +126,7 @@ export const stacks: TechStackGroup[] = [
         hexAlpha: '#F24E1E33',
         icon: '/svg/Figma.svg',
         color: 'text-pink-500',
+        loading: 'lazy',
       },
       {
         name: 'Adobe Photoshop',
@@ -129,6 +134,7 @@ export const stacks: TechStackGroup[] = [
         hexAlpha: '#31A8FF33',
         icon: '/svg/Photoshop.svg',
         color: 'text-blue-700',
+        loading: 'lazy',
       },
       {
         name: 'Canva',
@@ -136,6 +142,7 @@ export const stacks: TechStackGroup[] = [
         hexAlpha: '#00C4CC33',
         icon: '/svg/Canva.svg',
         color: 'text-teal-600',
+        loading: 'lazy',
       },
     ],
   },

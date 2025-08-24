@@ -20,15 +20,7 @@ const { title, items } = Astro.props as Props;
   >
     {
       items.map((tech) => {
-        const lazyNames = new Set([
-          'Git',
-          'VSCode',
-          'Postman',
-          'Figma',
-          'Adobe Photoshop',
-          'Canva',
-        ]);
-        const loading = lazyNames.has(tech.name) ? 'lazy' : 'eager';
+        const loading = tech.loading ?? 'eager';
         return (
           <TechCard
             name={tech.name}

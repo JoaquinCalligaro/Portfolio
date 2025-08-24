@@ -7,7 +7,7 @@ import { Image } from 'astro:assets';
 const {
   title = 'Background Generator',
   description = 'Un background re loco',
-  img = '/assets/projects/Bg-Generator.webp',
+  img = '../../assets/images/Bg-Generator.webp',
   repo = 'https://github.com/JoaquinCalligaro/Background-Generator',
   live = 'https://background-generator-final.netlify.app/',
 } = Astro.props;
@@ -29,14 +29,27 @@ const repoUrl = repo;
     >
       {
         img ? (
-          <img
-            src={img}
-            alt={title}
-            loading="lazy"
-            class="h-full w-full rounded-xl object-contain"
-          />
+          typeof img === 'string' ? (
+            /* fallback for public/static paths in /public: use plain <img> */
+            <img
+              src={img}
+              alt={title}
+              loading="lazy"
+              class="h-full w-full rounded-xl object-contain"
+              decoding="async"
+            />
+          ) : (
+            /* imported image modules: use Astro Image for optimization */
+            <Image
+              src={img}
+              alt={title}
+              loading="lazy"
+              class="h-full w-full rounded-xl object-contain"
+              sizes="(max-width:640px) 90vw, 480px"
+            />
+          )
         ) : (
-          <div class="h-full w-full border border-white/5 bg-transparent dark:border-white/3" />
+          <div class="h-full w-full rounded-xl border border-white/5 bg-transparent dark:border-white/3" />
         )
       }
     </div>
