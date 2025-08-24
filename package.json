@@ -10,6 +10,7 @@
     "lint:css": "stylelint \"src/styles/**/*.css\" --config .stylelintrc.json"
   },
   "dependencies": {
+    "@midudev/tailwind-animations": "^0.2.0",
     "astro": "^5.13.2",
     "framer-motion": "^12.23.12",
     "handlebars": "^4.7.8",

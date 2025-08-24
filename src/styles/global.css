@@ -1,7 +1,8 @@
 /* Importa Tailwind (no mover) */
 @import 'tailwindcss';
 @custom-variant dark (&:where(.dark, .dark *));
-
+@import 'tailwindcss';
+@plugin "@midudev/tailwind-animations";
 /*! Importaciones */
 @import './navbar.css';
 @import './animations.css';
