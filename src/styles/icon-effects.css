@@ -11,14 +11,19 @@
   box-shadow: 0 4px 8px 0 var(--icon-glow-color);
 }
 
+animation: pulse-shadow 2s infinite; /* Apply pulse-shadow animation */
 /* Base para todos los wrappers de icono (clases .icon-*) */
 [class*='icon-'] {
   position: relative;
   border-radius: 0.375rem;
   border: 1px solid var(--icon-color-border);
   /* glassmorphism: fondo semitransparente + degradado del color */
-  background-color: rgba(255,255,255,0.04);
-  background-image: linear-gradient(135deg, var(--icon-color-alpha), transparent);
+  background-color: rgba(255, 255, 255, 0.04);
+  background-image: linear-gradient(
+    135deg,
+    var(--icon-color-alpha),
+    transparent
+  );
   background-clip: padding-box;
   -webkit-backdrop-filter: blur(6px) saturate(120%);
   backdrop-filter: blur(6px) saturate(120%);
@@ -26,7 +31,10 @@
   overflow: hidden;
   /* borde con glow estático (intensificado) */
   box-shadow: 0 0 28px var(--icon-color-alpha);
-  transition: box-shadow 240ms ease, border-color 200ms ease, transform 180ms ease;
+  transition:
+    box-shadow 240ms ease,
+    border-color 200ms ease,
+    transform 180ms ease;
 }
 [class*='icon-']::before {
   content: '';
@@ -36,8 +44,11 @@
   border-radius: 0.5rem;
   /* glow permanente (muy sutil) */
   opacity: 0.02; /* aún más sutil */
-  transform: scale(1.00);
-  transition: transform 300ms ease, opacity 300ms ease, filter 300ms ease;
+  transform: scale(1);
+  transition:
+    transform 300ms ease,
+    opacity 300ms ease,
+    filter 300ms ease;
   background: linear-gradient(
     45deg,
     var(--icon-color),
@@ -55,6 +66,7 @@
   opacity: 0.6;
   filter: blur(10px);
 }
+animation: pulse-shadow 2s infinite; /* Apply pulse-shadow animation */
 [class*='icon-']:hover {
   /* sombra y borde más pronunciados en hover (intensificado) */
   box-shadow: 0 12px 44px var(--icon-color-alpha-hover);
@@ -73,19 +85,23 @@
   border-radius: 0.5rem;
   pointer-events: none;
   /* degradado con el color del icono para líneas visibles */
-  background: linear-gradient(90deg,
-    rgba(255,255,255,0) 0%,
-    rgba(255,255,255,0.03) 25%,
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.03) 25%,
     var(--icon-color) 40%,
     var(--icon-color) 60%,
-    rgba(255,255,255,0.03) 75%,
-    rgba(255,255,255,0) 100%);
+    rgba(255, 255, 255, 0.03) 75%,
+    rgba(255, 255, 255, 0) 100%
+  );
   background-size: 200% 100%;
   /* línea siempre visible (opacidad moderada) */
   opacity: 0.45;
   transform: scale(1);
   mix-blend-mode: screen;
-  transition: opacity 350ms ease, transform 350ms ease;
+  transition:
+    opacity 350ms ease,
+    transform 350ms ease;
   animation: border-slide 8s linear infinite;
 }
 
@@ -96,8 +112,12 @@
 }
 
 @keyframes border-slide {
-  from { background-position: 0% 0%; }
-  to { background-position: 200% 0%; }
+  from {
+    background-position: 0% 0%;
+  }
+  to {
+    background-position: 200% 0%;
+  }
 }
 
 /* border-glow animation removed per request; borders keep a steady glow defined above */
@@ -107,7 +127,9 @@
 .border-anim-only {
   /* desactivar animación global si existe (evita duplicar efectos) */
   animation: none !important;
-  transition: border-color 300ms ease, box-shadow 300ms ease;
+  transition:
+    border-color 300ms ease,
+    box-shadow 300ms ease;
   position: relative;
 }
 .border-anim-only::after {
@@ -119,7 +141,9 @@
   border-radius: inherit;
   border: 3px solid var(--icon-color-border);
   box-shadow: 0 0 28px var(--icon-color-alpha);
-  transition: box-shadow 240ms ease, border-color 200ms ease;
+  transition:
+    box-shadow 240ms ease,
+    border-color 200ms ease;
 }
 
 /* Intensificar glow en hover para la línea exterior */
@@ -158,6 +182,30 @@
   --icon-color-alpha-hover: #06b6d466;
   --icon-color-border: #06b6d466;
   --icon-color-border-hover: #06b6d4cc;
+}
+/* Pulse shadow animation: uses icon color variables to create a colored glow pulse */
+@keyframes pulse-shadow {
+  0% {
+    box-shadow:
+      0 0 8px 0 rgba(0, 0, 0, 0),
+      0 0 8px 0 var(--icon-color-alpha);
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    box-shadow:
+      0 6px 28px -6px rgba(0, 0, 0, 0),
+      0 0 40px 4px var(--icon-color-alpha-hover);
+    transform: scale(1.01);
+    opacity: 1;
+  }
+  100% {
+    box-shadow:
+      0 0 8px 0 rgba(0, 0, 0, 0),
+      0 0 8px 0 var(--icon-color-alpha);
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 .icon-react {
   --icon-color: #61dafb;
