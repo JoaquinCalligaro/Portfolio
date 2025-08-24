@@ -95,7 +95,7 @@ export const stacks: TechStackGroup[] = [
         name: 'Git',
         hex: '#F1502F',
         hexAlpha: '#F1502F33',
-        icon: '/src/assets/Git.svg',
+        icon: '/src/assets/GitHub.svg',
         color: 'text-red-600',
         loading: 'lazy',
       },

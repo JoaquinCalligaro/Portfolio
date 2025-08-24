@@ -1,5 +1,7 @@
 ---
 import { Image } from 'astro:assets';
+import gitSvg from '../../assets/GitHub.svg';
+import liveSvg from '../../assets/Live.svg';
 import defaultImg from '../../assets/images/Bg-Generator.webp';
 import HtmlIcon from '../icons/HtmlIcon.astro';
 import CssIcon from '../icons/CssIcon.astro';
@@ -119,18 +121,22 @@ const resolveTechnology = (item) => {
   <div class="flex items-center justify-center gap-20 pt-6 pb-6">
     <a
       href={repo}
-      class="inline-block rounded-md bg-slate-800 px-4 py-2 text-sm text-white transition hover:bg-slate-700"
-      target="_blank"
-      rel="noopener noreferrer">Ver Repositorio</a
-    >
-    <!-- Botón ver en vivo -->
-    <a
-      href={live || '#'}
-      class="inline-block rounded-md border border-slate-300 px-4 py-2 text-sm text-slate-800 transition hover:bg-slate-800 hover:text-white dark:text-slate-100"
+      class="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-gray-200 px-4 py-2 text-sm text-slate-800 transition hover:bg-slate-800 hover:text-white dark:bg-gray-500/40 dark:text-slate-100"
       target="_blank"
       rel="noopener noreferrer"
     >
-      Ver en vivo
+      <Image src={gitSvg} alt="Git" class="h-4 w-4" loading="lazy" />
+      <span>Ver Repositorio</span>
+    </a>
+    <!-- Botón ver en vivo -->
+    <a
+      href={live || '#'}
+      class="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-gray-200 px-4 py-2 text-sm text-slate-800 transition hover:bg-slate-800 hover:text-white dark:bg-gray-500/40 dark:text-slate-100"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <Image src={liveSvg} alt="Live" class="h-4 w-4" loading="lazy" />
+      <span>Ver en vivo</span>
     </a>
   </div>
 </article>
