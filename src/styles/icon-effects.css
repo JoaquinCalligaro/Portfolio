@@ -7,7 +7,8 @@
   background: linear-gradient(90deg, #ffffff08, #ffffff0f, #ffffff08);
   background-size: 200% 200%;
   animation: glowing 3s ease-in-out infinite;
-  box-shadow: 0 4px 10px 0 var(--icon-glow-color);
+  /* sombra base más sutil */
+  box-shadow: 0 4px 8px 0 var(--icon-glow-color);
 }
 
 /* Base para todos los wrappers de icono (clases .icon-*) */
@@ -15,7 +16,17 @@
   position: relative;
   border-radius: 0.375rem;
   border: 1px solid var(--icon-color-border);
-  background: linear-gradient(135deg, var(--icon-color-alpha), transparent);
+  /* glassmorphism: fondo semitransparente + degradado del color */
+  background-color: rgba(255,255,255,0.04);
+  background-image: linear-gradient(135deg, var(--icon-color-alpha), transparent);
+  background-clip: padding-box;
+  -webkit-backdrop-filter: blur(6px) saturate(120%);
+  backdrop-filter: blur(6px) saturate(120%);
+  /* evitar que pseudo-elementos sobresalgan del contenedor */
+  overflow: hidden;
+  /* borde con glow estático (intensificado) */
+  box-shadow: 0 0 28px var(--icon-color-alpha);
+  transition: box-shadow 240ms ease, border-color 200ms ease, transform 180ms ease;
 }
 [class*='icon-']::before {
   content: '';
@@ -23,8 +34,10 @@
   inset: -6px;
   z-index: -10;
   border-radius: 0.5rem;
-  opacity: 0;
-  transition: all 0.7s ease;
+  /* glow permanente (muy sutil) */
+  opacity: 0.02; /* aún más sutil */
+  transform: scale(1.00);
+  transition: transform 300ms ease, opacity 300ms ease, filter 300ms ease;
   background: linear-gradient(
     45deg,
     var(--icon-color),
@@ -32,21 +45,90 @@
     var(--icon-color)
   );
   background-size: 300%;
-  filter: blur(8px);
-  animation: glowing 8s ease-in-out infinite;
+  /* reducir borrosidad del fondo para que el borde sea el protagonista */
+  filter: blur(1px);
+  animation: none; /* desactivar movimiento del fondo */
 }
 [class*='icon-']:hover::before {
-  transform: scale(1.05);
-  opacity: 0.7;
-  filter: blur(12px);
+  /* intensificar glow en hover (sutil) */
+  transform: scale(1.04);
+  opacity: 0.6;
+  filter: blur(10px);
 }
 [class*='icon-']:hover {
-  box-shadow: 0 8px 20px var(--icon-color-alpha-hover);
+  /* sombra y borde más pronunciados en hover (intensificado) */
+  box-shadow: 0 12px 44px var(--icon-color-alpha-hover);
   border-color: var(--icon-color-border-hover);
 }
 [class*='icon-'] {
   --icon-glow-color: var(--icon-color-alpha-hover);
 }
+
+/* Líneas animadas alrededor del borde (sutiles) */
+[class*='icon-']::after {
+  content: '';
+  position: absolute;
+  inset: 0; /* dentro del contenedor para evitar overflow */
+  z-index: -8;
+  border-radius: 0.5rem;
+  pointer-events: none;
+  /* degradado con el color del icono para líneas visibles */
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.03) 25%,
+    var(--icon-color) 40%,
+    var(--icon-color) 60%,
+    rgba(255,255,255,0.03) 75%,
+    rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  /* línea siempre visible (opacidad moderada) */
+  opacity: 0.45;
+  transform: scale(1);
+  mix-blend-mode: screen;
+  transition: opacity 350ms ease, transform 350ms ease;
+  animation: border-slide 8s linear infinite;
+}
+
+[class*='icon-']:hover::after {
+  /* intensificar las líneas en hover (moderado) */
+  opacity: 0.75;
+  transform: scale(1.02);
+}
+
+@keyframes border-slide {
+  from { background-position: 0% 0%; }
+  to { background-position: 200% 0%; }
+}
+
+/* border-glow animation removed per request; borders keep a steady glow defined above */
+
+/* Clase de prueba: animación que afecta únicamente la línea del border
+   Pulsos de color y un outline sutil sin modificar el glow de fondo. */
+.border-anim-only {
+  /* desactivar animación global si existe (evita duplicar efectos) */
+  animation: none !important;
+  transition: border-color 300ms ease, box-shadow 300ms ease;
+  position: relative;
+}
+.border-anim-only::after {
+  /* pseudo-element para pintar solo la línea exterior (sin animación) */
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  border: 3px solid var(--icon-color-border);
+  box-shadow: 0 0 28px var(--icon-color-alpha);
+  transition: box-shadow 240ms ease, border-color 200ms ease;
+}
+
+/* Intensificar glow en hover para la línea exterior */
+.border-anim-only:hover::after {
+  box-shadow: 0 0 48px var(--icon-color-alpha-hover);
+  border-color: var(--icon-color-border-hover);
+}
+
+/* border-pulse animation removed; border remains static and glows slightly */
 
 /* Variables por icono (solo variables; estilos arriba) */
 .icon-html {
@@ -126,3 +208,6 @@
   --icon-color-border: #3178c666;
   --icon-color-border-hover: #3178c6cc;
 }
+
+/* Contenedor de icons con glassmorph y borde lineal por tecnología */
+/* Se eliminó el contenedor glassmorph; las líneas y glow se aplican por icono individual */

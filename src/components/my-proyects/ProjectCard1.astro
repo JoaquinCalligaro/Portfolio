@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import gitSvg from '../../assets/GitHub.svg';
 import liveSvg from '../../assets/Live.svg';
 import '../../styles/animations.css';
+import '../../styles/icon-effects.css';
 import img1 from '../../assets/images/BackgroundGenerator/Bg-Generator.webp';
 import img2 from '../../assets/images/BackgroundGenerator/Bg-Generator-2.webp';
 import img3 from '../../assets/images/BackgroundGenerator/Bg-Generator-3.webp';
@@ -159,11 +160,13 @@ const resolveTechnology = (item) => {
       {
         technologies && technologies.length > 0 && (
           <div class="my-4 mt-4 flex flex-wrap items-center gap-2">
-            {technologies.map((item) => {
+            {technologies.map((item, idx) => {
               const resolved = resolveTechnology(item);
               if (!resolved) return null;
               const { Component, cls, title: techTitle } = resolved;
-              return <Component class={cls} title={techTitle} />;
+              // aplicar la clase de prueba solo al primer icono
+              const extra = idx === 0 ? ' border-anim-only' : '';
+              return <Component class={`${cls}${extra}`} title={techTitle} />;
             })}
           </div>
         )
