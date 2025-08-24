@@ -1,0 +1,10 @@
+---
+export interface Props {
+  class?: string;
+  title?: string;
+}
+const { class: cls = 'h-6 w-6', title = 'React' } = Astro.props;
+---
+
+<!-- ReactIcon: usa el SVG estático desde public/svg y permite clases Tailwind -->
+<img src="/svg/react.svg" class={cls} alt={title} loading="lazy" />

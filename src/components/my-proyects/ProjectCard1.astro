@@ -1,13 +1,29 @@
 ---
 import { Image } from 'astro:assets';
+import HtmlIcon from '../icons/HtmlIcon.astro';
+import CssIcon from '../icons/CssIcon.astro';
+import JavascriptIcon from '../icons/JavascriptIcon.astro';
+import TailwindIcon from '../icons/TailwindIcon.astro';
+import ReactIcon from '../icons/ReactIcon.astro';
 /** GlassProjectCard - componente reutilizable con estilo glassmorphism */
 const {
   title = 'Background Generator',
+  // technologies puede pasarse como array de componentes (p. ej. [HtmlIcon, ReactIcon])
+  // o como objetos { component, class, title } o como strings compatibles con iconMap.
+  technologies = [HtmlIcon, CssIcon, JavascriptIcon, TailwindIcon, ReactIcon],
   description = 'Un background re loco',
   img = '../../assets/images/Bg-Generator.webp',
   repo = 'https://github.com/JoaquinCalligaro/Background-Generator',
   live = 'https://background-generator-final.netlify.app/',
 } = Astro.props;
+
+const iconMap = {
+  html: HtmlIcon,
+  css: CssIcon,
+  js: JavascriptIcon,
+  tailwind: TailwindIcon,
+  react: ReactIcon,
+};
 ---
 
 <!-- Contenedor principal: glassmorphism con Tailwind (incluye variantes dark) -->
@@ -55,6 +71,41 @@ const {
         {title}
       </h3>
     </div>
+
+    <!-- Tecnologías: mostrar iconos SVG debajo del título -->
+    {
+      technologies && technologies.length > 0 ? (
+        <div class="mt-3 flex flex-wrap items-center gap-2">
+          {technologies.map((item) => {
+            // item puede ser:
+            // - un componente (p. ej. HtmlIcon)
+            // - un objeto { component: Componente, class, title }
+            // - una string key que mapea a iconMap
+            let Component = null;
+            let cls = 'h-6 w-6';
+            let title = '';
+
+            if (
+              typeof item === 'function' ||
+              (typeof item === 'object' && item.render)
+            ) {
+              // componente directo (Astro component o función)
+              Component = item;
+            } else if (typeof item === 'object' && item.component) {
+              Component = item.component;
+              cls = item.class ?? cls;
+              title = item.title ?? title;
+            } else if (typeof item === 'string') {
+              const key = item;
+              Component = iconMap[key];
+            }
+
+            if (!Component) return null;
+            return <Component class={cls} title={title} />;
+          })}
+        </div>
+      ) : null
+    }
 
     <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">{description}</p>
   </div>
