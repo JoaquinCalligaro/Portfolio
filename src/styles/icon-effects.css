@@ -7,8 +7,8 @@
   background: linear-gradient(90deg, #ffffff08, #ffffff0f, #ffffff08);
   background-size: 200% 200%;
   animation: glowing 3s ease-in-out infinite;
-  /* sombra base más sutil */
-  box-shadow: 0 6px 18px 0 var(--icon-glow-color);
+  /* sombra base más sutil (reducida) */
+  box-shadow: 0 4px 10px 0 var(--icon-glow-color);
 }
 
 animation: pulse-shadow 2s infinite; /* Apply pulse-shadow animation */
@@ -33,15 +33,13 @@ animation: pulse-shadow 2s infinite; /* Apply pulse-shadow animation */
   /* add an inset colored stroke to make the border line more visible
      and increase the visible border thickness; keep the diffuse glow */
   box-shadow:
-    /* fine inset stroke to create a subtle border line */
-  inset 0 0 0 1px var(--icon-color-border),
-  0 8px 20px rgba(0, 0, 0, 0.05),
-  /* base color glow reduced */
-  0 0 18px 6px var(--icon-color-alpha),
-  /* subtle colored spread in base, stronger on hover only */
-  0 0 28px 10px var(--icon-color-alpha-hover);
+    /* fine inset stroke to create a subtle border line (subtle base) */
+    inset 0 0 0 1px var(--icon-color-border),
+    0 8px 18px rgba(0, 0, 0, 0.05),
+    0 0 12px 4px var(--icon-color-alpha),
+    0 0 36px 8px var(--icon-color-alpha-hover);
   transition:
-    box-shadow 300ms cubic-bezier(.2,.9,.2,1),
+    box-shadow 300ms cubic-bezier(0.2, 0.9, 0.2, 1),
     border-color 220ms ease,
     transform 180ms ease;
 }
@@ -66,7 +64,7 @@ animation: pulse-shadow 2s infinite; /* Apply pulse-shadow animation */
   inset: 0;
   z-index: -2;
   border-radius: inherit;
-  /* stronger glow layer behind decorative gradient (reduced at rest) */
+  /* glow layer: base subtle */
   opacity: 0.12;
   transform: scale(1);
   transition:
@@ -79,22 +77,21 @@ animation: pulse-shadow 2s infinite; /* Apply pulse-shadow animation */
     var(--icon-color-alpha-hover)
   );
   background-size: 300% 300%;
-  filter: blur(22px);
+  filter: blur(20px);
   animation: glowing 5s ease-in-out infinite;
 }
 [class*='icon-']:hover::before {
   /* intensify glow on hover */
   transform: scale(1.12);
   opacity: 0.85;
-  filter: blur(60px);
+  filter: blur(48px);
 }
 animation: pulse-shadow 2s infinite; /* Apply pulse-shadow animation */
 [class*='icon-']:hover {
-  /* stronger hover: larger, colored glow and brighter border */
-  /* intensified shadow on hover: more spread and stronger color glow */
+  /* stronger hover: much larger colored glow and brighter border */
   box-shadow:
-    0 30px 160px rgba(0, 0, 0, 0.16),
-    0 0 220px 72px var(--icon-color-alpha-hover);
+    0 30px 120px rgba(0, 0, 0, 0.16),
+    0 0 160px 48px var(--icon-color-alpha-hover);
   border-color: var(--icon-color-border-hover);
 }
 [class*='icon-'] {
@@ -180,7 +177,7 @@ animation: pulse-shadow 2s infinite; /* Apply pulse-shadow animation */
 /* Intensificar glow en hover para la línea exterior */
 .border-anim-only:hover::after {
   /* make the border glow stronger on hover as well */
-  box-shadow: 0 0 96px 12px var(--icon-color-alpha-hover);
+  box-shadow: 0 0 120px 16px var(--icon-color-alpha-hover);
   border-color: var(--icon-color-border-hover);
 }
 
