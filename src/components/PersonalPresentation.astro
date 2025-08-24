@@ -1,13 +1,17 @@
 ---
 import meImage from '../assets/me.webp';
+import { Image } from 'astro:assets';
 ---
 
 <!-- Presentación personal -->
 <div class="flex flex-col items-center gap-15 md:flex-row">
-  <img
-    src={meImage.src}
+  <Image
+    src={meImage}
     alt="Joaquin Calligaro"
-    class="h-48 w-48 rounded-full object-cover shadow-lg ring-4 ring-amber-200 transition-all duration-300 hover:scale-105 hover:shadow-xl sm:h-72 sm:w-72 md:h-56 md:w-56 dark:ring-amber-800"
+    loading="eager"
+    fetchpriority="high"
+    class="rounded-full object-cover shadow-lg ring-4 ring-amber-200 transition-all duration-300 hover:scale-105 hover:shadow-xl sm:h-72 sm:w-72 md:h-56 md:w-56 dark:ring-amber-800"
+    sizes="(max-width: 640px) 72vw, (max-width: 1024px) 40vw, 240px"
   />
   <div class="flex flex-col gap-4 text-center md:text-left">
     <h1

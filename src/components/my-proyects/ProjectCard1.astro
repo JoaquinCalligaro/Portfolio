@@ -6,7 +6,7 @@
 const {
   title = 'Background Generator',
   description = 'Un background re loco',
-  img = '../../public/svg/Bg-Generator-Prueba.png',
+  img = '/assets/projects/Bg-Generator.webp',
   repo = 'https://github.com/JoaquinCalligaro/Background-Generator',
   live = 'https://background-generator-final.netlify.app/',
 } = Astro.props;
@@ -31,6 +31,7 @@ const repoUrl = repo;
           <img
             src={img}
             alt={title}
+            loading="lazy"
             class="h-full w-full rounded-xl object-contain"
           />
         ) : (
