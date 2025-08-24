@@ -26,8 +26,10 @@
 }
 
 @layer techstack-animations {
+  /* Entrance animation for tech icons: avoid using @apply to keep build stable */
   .tech-enter {
-    @apply translate-y-7 opacity-0;
+    transform: translateY(1.75rem); /* equivalent to translate-y-7 */
+    opacity: 0;
     animation: fadeInUp 0.6s ease-out forwards;
   }
 
@@ -58,4 +60,6 @@
   .tech-enter:nth-child(9) {
     animation-delay: 0.9s;
   }
+
+  /* glow-effect moved to src/styles/icon-effects.css to keep icon-specific styles isolated */
 }

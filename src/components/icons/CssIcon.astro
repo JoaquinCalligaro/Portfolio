@@ -2,9 +2,16 @@
 export interface Props {
   class?: string;
   title?: string;
+  wrapperClass?: string;
 }
 const { class: cls = 'h-6 w-6', title = 'CSS' } = Astro.props;
+import '../../styles/icon-effects.css';
+const wrapper =
+  Astro.props.wrapperClass ??
+  'inline-flex items-center justify-center p-1 rounded-md transition-colors duration-200 hover:bg-sky-50 dark:hover:bg-sky-900 mr-2 icon-css';
 ---
 
 <!-- CssIcon: usa el SVG estático desde public/svg y permite clases Tailwind -->
-<img src="/svg/CSS.svg" class={cls} alt={title} loading="lazy" />
+<span class={wrapper} aria-hidden="true">
+  <img src="/svg/CSS.svg" class={cls} alt={title} loading="lazy" />
+</span>

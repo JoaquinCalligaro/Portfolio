@@ -1,0 +1,249 @@
+/*
+  Icon effects (glow, shadows) — exclusivo para wrappers de iconos.
+  Importa este archivo en componentes de icono para aplicar el efecto.
+  Depende de la animación `glowing` definida en `animations.css`.
+*/
+
+@import './animations.css'; /* trae keyframes (glowing) para uso aquí */
+
+/* ICONS: clase reutilizable para efecto glow en wrappers de iconos
+   - Usa la variable --icon-glow-color para ajustar el color del resplandor
+   - Añade box-shadow para crear el glow alrededor del icono
+   - Mantiene también una ligera animación de fondo para un efecto sutil
+*/
+.glow-effect {
+  --icon-glow-color: rgba(56, 189, 248, 0.12); /* default sky color */
+  /* fondo sutil que se anima con keyframes 'glowing' */
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03),
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.03)
+  );
+  background-size: 200% 200%;
+  animation: glowing 3s ease-in-out infinite;
+  /* sombra principal del glow, controlable vía CSS variable */
+  box-shadow: 0 4px 10px 0 var(--icon-glow-color);
+}
+
+/* ==========================================================================
+   Per-icon hover/glow rules
+   These mirror the visual treatment used in techstack.css but tuned for
+   small icon wrappers. Each .icon-<name> sets the color variables used
+   by the ::before animated gradient and the box-shadow. The --icon-glow-color
+   is set from the hover alpha so the existing .glow-effect can reuse it.
+   ========================================================================== */
+
+.icon-html {
+  --icon-color: #e34f26;
+  --icon-color-alpha: #e34f2633;
+  --icon-color-alpha-hover: #e34f2640;
+  --icon-color-border: #e34f264d;
+  --icon-color-border-hover: #e34f26cc;
+  position: relative;
+  border-radius: 0.375rem; /* rounded-md */
+  border: 1px solid var(--icon-color-border);
+  background: linear-gradient(135deg, var(--icon-color-alpha), transparent);
+}
+
+.icon-html::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  z-index: -10;
+  border-radius: 0.5rem;
+  opacity: 0;
+  transition: all 0.7s ease;
+  background: linear-gradient(
+    45deg,
+    var(--icon-color),
+    var(--icon-color-alpha-hover),
+    var(--icon-color)
+  );
+  background-size: 300%;
+  filter: blur(8px);
+  animation: glowing 8s ease-in-out infinite;
+}
+
+.icon-html:hover::before {
+  transform: scale(1.05);
+  opacity: 0.7;
+  filter: blur(12px);
+}
+
+.icon-html:hover {
+  box-shadow: 0 8px 20px var(--icon-color-alpha-hover);
+  border-color: var(--icon-color-border-hover);
+}
+
+.icon-html {
+  --icon-glow-color: var(--icon-color-alpha-hover);
+}
+
+.icon-css {
+  --icon-color: #1572b6;
+  --icon-color-alpha: #1572b633;
+  --icon-color-alpha-hover: #1572b640;
+  --icon-color-border: #1572b64d;
+  --icon-color-border-hover: #1572b6cc;
+  position: relative;
+  border-radius: 0.375rem;
+  border: 1px solid var(--icon-color-border);
+  background: linear-gradient(135deg, var(--icon-color-alpha), transparent);
+}
+.icon-css::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  z-index: -10;
+  border-radius: 0.5rem;
+  opacity: 0;
+  transition: all 0.7s ease;
+  background: linear-gradient(
+    45deg,
+    var(--icon-color),
+    var(--icon-color-alpha-hover),
+    var(--icon-color)
+  );
+  background-size: 300%;
+  filter: blur(8px);
+  animation: glowing 8s ease-in-out infinite;
+}
+.icon-css:hover::before {
+  transform: scale(1.05);
+  opacity: 0.7;
+  filter: blur(12px);
+}
+.icon-css:hover {
+  box-shadow: 0 8px 20px var(--icon-color-alpha-hover);
+  border-color: var(--icon-color-border-hover);
+}
+.icon-css {
+  --icon-glow-color: var(--icon-color-alpha-hover);
+}
+
+.icon-js {
+  --icon-color: #f7df1e;
+  --icon-color-alpha: #f7df1e33;
+  --icon-color-alpha-hover: #f7df1e40;
+  --icon-color-border: #f7df1e4d;
+  --icon-color-border-hover: #f7df1ecc;
+  position: relative;
+  border-radius: 0.375rem;
+  border: 1px solid var(--icon-color-border);
+  background: linear-gradient(135deg, var(--icon-color-alpha), transparent);
+}
+.icon-js::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  z-index: -10;
+  border-radius: 0.5rem;
+  opacity: 0;
+  transition: all 0.7s ease;
+  background: linear-gradient(
+    45deg,
+    var(--icon-color),
+    var(--icon-color-alpha-hover),
+    var(--icon-color)
+  );
+  background-size: 300%;
+  filter: blur(8px);
+  animation: glowing 8s ease-in-out infinite;
+}
+.icon-js:hover::before {
+  transform: scale(1.05);
+  opacity: 0.7;
+  filter: blur(12px);
+}
+.icon-js:hover {
+  box-shadow: 0 8px 20px var(--icon-color-alpha-hover);
+  border-color: var(--icon-color-border-hover);
+}
+.icon-js {
+  --icon-glow-color: var(--icon-color-alpha-hover);
+}
+
+.icon-tailwind {
+  --icon-color: #06b6d4;
+  --icon-color-alpha: #06b6d433;
+  --icon-color-alpha-hover: #06b6d440;
+  --icon-color-border: #06b6d44d;
+  --icon-color-border-hover: #06b6d4cc;
+  position: relative;
+  border-radius: 0.375rem;
+  border: 1px solid var(--icon-color-border);
+  background: linear-gradient(135deg, var(--icon-color-alpha), transparent);
+}
+.icon-tailwind::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  z-index: -10;
+  border-radius: 0.5rem;
+  opacity: 0;
+  transition: all 0.7s ease;
+  background: linear-gradient(
+    45deg,
+    var(--icon-color),
+    var(--icon-color-alpha-hover),
+    var(--icon-color)
+  );
+  background-size: 300%;
+  filter: blur(8px);
+  animation: glowing 8s ease-in-out infinite;
+}
+.icon-tailwind:hover::before {
+  transform: scale(1.05);
+  opacity: 0.7;
+  filter: blur(12px);
+}
+.icon-tailwind:hover {
+  box-shadow: 0 8px 20px var(--icon-color-alpha-hover);
+  border-color: var(--icon-color-border-hover);
+}
+.icon-tailwind {
+  --icon-glow-color: var(--icon-color-alpha-hover);
+}
+
+.icon-react {
+  --icon-color: #61dafb;
+  --icon-color-alpha: #61dafb33;
+  --icon-color-alpha-hover: #61dafb40;
+  --icon-color-border: #61dafb4d;
+  --icon-color-border-hover: #61dafbcc;
+  position: relative;
+  border-radius: 0.375rem;
+  border: 1px solid var(--icon-color-border);
+  background: linear-gradient(135deg, var(--icon-color-alpha), transparent);
+}
+.icon-react::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  z-index: -10;
+  border-radius: 0.5rem;
+  opacity: 0;
+  transition: all 0.7s ease;
+  background: linear-gradient(
+    45deg,
+    var(--icon-color),
+    var(--icon-color-alpha-hover),
+    var(--icon-color)
+  );
+  background-size: 300%;
+  filter: blur(8px);
+  animation: glowing 8s ease-in-out infinite;
+}
+.icon-react:hover::before {
+  transform: scale(1.05);
+  opacity: 0.7;
+  filter: blur(12px);
+}
+.icon-react:hover {
+  box-shadow: 0 8px 20px var(--icon-color-alpha-hover);
+  border-color: var(--icon-color-border-hover);
+}
+.icon-react {
+  --icon-glow-color: var(--icon-color-alpha-hover);
+}

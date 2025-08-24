@@ -2,9 +2,17 @@
 export interface Props {
   class?: string;
   title?: string;
+  wrapperClass?: string;
 }
 const { class: cls = 'h-6 w-6', title = 'HTML' } = Astro.props;
+import '../../styles/icon-effects.css';
+// wrapper con estilos Tailwind (padding, bg suave en hover, margen)
+const wrapper =
+  Astro.props.wrapperClass ??
+  'inline-flex items-center justify-center p-1 rounded-md transition-colors duration-200 hover:bg-orange-50 dark:hover:bg-orange-900 mr-2 glow-effect icon-html';
 ---
 
 <!-- HtmlIcon: usa el SVG estático desde public/svg y permite clases Tailwind -->
-<img src="/svg/html.svg" class={cls} alt={title} loading="lazy" />
+<span class={wrapper} aria-hidden="true">
+  <img src="/svg/html.svg" class={cls} alt={title} loading="lazy" />
+</span>
