@@ -12,18 +12,34 @@
    - Mantiene también una ligera animación de fondo para un efecto sutil
 */
 .glow-effect {
-  --icon-glow-color: rgba(56, 189, 248, 0.12); /* default sky color */
-  /* fondo sutil que se anima con keyframes 'glowing' */
-  background: linear-gradient(
+  --icon-glow-color: rgba(56, 189, 248, 0.16); /* stronger default sky color */
+  /* glassmorphism base (translucent background + stronger blur) */
+  --icon-glass-bg: rgba(255, 255, 255, 0.08);
+  --icon-glass-bg-dark: rgba(15, 23, 42, 0.52);
+  --icon-glass-border: rgba(255, 255, 255, 0.12);
+
+  background-color: var(--icon-glass-bg);
+  /* more pronounced translucent sheen */
+  background-image: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.03),
     rgba(255, 255, 255, 0.06),
-    rgba(255, 255, 255, 0.03)
+    rgba(255, 255, 255, 0.12),
+    rgba(255, 255, 255, 0.06)
   );
-  background-size: 200% 200%;
-  animation: glowing 3s ease-in-out infinite;
-  /* sombra principal del glow, controlable vía CSS variable */
-  box-shadow: 0 4px 10px 0 var(--icon-glow-color);
+  background-size: 220% 220%;
+  /* stronger backdrop blur for a more visible glass effect */
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+  border: 1px solid var(--icon-glass-border);
+  animation: glowing 2.6s ease-in-out infinite;
+  /* stronger shadow for the intensified glow */
+  box-shadow: 0 6px 14px 0 var(--icon-glow-color);
+}
+
+/* Dark mode tweak: use darker translucent background when .dark is present */
+.dark .glow-effect {
+  background-color: var(--icon-glass-bg-dark);
+  border-color: rgba(255, 255, 255, 0.04);
 }
 
 /* ==========================================================================
@@ -61,18 +77,18 @@
     var(--icon-color)
   );
   background-size: 300%;
-  filter: blur(8px);
-  animation: glowing 8s ease-in-out infinite;
+  filter: blur(12px);
+  animation: glowing 7s ease-in-out infinite;
 }
 
 .icon-html:hover::before {
-  transform: scale(1.05);
-  opacity: 0.7;
-  filter: blur(12px);
+  transform: scale(1.07);
+  opacity: 0.9;
+  filter: blur(18px);
 }
 
 .icon-html:hover {
-  box-shadow: 0 8px 20px var(--icon-color-alpha-hover);
+  box-shadow: 0 12px 30px var(--icon-color-alpha-hover);
   border-color: var(--icon-color-border-hover);
 }
 
@@ -106,16 +122,16 @@
     var(--icon-color)
   );
   background-size: 300%;
-  filter: blur(8px);
-  animation: glowing 8s ease-in-out infinite;
+  filter: blur(12px);
+  animation: glowing 7s ease-in-out infinite;
 }
 .icon-css:hover::before {
-  transform: scale(1.05);
-  opacity: 0.7;
-  filter: blur(12px);
+  transform: scale(1.07);
+  opacity: 0.9;
+  filter: blur(18px);
 }
 .icon-css:hover {
-  box-shadow: 0 8px 20px var(--icon-color-alpha-hover);
+  box-shadow: 0 12px 30px var(--icon-color-alpha-hover);
   border-color: var(--icon-color-border-hover);
 }
 .icon-css {
@@ -148,16 +164,16 @@
     var(--icon-color)
   );
   background-size: 300%;
-  filter: blur(8px);
-  animation: glowing 8s ease-in-out infinite;
+  filter: blur(12px);
+  animation: glowing 7s ease-in-out infinite;
 }
 .icon-js:hover::before {
-  transform: scale(1.05);
-  opacity: 0.7;
-  filter: blur(12px);
+  transform: scale(1.07);
+  opacity: 0.9;
+  filter: blur(18px);
 }
 .icon-js:hover {
-  box-shadow: 0 8px 20px var(--icon-color-alpha-hover);
+  box-shadow: 0 12px 30px var(--icon-color-alpha-hover);
   border-color: var(--icon-color-border-hover);
 }
 .icon-js {
@@ -190,16 +206,16 @@
     var(--icon-color)
   );
   background-size: 300%;
-  filter: blur(8px);
-  animation: glowing 8s ease-in-out infinite;
+  filter: blur(12px);
+  animation: glowing 7s ease-in-out infinite;
 }
 .icon-tailwind:hover::before {
-  transform: scale(1.05);
-  opacity: 0.7;
-  filter: blur(12px);
+  transform: scale(1.07);
+  opacity: 0.9;
+  filter: blur(18px);
 }
 .icon-tailwind:hover {
-  box-shadow: 0 8px 20px var(--icon-color-alpha-hover);
+  box-shadow: 0 12px 30px var(--icon-color-alpha-hover);
   border-color: var(--icon-color-border-hover);
 }
 .icon-tailwind {
@@ -232,16 +248,16 @@
     var(--icon-color)
   );
   background-size: 300%;
-  filter: blur(8px);
-  animation: glowing 8s ease-in-out infinite;
+  filter: blur(12px);
+  animation: glowing 7s ease-in-out infinite;
 }
 .icon-react:hover::before {
-  transform: scale(1.05);
-  opacity: 0.7;
-  filter: blur(12px);
+  transform: scale(1.07);
+  opacity: 0.9;
+  filter: blur(18px);
 }
 .icon-react:hover {
-  box-shadow: 0 8px 20px var(--icon-color-alpha-hover);
+  box-shadow: 0 12px 30px var(--icon-color-alpha-hover);
   border-color: var(--icon-color-border-hover);
 }
 .icon-react {
