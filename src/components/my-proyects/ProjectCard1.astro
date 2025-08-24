@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import gitSvg from '../../assets/GitHub.svg';
 import liveSvg from '../../assets/Live.svg';
+import '../../styles/animations.css';
 import img1 from '../../assets/images/BackgroundGenerator/Bg-Generator.webp';
 import img2 from '../../assets/images/BackgroundGenerator/Bg-Generator-2.webp';
 import img3 from '../../assets/images/BackgroundGenerator/Bg-Generator-3.webp';
@@ -64,144 +65,145 @@ const resolveTechnology = (item) => {
 ---
 
 <article
-  class="inline-block w-auto transform rounded-2xl border border-white/20 bg-white/60 px-5 py-5 shadow-sm backdrop-blur-md transition-transform duration-150 dark:border-white/10 dark:bg-gray-900/50"
+  class="card-root inline-block w-auto transform rounded-2xl border border-white/20 bg-white/60 px-5 py-5 shadow-sm backdrop-blur-md transition-transform duration-1000 ease-in-out hover:scale-110 dark:border-white/10 dark:bg-gray-900/50"
+  style="will-change: transform;"
 >
-  <div id={sliderId} class="w-full max-w-full">
-    <div
-      class="group relative h-48 w-full overflow-hidden rounded-xl bg-gray-100 sm:h-40 md:h-48 dark:bg-gray-800"
-    >
+  <div class="card-inner">
+    <div id={sliderId} class="w-full max-w-full">
       <div
-        class="slider-track absolute inset-0 flex transition-transform duration-500 ease-in-out"
-        style={`transform: translateX(0%); width: calc(100% * ${finalImages.length});`}
+        class="group relative h-64 w-full overflow-hidden rounded-xl bg-gray-100 sm:h-56 md:h-64 dark:bg-transparent"
       >
-        {
-          finalImages.map((src, index) => (
-            <div
-              class="slide flex h-full items-center justify-center"
-              style={`width: calc(100% / ${finalImages.length}); flex-shrink: 0;`}
-            >
-              {typeof src === 'string' ? (
-                <img
-                  src={src}
-                  alt={title + ' - Imagen ' + (index + 1)}
-                  loading="lazy"
-                  class="h-full w-full rounded-lg object-cover"
-                />
-              ) : (
+        <div
+          class="slider-track absolute inset-0 flex transition-transform duration-500 ease-in-out"
+          style={`transform: translateX(0%); width: calc(100% * ${finalImages.length});`}
+        >
+          {
+            finalImages.map((src, index) => (
+              <div
+                class="slide flex h-full items-center justify-center"
+                style={`width: calc(100% / ${finalImages.length}); flex-shrink: 0;`}
+              >
                 <Image
                   src={src}
                   alt={title + ' - Imagen ' + (index + 1)}
-                  class="h-full w-full rounded-lg object-cover"
-                  sizes="(max-width:640px) 90vw, 480px"
+                  class="h-full w-full rounded-lg object-contain"
+                  sizes="(max-width:640px) 90vw, (max-width:1024px) 720px, 1080px"
+                  quality={90}
+                  loading={index === 0 ? 'eager' : 'lazy'}
                 />
-              )}
-            </div>
-          ))
-        }
+              </div>
+            ))
+          }
+        </div>
+
+        <button
+          type="button"
+          class="slider-prev absolute top-1/2 left-2 z-30 -translate-y-1/2 rounded-full bg-white/90 p-2 shadow-lg transition-all duration-200 hover:scale-110 hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-700"
+          aria-label="Imagen anterior"
+        >
+          <svg
+            class="h-4 w-4 text-slate-800 dark:text-white"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            ><path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 18l-6-6 6-6"></path></svg
+          >
+        </button>
+
+        <button
+          type="button"
+          class="slider-next absolute top-1/2 right-2 z-30 -translate-y-1/2 rounded-full bg-white/90 p-2 shadow-lg transition-all duration-200 hover:scale-110 hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-700"
+          aria-label="Imagen siguiente"
+        >
+          <svg
+            class="h-4 w-4 text-slate-800 dark:text-white"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            ><path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 6l6 6-6 6"></path></svg
+          >
+        </button>
       </div>
 
-      <button
-        type="button"
-        class="slider-prev absolute top-1/2 left-2 z-30 -translate-y-1/2 rounded-full bg-white/90 p-2 shadow-lg transition-all duration-200 hover:scale-110 hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-700"
-        aria-label="Imagen anterior"
-      >
-        <svg
-          class="h-4 w-4 text-slate-800 dark:text-white"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          ><path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M15 18l-6-6 6-6"></path></svg
-        >
-      </button>
-
-      <button
-        type="button"
-        class="slider-next absolute top-1/2 right-2 z-30 -translate-y-1/2 rounded-full bg-white/90 p-2 shadow-lg transition-all duration-200 hover:scale-110 hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-700"
-        aria-label="Imagen siguiente"
-      >
-        <svg
-          class="h-4 w-4 text-slate-800 dark:text-white"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          ><path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9 6l6 6-6 6"></path></svg
-        >
-      </button>
+      {
+        finalImages.length > 1 && (
+          <div class="mt-3 flex items-center justify-center gap-2">
+            {finalImages.map((_, i) => (
+              <button
+                type="button"
+                class="slider-dot h-3 w-3 cursor-pointer rounded-full bg-gray-400 transition-all duration-200 hover:bg-gray-600 dark:bg-gray-400 dark:hover:bg-gray-600"
+                data-index={i}
+                aria-label={'Ir a imagen ' + (i + 1)}
+              />
+            ))}
+          </div>
+        )
+      }
     </div>
 
-    {
-      finalImages.length > 1 && (
-        <div class="mt-3 flex items-center justify-center gap-2">
-          {finalImages.map((_, i) => (
-            <button
-              type="button"
-              class="slider-dot h-3 w-3 cursor-pointer rounded-full bg-gray-400 transition-all duration-200 hover:bg-gray-600 dark:bg-gray-400 dark:hover:bg-gray-600"
-              data-index={i}
-              aria-label={'Ir a imagen ' + (i + 1)}
-            />
-          ))}
-        </div>
-      )
-    }
-  </div>
+    <div class="mb-4 p-4">
+      <div class="mb-4 flex items-center">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+          {title}
+        </h3>
+      </div>
 
-  <div class="mb-4 p-4">
-    <div class="mb-4 flex items-center">
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-        {title}
-      </h3>
+      {
+        technologies && technologies.length > 0 && (
+          <div class="my-4 mt-4 flex flex-wrap items-center gap-2">
+            {technologies.map((item) => {
+              const resolved = resolveTechnology(item);
+              if (!resolved) return null;
+              const { Component, cls, title: techTitle } = resolved;
+              return <Component class={cls} title={techTitle} />;
+            })}
+          </div>
+        )
+      }
+
+      <p class="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+        {description}
+      </p>
     </div>
 
-    {
-      technologies && technologies.length > 0 && (
-        <div class="my-4 mt-4 flex flex-wrap items-center gap-2">
-          {technologies.map((item) => {
-            const resolved = resolveTechnology(item);
-            if (!resolved) return null;
-            const { Component, cls, title: techTitle } = resolved;
-            return <Component class={cls} title={techTitle} />;
-          })}
-        </div>
-      )
-    }
+    <div class="flex items-center justify-center gap-4 pt-4 pb-2">
+      <a
+        href={repo}
+        class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 transition-all hover:border-slate-800 hover:bg-slate-800 hover:text-white dark:border-gray-600 dark:bg-gray-700 dark:text-slate-100 dark:hover:bg-gray-600"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <Image src={gitSvg} alt="GitHub" class="h-4 w-4" loading="lazy" />
+        <span>Repositorio</span>
+      </a>
 
-    <p class="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-      {description}
-    </p>
+      <a
+        href={live}
+        class="inline-flex items-center gap-2 rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-800 transition-all hover:border-blue-600 hover:bg-blue-600 hover:text-white dark:border-blue-600 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-600 dark:hover:text-white"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <Image
+          src={liveSvg}
+          alt="Demo en vivo"
+          class="h-4 w-4"
+          loading="lazy"
+        />
+        <span>Demo</span>
+      </a>
+    </div>
+
+    <script type="module" define:vars={{ sliderId }}>
+      import initSlider from '/js/slider-client.js';
+      initSlider(sliderId);
+    </script>
   </div>
-
-  <div class="flex items-center justify-center gap-4 pt-4 pb-2">
-    <a
-      href={repo}
-      class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 transition-all hover:border-slate-800 hover:bg-slate-800 hover:text-white dark:border-gray-600 dark:bg-gray-700 dark:text-slate-100 dark:hover:bg-gray-600"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <Image src={gitSvg} alt="GitHub" class="h-4 w-4" loading="lazy" />
-      <span>Repositorio</span>
-    </a>
-
-    <a
-      href={live}
-      class="inline-flex items-center gap-2 rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-800 transition-all hover:border-blue-600 hover:bg-blue-600 hover:text-white dark:border-blue-600 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-600 dark:hover:text-white"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <Image src={liveSvg} alt="Demo en vivo" class="h-4 w-4" loading="lazy" />
-      <span>Demo</span>
-    </a>
-  </div>
-
-  <script type="module" define:vars={{ sliderId }}>
-    import initSlider from '/js/slider-client.js';
-    initSlider(sliderId);
-  </script>
 </article>

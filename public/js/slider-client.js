@@ -259,6 +259,8 @@ export function initSlider(sliderId) {
     updateActiveDot(0);
     applyFadeEffect(0, 0, 'next'); // Aplicar efecto al slide inicial
     startAutoplay();
+
+    // (hover control removed — animations will be handled via Tailwind utility classes)
   } catch (error) {
     // Manejo de errores para debugging
     console.error('Error initializing slider:', error);
