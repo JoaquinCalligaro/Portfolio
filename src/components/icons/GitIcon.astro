@@ -7,19 +7,18 @@ export interface Props {
 }
 const {
   class: cls = 'h-6 w-6',
-  title = 'JavaScript',
+  title = 'Git',
   wrapperClass = null,
   glow = true,
 } = Astro.props;
 import '../../styles/icon-effects.css';
 const base =
   'inline-flex items-center justify-center p-1 rounded-md transition-colors duration-200 mr-2';
-const hover = 'hover:bg-yellow-50 dark:hover:bg-yellow-900';
+const hover = 'hover:bg-gray-50 dark:hover:bg-gray-900';
 const wrapper =
-  wrapperClass ?? `${base} ${hover} ${glow ? 'glow-effect' : ''} icon-js`;
+  wrapperClass ?? `${base} ${hover} ${glow ? 'glow-effect' : ''} icon-git`;
 ---
 
-<!-- JavascriptIcon: usa el SVG estático desde public/svg y permite clases Tailwind -->
 <span class={wrapper} aria-hidden="true">
-  <img src="/svg/Javascript.svg" class={cls} alt={title} loading="lazy" />
+  <img src="/svg/Git.svg" class={cls} alt={title} loading="lazy" />
 </span>

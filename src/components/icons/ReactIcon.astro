@@ -3,12 +3,20 @@ export interface Props {
   class?: string;
   title?: string;
   wrapperClass?: string;
+  glow?: boolean;
 }
-const { class: cls = 'h-6 w-6', title = 'React' } = Astro.props;
+const {
+  class: cls = 'h-6 w-6',
+  title = 'React',
+  wrapperClass = null,
+  glow = true,
+} = Astro.props;
 import '../../styles/icon-effects.css';
+const base =
+  'inline-flex items-center justify-center p-1 rounded-md transition-colors duration-200 mr-2';
+const hover = 'hover:bg-cyan-50 dark:hover:bg-cyan-900';
 const wrapper =
-  Astro.props.wrapperClass ??
-  'inline-flex items-center justify-center p-1 rounded-md transition-colors duration-200 hover:bg-cyan-50 dark:hover:bg-cyan-900 mr-2 glow-effect icon-react';
+  wrapperClass ?? `${base} ${hover} ${glow ? 'glow-effect' : ''} icon-react`;
 ---
 
 <!-- ReactIcon: usa el SVG estático desde public/svg y permite clases Tailwind -->

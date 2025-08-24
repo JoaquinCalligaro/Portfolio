@@ -10,7 +10,7 @@ import SERVICES from '../assets/collections/services.json';
 import HireServiceModal from '../components/HireServiceModal.astro';
 import PersonalPresentation from '../components/PersonalPresentation.astro';
 import ProjectCard1 from '../components/my-proyects/ProjectCard1.astro';
-import bgGenerator from '../assets/images/Bg-Generator.webp';
+// img assets are provided inside ProjectCard1 components now
 import '../styles/global.css';
 ---
 
@@ -30,34 +30,10 @@ import '../styles/global.css';
         class="mt-20 grid grid-cols-1 gap-15 sm:grid-cols-2 md:grid-cols-2"
         id="projects"
       >
-        <ProjectCard1
-          img={bgGenerator}
-          title="Background Generator"
-          description="Generador de fondos dinámicos"
-          repo="https://github.com/JoaquinCalligaro/Background-Generator"
-          live="https://background-generator-final.netlify.app/"
-        />
-        <ProjectCard1
-          img={bgGenerator}
-          title="Background Generator"
-          description="Generador de fondos dinámicos"
-          repo="https://github.com/JoaquinCalligaro/Background-Generator"
-          live="https://background-generator-final.netlify.app/"
-        />
-        <ProjectCard1
-          img={bgGenerator}
-          title="Background Generator"
-          description="Generador de fondos dinámicos"
-          repo="https://github.com/JoaquinCalligaro/Background-Generator"
-          live="https://background-generator-final.netlify.app/"
-        />
-        <ProjectCard1
-          img={bgGenerator}
-          title="Background Generator"
-          description="Generador de fondos dinámicos"
-          repo="https://github.com/JoaquinCalligaro/Background-Generator"
-          live="https://background-generator-final.netlify.app/"
-        />
+        <ProjectCard1 />
+        <ProjectCard1 />
+        <ProjectCard1 />
+        <ProjectCard1 />
       </div>
       <!-- Sección Sobre Mí -->
       <section id="about" class="flex flex-col py-16">
