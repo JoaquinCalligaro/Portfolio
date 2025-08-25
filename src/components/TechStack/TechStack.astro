@@ -47,40 +47,5 @@ const splitClasses = className.split(' ');
         ))
       }
     </div>
-
-    <script>
-      // Efecto interactivo adicional para los iconos de tecnologías
-      document.addEventListener('DOMContentLoaded', () => {
-        const techIcons = document.querySelectorAll(
-          '.tech-stack__item'
-        ) as NodeListOf<HTMLElement>;
-
-        techIcons.forEach((icon) => {
-          icon.addEventListener('mouseenter', () => {
-            // Pequeña vibración al hacer hover
-            icon.style.transform = 'translateY(-4px) scale(1.05)';
-          });
-
-          icon.addEventListener('mouseleave', () => {
-            icon.style.transform = 'translateY(0) scale(1)';
-          });
-
-          // Efecto de click
-          icon.addEventListener('click', () => {
-            const techName = icon.getAttribute('data-tech-name');
-
-            // Crear un pequeño efecto de "ping"
-            icon.style.transform = 'translateY(-4px) scale(0.95)';
-            setTimeout(() => {
-              icon.style.transform = 'translateY(-4px) scale(1.05)';
-            }, 150);
-
-            // Opcional: podrías agregar aquí funcionalidad adicional
-            // como mostrar más información sobre la tecnología
-            console.log(`Clicked on ${techName}`);
-          });
-        });
-      });
-    </script>
   </div>
 </div>

@@ -24,6 +24,7 @@ export const stacks: TechStackGroup[] = [
         hexAlpha: '#E34F2633',
         icon: '/src/assets/html.svg',
         color: 'text-orange-500',
+        loading: 'eager',
       },
       {
         name: 'CSS3',
@@ -31,6 +32,7 @@ export const stacks: TechStackGroup[] = [
         hexAlpha: '#1572B633',
         icon: '/src/assets/CSS.svg',
         color: 'text-blue-600',
+        loading: 'eager',
       },
       {
         name: 'Sass',
@@ -38,6 +40,7 @@ export const stacks: TechStackGroup[] = [
         hexAlpha: '#CC669933',
         icon: '/src/assets/SASS.svg',
         color: 'text-pink-500',
+        loading: 'eager',
       },
       {
         name: 'Tailwind CSS',
@@ -45,6 +48,7 @@ export const stacks: TechStackGroup[] = [
         hexAlpha: '#06B6D433',
         icon: '/src/assets/TailwindCSS.svg',
         color: 'text-teal-500',
+        loading: 'eager',
       },
       {
         name: 'JavaScript',
@@ -52,6 +56,7 @@ export const stacks: TechStackGroup[] = [
         hexAlpha: '#F7DF1E33',
         icon: '/src/assets/Javascript.svg',
         color: 'text-yellow-500',
+        loading: 'eager',
       },
       {
         name: 'TypeScript',
@@ -66,6 +71,7 @@ export const stacks: TechStackGroup[] = [
         hexAlpha: '#61DAFB33',
         icon: '/src/assets/react.svg',
         color: 'text-cyan-400',
+        loading: 'eager',
       },
       {
         name: 'Astro',
@@ -73,6 +79,7 @@ export const stacks: TechStackGroup[] = [
         hexAlpha: '#FF5E0033',
         icon: '/src/assets/AstroLogo.svg',
         color: 'text-orange-500',
+        loading: 'eager',
       },
     ],
   },
@@ -85,6 +92,7 @@ export const stacks: TechStackGroup[] = [
         hexAlpha: '#4479A133',
         icon: '/src/assets/MySQL.svg',
         color: 'text-gray-900 dark:text-white',
+        loading: 'lazy',
       },
     ],
   },
