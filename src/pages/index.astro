@@ -1,19 +1,22 @@
 ---
 // index.astro - Refactorizado usando principalmente Tailwind
-import Card from '../components/Cards/Card.astro';
+import Card from '../components/cards/Card.astro';
 import Layout from '../layouts/Layout.astro';
 import TimelineItem from '../components/TimelineItem.astro';
-import CardService from '../components/Cards/CardService.astro';
-import TechStack from '../components/TechStack/TechStack.astro';
+import CardService from '../components/cards/CardService.astro';
+import TechStack from '../components/tech-stack/TechStack.astro';
 import EXPERIENCES from '../assets/collections/experiences.json';
 import SERVICES from '../assets/collections/services.json';
 import HireServiceModal from '../components/HireServiceModal.astro';
 import PersonalPresentation from '../components/PersonalPresentation.astro';
-import ProjectTitle from '../components/MyProjects/ProyectsTitle.astro';
-import ProjectCard1 from '../components/MyProjects/ProjectCard1.astro';
-import ProjectCard2 from '../components/MyProjects/ProjectCard2.astro';
-import ProjectCard3 from '../components/MyProjects/ProjectCard3.astro';
-import ProjectCard4 from '../components/MyProjects/ProjectCard4.astro';
+import ProjectTitle from '../components/my-projects/ProyectsTitle.astro';
+import ProjectCard1 from '../components/my-projects/ProjectCard1.astro';
+import ProjectCard2 from '../components/my-projects/ProjectCard2.astro';
+import ProjectCard3 from '../components/my-projects/ProjectCard3.astro';
+import ProjectCard4 from '../components/my-projects/ProjectCard4.astro';
+import ProjectCard5 from '../components/my-projects/ProjectCard5.astro';
+import ProjectCard6 from '../components/my-projects/ProjectCard6.astro';
+import ShowMoreBtn from '../components/ui/ShowMoreBtn.astro';
 
 import '../styles/global.css';
 ---
@@ -32,13 +35,30 @@ import '../styles/global.css';
       </div>
       <div id="projects">
         <ProjectTitle />
-        <div
-          class="mt-12 grid grid-cols-1 gap-15 sm:grid-cols-2 md:grid-cols-2"
-        >
-          <ProjectCard1 />
-          <ProjectCard2 />
-          <ProjectCard3 />
-          <ProjectCard4 />
+        <div class="mt-12">
+          <div class="grid grid-cols-1 gap-15 sm:grid-cols-2 md:grid-cols-2">
+            <ProjectCard1 />
+            <ProjectCard2 />
+            <ProjectCard3 />
+            <ProjectCard4 />
+          </div>
+
+          <!-- Contenedor oculto con los proyectos adicionales (5 y 6) -->
+          <div id="extra-projects" class="mt-8 hidden">
+            <div class="grid grid-cols-1 gap-15 sm:grid-cols-2 md:grid-cols-2">
+              <ProjectCard5 />
+              <ProjectCard6 />
+            </div>
+          </div>
+
+          <!-- Botón aislado reusable en ui -->
+          <div class="mt-6 flex justify-center">
+            <ShowMoreBtn
+              id="show-more-projects"
+              class="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+              text="Mostrar +2"
+            />
+          </div>
         </div>
       </div>
       <!-- Sección Sobre Mí -->
@@ -224,6 +244,53 @@ import '../styles/global.css';
           );
         });
       });
+
+      // Inicializar show-more button (usa window.initShowMore o inyecta script desde /js)
+      (function ensureInitShowMore() {
+        function run() {
+          try {
+            if (typeof window === 'undefined') return;
+            if (!Object.prototype.hasOwnProperty.call(window, 'initShowMore'))
+              return;
+            const fn = (window as unknown)['initShowMore'];
+            if (typeof fn === 'function')
+              fn('show-more-projects', {
+                targetId: 'extra-projects',
+                hiddenClass: 'hidden',
+              });
+          } catch {
+            // noop
+          }
+        }
+
+        try {
+          if (
+            typeof window !== 'undefined' &&
+            Object.prototype.hasOwnProperty.call(window, 'initShowMore')
+          ) {
+            run();
+            return;
+          }
+        } catch {
+          // noop
+        }
+
+        const existing = document.querySelector(
+          'script[data-show-more-module]'
+        );
+        if (existing) {
+          existing.addEventListener('load', run);
+          return;
+        }
+
+        const script = document.createElement('script');
+        script.type = 'module';
+        script.src = '/js/show-more/show-more-projects.js';
+        script.setAttribute('data-show-more-module', '');
+        script.addEventListener('load', run);
+        script.addEventListener('error', () => {});
+        document.head.appendChild(script);
+      })();
     </script>
   </section></Layout
 >

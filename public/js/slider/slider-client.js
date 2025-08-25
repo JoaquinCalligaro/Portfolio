@@ -25,6 +25,7 @@ export function initSlider(sliderId) {
     if (!track || totalSlides <= 1) return; // No inicializar si no hay suficientes slides
 
     let currentIndex = 0; // Slide actual
+    let lastIndex = 0; // VARIABLE AÑADIDA - Slide anterior para tracking
     let autoplayTimer = null; // Timer para autoplay
     const animationDuration = '800ms'; // Duración de las animaciones para suavizar
 
@@ -260,7 +261,7 @@ export function initSlider(sliderId) {
     applyFadeEffect(0, 0, 'next'); // Aplicar efecto al slide inicial
     startAutoplay();
 
-    // (hover control removed — animations will be handled via Tailwind utility classes)
+    // (hover control removed – animations will be handled via Tailwind utility classes)
   } catch (error) {
     // Manejo de errores para debugging
     console.error('Error initializing slider:', error);
@@ -268,3 +269,12 @@ export function initSlider(sliderId) {
 }
 
 export default initSlider;
+
+// Expose for non-bundled runtime usage (when loaded via <script type="module" src="/js/slider/slider-client.js">)
+try {
+  if (typeof window !== 'undefined') {
+    window.initSlider = initSlider;
+  }
+} catch {
+  // noop
+}

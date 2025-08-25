@@ -4,36 +4,44 @@ import RepositoryBtn from '../ui/RepositoryBtn.astro';
 import LiveBtn from '../ui/LiveBtn.astro';
 import '../../styles/animations.css';
 import '../../styles/icon-effects.css';
-import img1 from '../../assets/images/OrganicStore/organic-store-1.webp';
-import img2 from '../../assets/images/OrganicStore/organic-store-2.webp';
-import img3 from '../../assets/images/OrganicStore/organic-store-3.webp';
-import img4 from '../../assets/images/OrganicStore/organic-store-4.webp';
-import img5 from '../../assets/images/OrganicStore/organic-store-5.webp';
+import img1 from '../../assets/images/password-generator/Password-Generator-1.webp';
+import img2 from '../../assets/images/password-generator/Password-Generator-2.webp';
+import img3 from '../../assets/images/password-generator/Password-Generator-3.webp';
 import HtmlIcon from '../icons/HtmlIcon.astro';
 import CssIcon from '../icons/CssIcon.astro';
+import JavascriptIcon from '../icons/JavascriptIcon.astro';
+import TailwindIcon from '../icons/TailwindIcon.astro';
+import TypescriptIcon from '../icons/TypescriptIcon.astro';
 import LocalizedText from '../language/LocalizedText.astro';
 import { translations } from '../../data/translations';
 // Títulos y descripciones vienen de translations.ts (idioma fijo: ES)
 const props = Astro.props || {};
 const serverTitle =
-  props.title ?? translations['ES'].projects.organicStore.title;
+  props.title ?? translations['ES'].projects.passwordGenerator.title;
 const title = props.title ?? null;
-const technologies = props.technologies ?? ['html', 'css'];
-const images = props.images ?? [img1, img2, img3, img4, img5];
-const repo = 'https://github.com/JoaquinCalligaro/Organic-Store';
-const live = 'https://joaquincalligaro.github.io/Organic-Store/index.html';
-
+const technologies = props.technologies ?? [
+  'html',
+  'css',
+  'js',
+  'tailwind',
+  'typescript',
+];
+const images = props.images ?? [img1, img2, img3];
+const repo = 'https://github.com/JoaquinCalligaro/Password-Generator';
+const live = 'https://password-generatorjc.netlify.app/';
 const sliderId = `slider-${Math.random().toString(36).slice(2, 9)}`;
 
 const iconMap = {
   html: HtmlIcon,
   css: CssIcon,
+  js: JavascriptIcon,
+  javascript: JavascriptIcon,
+  tailwind: TailwindIcon,
+  typescript: TypescriptIcon,
 };
 
 const finalImages =
-  Array.isArray(images) && images.length > 0
-    ? images
-    : [img1, img2, img3, img4, img5];
+  Array.isArray(images) && images.length > 0 ? images : [img1, img2, img3];
 
 const resolveTechnology = (item) => {
   if (!item) return null;
@@ -140,7 +148,7 @@ const resolveTechnology = (item) => {
     <div class="mb-4 p-4">
       <div class="flex items-center">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-          {title ?? <LocalizedText key="projects.organicStore.title" />}
+          {title ?? <LocalizedText key="projects.passwordGenerator.title" />}
         </h3>
       </div>
 
@@ -162,23 +170,19 @@ const resolveTechnology = (item) => {
       <p
         class="pt-1.5 text-sm leading-relaxed text-slate-600 dark:text-slate-300"
       >
-        {
-          props.description ?? (
-            <LocalizedText key="projects.organicStore.description" />
-          )
-        }
+        <LocalizedText key="projects.passwordGenerator.description" />
       </p>
     </div>
 
     <div
-      class="flex items-center justify-center gap-8 pt-4 pb-2 sm:gap-8 md:gap-10 xl:gap-25"
+      class="flex items-center justify-center gap-15 pt-4 pb-2 sm:gap-15 md:gap-10 xl:gap-25"
     >
       <RepositoryBtn href={repo} />
       <LiveBtn href={live} />
     </div>
 
     <script type="module" define:vars={{ sliderId }}>
-      import initSlider from '/js/slider-client.js';
+      import initSlider from '/js/slider/slider-client.js';
       initSlider(sliderId);
     </script>
   </div>

@@ -1,0 +1,22 @@
+---
+// Props:
+// - id: string (id del botón y target)
+// - class: string (clases tailwind para el botón)
+// - text: string (texto por defecto)
+const {
+  id = 'show-more-projects',
+  class: cls = '',
+  text = 'Mostrar más',
+} = Astro.props;
+---
+
+<button
+  id={id}
+  class={`show-more-projects-btn ${cls}`}
+  type="button"
+  aria-expanded="false"
+>
+  {text}
+</button>
+
+<!-- El archivo JS que maneja la lógica está separado en public/js/show-more/show-more-projects.js -->
