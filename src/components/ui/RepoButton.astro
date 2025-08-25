@@ -7,12 +7,12 @@ import gitSvg from '../../assets/GitHub.svg';
 
 <a
   href={href}
-  class={`inline-flex items-center  rounded-lg border border-slate-300 bg-white px-2 py-2 text-sm font-medium text-slate-800 transition-all hover:border-slate-800 hover:bg-slate-800 hover:text-white dark:border-gray-600 dark:bg-gray-400/10 dark:text-slate-100 dark:hover:bg-gray-600 ${className}`}
+  class={`inline-flex items-center  rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 transition-all hover:border-slate-800 hover:bg-slate-800 hover:text-white dark:border-gray-600 dark:bg-gray-400/10 dark:text-slate-100 dark:hover:bg-gray-600 ${className}`}
   target="_blank"
   rel="noopener noreferrer"
 >
   <Image src={gitSvg} alt="GitHub" class="h-4 w-4" loading="lazy" />
-  <span class="xl:24 inline-block w-20 text-center sm:w-18 md:w-22"
+  <span class="xl:25 inline-block w-22 text-center sm:w-22 md:w-24"
     >{label ?? <LocalizedText key="buttons.repo" />}</span
   >
 </a>
