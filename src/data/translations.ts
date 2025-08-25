@@ -11,6 +11,9 @@ export const translations = {
       description:
         'Soy desarrollador frontend junior con experiencia en HTML, CSS y JavaScript. Actualmente trabajo con React, Tailwind y Astro, creando proyectos prácticos que combinan diseño moderno, rendimiento y buenas prácticas de desarrollo.',
     },
+    techStack: {
+      heading: 'Stack Tecnológico',
+    },
     projects: {
       backgroundGenerator: {
         title: 'Background Generator',
@@ -39,6 +42,9 @@ export const translations = {
       name: 'Joaquin Calligaro',
       description:
         'I am a junior frontend developer with experience in HTML, CSS and JavaScript. I work with React, Tailwind and Astro, building practical projects that combine modern design, performance and good development practices.',
+    },
+    techStack: {
+      heading: 'Tech Stack',
     },
     projects: {
       backgroundGenerator: {

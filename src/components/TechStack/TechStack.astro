@@ -2,6 +2,7 @@
 // Render-only component for Tech Stack.
 // Imports `stacks` (data) from src/data/techs.ts — keep UI logic here only.
 import TechStackSection from './TechStackSection.astro';
+import LocalizedText from '../language/LocalizedText.astro';
 import { stacks } from '../../data/techs';
 interface Props {
   className?: string;
@@ -36,7 +37,7 @@ const splitClasses = className.split(' ');
         </svg>
       </div>
       <h3 class="text-lg font-bold text-gray-950 sm:text-xl dark:text-white">
-        Tech Stack
+        <LocalizedText key="techStack.heading" />
       </h3>
     </div>
 
