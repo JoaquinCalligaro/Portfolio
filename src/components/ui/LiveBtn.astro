@@ -7,12 +7,12 @@ import liveSvg from '../../assets/Live.svg';
 
 <a
   href={href}
-  class={`inline-flex items-center glassmorph-effect rounded-lg border border-blue-300 bg-blue-50 px-2 py-2 text-sm font-medium text-blue-800 transition-all hover:border-blue-600/50 hover:bg-blue-600/50 hover:text-white dark:border-blue-600/50 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-600/50  dark:hover:text-white ${className}`}
+  class={`inline-flex items-center glassmorph-effect rounded-lg border border-blue-300 bg-blue-200/50 px-2 py-2 text-sm font-medium text-blue-800 transition-all hover:border-blue-600/50 hover:bg-blue-600/50 hover:text-white dark:border-blue-600/50 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-600/40  dark:hover:text-white ${className}`}
   target="_blank"
   rel="noopener noreferrer"
 >
-  <Image src={liveSvg} alt="Demo" class="h-4 w-4" loading="lazy" />
+  <Image src={liveSvg} alt="Live" class="h-5 w-5" loading="lazy" />
   <span class="xl:20 inline-block w-18 text-center sm:w-18 md:w-20"
-    >{label ?? <LocalizedText key="buttons.demo" />}</span
+    >{label ?? <LocalizedText key="buttons.live" />}</span
   >
 </a>

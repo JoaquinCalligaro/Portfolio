@@ -4,33 +4,31 @@ import RepositoryBtn from '../ui/RepositoryBtn.astro';
 import LiveBtn from '../ui/LiveBtn.astro';
 import '../../styles/animations.css';
 import '../../styles/icon-effects.css';
-import img1 from '../../assets/images/BackgroundGenerator/Bg-Generator.webp';
-import img2 from '../../assets/images/BackgroundGenerator/Bg-Generator-2.webp';
-import img3 from '../../assets/images/BackgroundGenerator/Bg-Generator-3.webp';
+import img1 from '../../assets/images/password-generator/Password-Generator-1.webp';
+import img2 from '../../assets/images/password-generator/Password-Generator-2.webp';
+import img3 from '../../assets/images/password-generator/Password-Generator-3.webp';
 import HtmlIcon from '../icons/HtmlIcon.astro';
 import CssIcon from '../icons/CssIcon.astro';
 import JavascriptIcon from '../icons/JavascriptIcon.astro';
 import TailwindIcon from '../icons/TailwindIcon.astro';
-import ReactIcon from '../icons/ReactIcon.astro';
 import TypescriptIcon from '../icons/TypescriptIcon.astro';
 import LocalizedText from '../language/LocalizedText.astro';
 import { translations } from '../../data/translations';
 // Títulos y descripciones vienen de translations.ts (idioma fijo: ES)
 const props = Astro.props || {};
 const serverTitle =
-  props.title ?? translations['ES'].projects.backgroundGenerator.title;
+  props.title ?? translations['ES'].projects.passwordGenerator.title;
 const title = props.title ?? null;
 const technologies = props.technologies ?? [
   'html',
   'css',
   'js',
   'tailwind',
-  'react',
   'typescript',
 ];
 const images = props.images ?? [img1, img2, img3];
-const repo = 'https://github.com/JoaquinCalligaro/Background-Generator';
-const live = 'https://background-generator-final.netlify.app/';
+const repo = 'https://github.com/JoaquinCalligaro/Password-Generator';
+const live = 'https://password-generatorjc.netlify.app/';
 const sliderId = `slider-${Math.random().toString(36).slice(2, 9)}`;
 
 const iconMap = {
@@ -39,7 +37,6 @@ const iconMap = {
   js: JavascriptIcon,
   javascript: JavascriptIcon,
   tailwind: TailwindIcon,
-  react: ReactIcon,
   typescript: TypescriptIcon,
 };
 
@@ -151,7 +148,7 @@ const resolveTechnology = (item) => {
     <div class="mb-4 p-4">
       <div class="flex items-center">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-          {title ?? <LocalizedText key="projects.backgroundGenerator.title" />}
+          {title ?? <LocalizedText key="projects.passwordGenerator.title" />}
         </h3>
       </div>
 
@@ -173,7 +170,7 @@ const resolveTechnology = (item) => {
       <p
         class="pt-1.5 text-sm leading-relaxed text-slate-600 dark:text-slate-300"
       >
-        <LocalizedText key="projects.backgroundGenerator.description" />
+  <LocalizedText key="projects.passwordGenerator.description" />
       </p>
     </div>
 

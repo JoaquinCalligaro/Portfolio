@@ -27,10 +27,15 @@ export const translations = {
         description:
           'Tienda en línea de productos orgánicos y saludables, con catálogo claro y ordenado. Diseñada para una navegación simple y una experiencia de compra agradable.',
       },
+      passwordGenerator: {
+        title: 'Generador de contraseñas',
+        description:
+          'Generador de contraseñas seguras con interfaz moderna.Incluye sistema de fortaleza visual, modo oscuro/claro automático y animaciones fluidas.',
+      },
     },
     buttons: {
       repo: 'Repositorio',
-      demo: 'Demo',
+      live: 'Demo',
     },
   },
   EN: {
@@ -60,10 +65,15 @@ export const translations = {
         description:
           'Simple online store for organic products with a clean catalog and easy navigation.',
       },
+      passwordGenerator: {
+        title: 'Password Generator',
+        description:
+          'Secure password generator with a modern interface. Includes a visual strength indicator, automatic dark/light mode, and smooth animations.',
+      },
     },
     buttons: {
       repo: 'Repository',
-      demo: 'Live',
+      live: 'Live',
     },
   },
 } as const;
