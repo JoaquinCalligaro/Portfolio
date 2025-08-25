@@ -32,6 +32,11 @@ export const translations = {
         description:
           'Generador de contraseñas seguras con interfaz moderna.Incluye sistema de fortaleza visual, modo oscuro/claro automático y animaciones fluidas.',
       },
+      gifApp: {
+        title: 'Gif App',
+        description:
+          'Aplicación Gif-App es una aplicación web que permite a los usuarios buscar, ver y compartir GIFs fácilmente. Utiliza la API de GIPHY para obtener GIFs en tendencia y populares',
+      },
     },
     buttons: {
       repo: 'Repositorio',
@@ -69,6 +74,11 @@ export const translations = {
         title: 'Password Generator',
         description:
           'Secure password generator with a modern interface. Includes a visual strength indicator, automatic dark/light mode, and smooth animations.',
+      },
+      gifApp: {
+        title: 'Gif App',
+        description:
+          'Gif-App is a web application that allows users to search, view, and share GIFs easily. It uses the GIPHY API to fetch trending and popular GIFs',
       },
     },
     buttons: {
