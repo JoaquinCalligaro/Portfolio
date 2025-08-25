@@ -1,0 +1,83 @@
+---
+import { translations, type Lang } from '../../data/translations';
+
+interface Props {
+  key: string;
+  fallback?: string;
+}
+
+const { key: i18nKey, fallback = '' } = Astro.props as Props;
+
+function resolve(lang: Lang, k: string) {
+  return k.split('.').reduce(
+    (acc: unknown, part) => {
+      if (
+        acc &&
+        typeof acc === 'object' &&
+        Object.prototype.hasOwnProperty.call(acc, part)
+      ) {
+        return (acc as unknown as Record<string, unknown>)[part];
+      }
+      return null;
+    },
+    (translations as unknown as Record<string, unknown>)[lang]
+  );
+}
+
+const serverLang: Lang = 'ES';
+const resolved = resolve(serverLang, i18nKey) ?? fallback ?? '';
+---
+
+<span data-i18n-key={i18nKey}>{resolved}</span>
+
+<script is:inline>
+  (function () {
+    const updateNode = (node, lang) => {
+      try {
+        const key = node.dataset.i18nKey;
+        if (!key || !window.TRANSLATIONS || !window.TRANSLATIONS[lang]) {
+          return;
+        }
+
+        // Navegar a través del objeto de traducciones usando el key
+        const parts = key.split('.');
+        let value = window.TRANSLATIONS[lang]; // Empezar desde el idioma específico
+
+        for (const part of parts) {
+          if (value && typeof value === 'object' && value[part] !== undefined) {
+            value = value[part];
+          } else {
+            value = null;
+            break;
+          }
+        }
+
+        if (typeof value === 'string') {
+          node.textContent = value;
+        }
+      } catch (e) {
+        console.warn(
+          'Error updating translation for key:',
+          node.dataset.i18nKey,
+          e
+        );
+      }
+    };
+
+    const applyAllTranslations = (lang) => {
+      document
+        .querySelectorAll('[data-i18n-key]')
+        .forEach((node) => updateNode(node, lang));
+    };
+
+    window.addEventListener('langChange', (e) => {
+      const lang = (e && e.detail) || document.documentElement.lang || 'ES';
+      applyAllTranslations(lang);
+    });
+
+    // Aplicar traducciones iniciales si ya están disponibles
+    if (window.TRANSLATIONS && document.documentElement.lang) {
+      applyAllTranslations(document.documentElement.lang);
+    }
+  })();
+</script>

@@ -1,0 +1,86 @@
+---
+import { translations } from '../../data/translations';
+import SpanishIcon from '../../assets/spanish.svg';
+import EnglishIcon from '../../assets/english.svg';
+// safe serialized translations for embedding in the DOM
+const __TRANSLATIONS_JSON = JSON.stringify(translations).replace(
+  /</g,
+  '\\u003c'
+);
+// mark used to satisfy static linters (value is injected into markup below)
+void __TRANSLATIONS_JSON;
+---
+
+<button
+  id="lang-toggle-component"
+  class="glow-hover action-button flex items-center px-3 py-1 dark:text-white"
+  aria-label="Toggle language"
+>
+  <span id="icon-es" aria-hidden="true"><SpanishIcon /></span>
+  <span id="icon-en" aria-hidden="true" style="display:none;"
+    ><EnglishIcon /></span
+  >
+</button>
+
+<script
+  id="__translations"
+  type="application/json"
+  is:inline
+  set:html={__TRANSLATIONS_JSON}
+/>
+
+<script is:inline>
+  (function () {
+    const btn = document.getElementById('lang-toggle-component');
+    const stored = localStorage.getItem('lang') || 'ES';
+
+    const apply = (lang) => {
+      document.documentElement.lang = lang;
+      document.documentElement.dataset.lang = lang;
+      localStorage.setItem('lang', lang);
+      window.dispatchEvent(new CustomEvent('langChange', { detail: lang }));
+    };
+
+    // Asegurar que el contenedor global existe con un nombre más claro
+    window.TRANSLATIONS = window.TRANSLATIONS || {};
+    window.TRANSLATIONS.ES = window.TRANSLATIONS.ES || {};
+    window.TRANSLATIONS.EN = window.TRANSLATIONS.EN || {};
+
+    try {
+      // Leer traducciones del <script> JSON inyectado por el servidor
+      const el = document.getElementById('__translations');
+      if (el && el.textContent) {
+        const parsed = JSON.parse(el.textContent);
+        window.TRANSLATIONS.ES = parsed.ES || window.TRANSLATIONS.ES;
+        window.TRANSLATIONS.EN = parsed.EN || window.TRANSLATIONS.EN;
+      }
+    } catch (e) {
+      console.warn('Could not set translations', e);
+    }
+
+    // helper para actualizar qué icono es visible
+    const updateIcons = (lang) => {
+      try {
+        const es = document.getElementById('icon-es');
+        const en = document.getElementById('icon-en');
+        if (es) es.style.display = lang === 'ES' ? '' : 'none';
+        if (en) en.style.display = lang === 'EN' ? '' : 'none';
+      } catch {
+        // noop
+      }
+    };
+
+    // Aplicar idioma guardado al inicializar y actualizar iconos
+    updateIcons(stored);
+    apply(stored);
+
+    if (btn) {
+      btn.addEventListener('click', () => {
+        const current = document.documentElement.lang || 'ES';
+        const next = current === 'ES' ? 'EN' : 'ES';
+        apply(next);
+        updateIcons(next);
+      });
+    }
+  })();
+</script>

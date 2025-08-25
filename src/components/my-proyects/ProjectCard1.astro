@@ -14,9 +14,10 @@ import TailwindIcon from '../icons/TailwindIcon.astro';
 import ReactIcon from '../icons/ReactIcon.astro';
 import GitIcon from '../icons/GitIcon.astro';
 import TypescriptIcon from '../icons/TypescriptIcon.astro';
+import LocalizedText from '../language/LocalizedText.astro';
 
 const props = Astro.props || {};
-const title = props.title ?? 'Background Generator';
+const title = props.title ?? null;
 const technologies = props.technologies ?? [
   'html',
   'css',
@@ -25,9 +26,7 @@ const technologies = props.technologies ?? [
   'react',
   'typescript',
 ];
-const description =
-  props.description ??
-  'Generador de fondos animados con múltiples diseños predefinidos y más de 26 animaciones personalizables en tiempo real.';
+const description = props.description ?? null;
 const images = props.images ?? [img1, img2, img3];
 const repo = 'https://github.com/JoaquinCalligaro/Background-Generator';
 const live = 'https://background-generator-final.netlify.app/';
@@ -66,10 +65,10 @@ const resolveTechnology = (item) => {
 ---
 
 <article
-  class="card-root inline-block w-auto transform rounded-2xl border border-white/20 bg-white/60 px-4 pb-6 shadow-sm backdrop-blur-md transition-transform duration-500 ease-in-out hover:scale-110 dark:border-white/10 dark:bg-gray-900/50"
+  class="card-root flex h-full transform flex-col rounded-2xl border border-white/20 bg-white/60 px-4 pb-6 shadow-sm backdrop-blur-md transition-transform duration-500 ease-in-out hover:scale-110 dark:border-white/10 dark:bg-gray-900/50"
   style="will-change: transform;"
 >
-  <div class="card-inner">
+  <div class="card-inner flex h-full flex-col justify-between">
     <div id={sliderId} class="w-full max-w-full">
       <div
         class="group relative h-64 w-full overflow-hidden rounded-sm bg-transparent sm:h-56 md:h-64 dark:bg-transparent"
@@ -153,7 +152,7 @@ const resolveTechnology = (item) => {
     <div class="mb-4 p-4">
       <div class="flex items-center">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-          {title}
+          {title ?? <LocalizedText key="projects.backgroundGenerator.title" />}
         </h3>
       </div>
 
@@ -175,11 +174,17 @@ const resolveTechnology = (item) => {
       <p
         class="pt-1.5 text-sm leading-relaxed text-slate-600 dark:text-slate-300"
       >
-        {description}
+        {
+          description ?? (
+            <LocalizedText key="projects.backgroundGenerator.description" />
+          )
+        }
       </p>
     </div>
 
-    <div class="flex items-center justify-center gap-25 pt-4 pb-2">
+    <div
+      class="flex items-center justify-center gap-8 pt-4 pb-2 sm:gap-8 md:gap-10 xl:gap-25"
+    >
       <RepoButton href={repo} />
       <DemoButton href={live} />
     </div>

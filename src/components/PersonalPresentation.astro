@@ -1,6 +1,7 @@
 ---
 import meImage from '../assets/images/me.webp';
 import { Image } from 'astro:assets';
+import LocalizedText from './language/LocalizedText.astro';
 ---
 
 <!-- Presentación personal -->
@@ -13,19 +14,21 @@ import { Image } from 'astro:assets';
     class="h-60 w-60 rounded-full object-cover shadow-lg ring-4 ring-amber-200 transition-all duration-300 hover:scale-105 hover:shadow-xl sm:h-40 sm:w-40 md:h-56 md:w-56 dark:ring-amber-800"
     sizes="(max-width: 640px) 72vw, (max-width: 1024px) 40vw, 240px"
   />
-  <div class="flex flex-col gap-4 text-center md:text-left">
+  <div
+    class="flex flex-col gap-5 text-center sm:gap-5 md:gap-5 md:text-left xl:gap-0"
+  >
     <h1
       class="text-4xl font-bold text-black md:text-6xl xl:mb-10 dark:text-white"
     >
-      Joaquin Calligaro
+      <LocalizedText key="personal.name" fallback="Joaquin Calligaro" />
     </h1>
     <p
       class="max-w-3xl text-lg leading-relaxed text-gray-600 dark:text-gray-300"
     >
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Vel laudantium
-      reiciendis impedit voluptatum! Harum aliquid, sint vero officia molestiae
-      tempore voluptates, corporis expedita facere deserunt iure magni ratione
-      quidem veniam?
+      <LocalizedText
+        key="personal.description"
+        fallback="Soy desarrollador frontend..."
+      />
     </p>
   </div>
 </div>
