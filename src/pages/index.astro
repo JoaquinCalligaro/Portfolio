@@ -9,11 +9,10 @@ import EXPERIENCES from '../assets/collections/experiences.json';
 import SERVICES from '../assets/collections/services.json';
 import HireServiceModal from '../components/HireServiceModal.astro';
 import PersonalPresentation from '../components/PersonalPresentation.astro';
-import ProjectCard1 from '../components/my-proyects/ProjectCard1.astro';
-
-// img assets are provided inside ProjectCard1 components now
+import ProjectTitle from '../components/MyProjects/ProyectsTitle.astro';
+import ProjectCard1 from '../components/MyProjects/ProjectCard1.astro';
+import ProjectCard2 from '../components/MyProjects/ProjectCard2.astro';
 import '../styles/global.css';
-import ProjectCard2 from '../components/my-proyects/ProjectCard2.astro';
 ---
 
 <Layout>
@@ -28,12 +27,14 @@ import ProjectCard2 from '../components/my-proyects/ProjectCard2.astro';
       <div id="tech-stack">
         <TechStack />
       </div>
-      <div
-        class="mt-20 grid grid-cols-1 gap-15 sm:grid-cols-2 md:grid-cols-2"
-        id="projects"
-      >
-        <ProjectCard1 />
-        <ProjectCard2 />
+      <div id="projects">
+        <ProjectTitle />
+        <div
+          class="mt-12 grid grid-cols-1 gap-15 sm:grid-cols-2 md:grid-cols-2"
+        >
+          <ProjectCard1 />
+          <ProjectCard2 />
+        </div>
       </div>
       <!-- Sección Sobre Mí -->
       <section id="about" class="flex flex-col py-16">

@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
-import RepoButton from '../ui/RepoButton.astro';
-import DemoButton from '../ui/DemoButton.astro';
+import RepositoryBtn from '../ui/RepositoryBtn.astro';
+import LiveBtn from '../ui/LiveBtn.astro';
 import '../../styles/animations.css';
 import '../../styles/icon-effects.css';
 import img1 from '../../assets/images/BackgroundGenerator/Bg-Generator.webp';
@@ -15,8 +15,11 @@ import ReactIcon from '../icons/ReactIcon.astro';
 import GitIcon from '../icons/GitIcon.astro';
 import TypescriptIcon from '../icons/TypescriptIcon.astro';
 import LocalizedText from '../language/LocalizedText.astro';
-
+import { translations } from '../../data/translations';
+// Títulos y descripciones vienen de translations.ts (idioma fijo: ES)
 const props = Astro.props || {};
+const serverTitle =
+  props.title ?? translations['ES'].projects.backgroundGenerator.title;
 const title = props.title ?? null;
 const technologies = props.technologies ?? [
   'html',
@@ -26,11 +29,9 @@ const technologies = props.technologies ?? [
   'react',
   'typescript',
 ];
-const description = props.description ?? null;
 const images = props.images ?? [img1, img2, img3];
 const repo = 'https://github.com/JoaquinCalligaro/Background-Generator';
 const live = 'https://background-generator-final.netlify.app/';
-
 const sliderId = `slider-${Math.random().toString(36).slice(2, 9)}`;
 
 const iconMap = {
@@ -85,7 +86,7 @@ const resolveTechnology = (item) => {
               >
                 <Image
                   src={src}
-                  alt={title + ' - Imagen ' + (index + 1)}
+                  alt={serverTitle + ' - Imagen ' + (index + 1)}
                   class="block max-h-full max-w-full rounded-xl object-contain"
                   sizes="(max-width:640px) 90vw, (max-width:1024px) 720px, 1080px"
                   quality={90}
@@ -174,19 +175,15 @@ const resolveTechnology = (item) => {
       <p
         class="pt-1.5 text-sm leading-relaxed text-slate-600 dark:text-slate-300"
       >
-        {
-          description ?? (
-            <LocalizedText key="projects.backgroundGenerator.description" />
-          )
-        }
+        <LocalizedText key="projects.backgroundGenerator.description" />
       </p>
     </div>
 
     <div
       class="flex items-center justify-center gap-15 pt-4 pb-2 sm:gap-15 md:gap-10 xl:gap-25"
     >
-      <RepoButton href={repo} />
-      <DemoButton href={live} />
+      <RepositoryBtn href={repo} />
+      <LiveBtn href={live} />
     </div>
 
     <script type="module" define:vars={{ sliderId }}>

@@ -14,7 +14,9 @@ export const translations = {
     techStack: {
       heading: 'Stack Tecnológico',
     },
+
     projects: {
+      heading: 'Mis Proyectos',
       backgroundGenerator: {
         title: 'Background Generator',
         description:
@@ -47,15 +49,16 @@ export const translations = {
       heading: 'Tech Stack',
     },
     projects: {
+      heading: 'My Projects',
       backgroundGenerator: {
         title: 'Background Generator',
         description:
-          'Background generator with multiple predefined designs and over 26 customizable animations in real time.',
+          'Animated background generator with multiple presets and 26+ customizable animations.',
       },
       organicStore: {
         title: 'Organic Store',
         description:
-          'Online store for organic and healthy products, with a clear, well-organized catalogue. Designed for simple navigation and a pleasant buying experience.',
+          'Simple online store for organic products with a clean catalog and easy navigation.',
       },
     },
     buttons: {
