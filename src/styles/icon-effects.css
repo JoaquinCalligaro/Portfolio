@@ -1,0 +1,5 @@
+/* Efectos de iconos: versión compacta (usa variables CSS) */
+@import './animations.css';
+
+/* Contenedor de icons con glassmorph y borde lineal por tecnología */
+/* Se eliminó el contenedor glassmorph; las líneas y glow se aplican por icono individual */

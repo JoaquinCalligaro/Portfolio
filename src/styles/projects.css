@@ -1,3 +1,4 @@
+/* Efecto glowing */
 @keyframes glowing {
   0%,
   100% {
@@ -57,8 +58,7 @@
     animation-delay: 0.9s;
   }
 }
-
-/* Helper to ensure transform origin and smoother rendering */
+/* Efectos de las cards */
 .card-inner {
   transform-origin: center center;
   will-change: transform;
@@ -71,7 +71,7 @@
   transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* Efecto glassmorph ligero y espejo (no muy intenso) */
+/* Efecto glassmorph ligero y espejo*/
 @keyframes glassmorph-glow {
   0% {
     filter: brightness(1) saturate(1);
@@ -155,15 +155,16 @@
 
 /* Contenedor glow */
 .glow-effect {
-  --icon-glow-color: #38bdf82e;
-  background: linear-gradient(90deg, #ffffff08, #ffffff0f, #ffffff08);
+  --icon-glow-color: #00b3ff2e;
+  background: linear-gradient(90deg, #ff000008, #ffffff0f, #ffffff08);
   background-size: 200% 200%;
   animation: glowing 3s ease-in-out infinite;
   /* sombra base más sutil (reducida) */
   box-shadow: 0 4px 10px 0 var(--icon-glow-color);
 }
 
-animation: pulse-shadow 2s infinite; /* Apply pulse-shadow animation */
+/* Animacion glow exterior que cubre a los iconos */
+animation: pulse-shadow 2s infinite;
 /* Base para todos los wrappers de icono (clases .icon-*) */
 [class*='icon-'] {
   position: relative;
@@ -180,7 +181,7 @@ animation: pulse-shadow 2s infinite; /* Apply pulse-shadow animation */
   background-clip: padding-box;
   -webkit-backdrop-filter: blur(6px) saturate(120%);
   backdrop-filter: blur(6px) saturate(120%);
-  /* evitar que pseudo-elementos sobresalgan del contenedor */
+
   overflow: hidden;
   /* add an inset colored stroke to make the border line more visible
      and increase the visible border thickness; keep the diffuse glow */
@@ -305,7 +306,7 @@ animation: pulse-shadow 2s infinite; /* Apply pulse-shadow animation */
    Pulsos de color y un outline sutil sin modificar el glow de fondo. */
 .border-anim-only {
   /* desactivar animación global si existe (evita duplicar efectos) */
-  animation: none !important;
+
   /* faster border-only hover transitions */
   transition:
     border-color 90ms ease,
@@ -337,9 +338,7 @@ animation: pulse-shadow 2s infinite; /* Apply pulse-shadow animation */
   border-color: var(--icon-color-border-hover);
 }
 
-/* border-pulse animation removed; border remains static and glows slightly */
-
-/* Variables por icono (solo variables; estilos arriba) */
+/* Variables por icono individual (color de fondo animado)*/
 .icon-html {
   --icon-color: #e34f26;
   --icon-color-alpha: #e34f2644;
@@ -406,13 +405,7 @@ animation: pulse-shadow 2s infinite; /* Apply pulse-shadow animation */
   --icon-color-border: #ff5d8f66;
   --icon-color-border-hover: #ff5d8fcc;
 }
-.icon-figma {
-  --icon-color: #ff7262;
-  --icon-color-alpha: #ff726244;
-  --icon-color-alpha-hover: #ff726266;
-  --icon-color-border: #ff726266;
-  --icon-color-border-hover: #ff7262cc;
-}
+
 .icon-git {
   --icon-color: #f05032;
   --icon-color-alpha: #f0503244;
@@ -420,20 +413,7 @@ animation: pulse-shadow 2s infinite; /* Apply pulse-shadow animation */
   --icon-color-border: #f0503266;
   --icon-color-border-hover: #f05032cc;
 }
-.icon-mysql {
-  --icon-color: #00758f;
-  --icon-color-alpha: #00758f44;
-  --icon-color-alpha-hover: #00758f66;
-  --icon-color-border: #00758f66;
-  --icon-color-border-hover: #00758fcc;
-}
-.icon-postman {
-  --icon-color: #ff6c37;
-  --icon-color-alpha: #ff6c3744;
-  --icon-color-alpha-hover: #ff6c3766;
-  --icon-color-border: #ff6c3766;
-  --icon-color-border-hover: #ff6c37cc;
-}
+
 .icon-typescript {
   --icon-color: #3178c6;
   --icon-color-alpha: #3178c644;
@@ -443,36 +423,20 @@ animation: pulse-shadow 2s infinite; /* Apply pulse-shadow animation */
 }
 
 /* ==========================================================================  
-   SHOW MORE PROJECTS STYLES 
+   BOTON VER TODO/OCULTAR - Estilos para botón "Mostrar más" con efectos neón
    ========================================================================== */
 
-.show-more-projects-container {
-  transition:
-    max-height 0.6s ease-out,
-    opacity 0.45s ease-out,
-    margin 0.45s ease-out,
-    padding 0.45s ease-out;
-  overflow: hidden;
+/* Variables específicas para el botón Show More */
+:root {
+  /* linea de borde animada */
+  --showmore-primary: #0091ff;
+  /* grosor de la linea */
+  --showmore-border-width: 1.5px;
 }
 
-.animate-expand-vertically {
-  animation-name: expand-vertically;
-  animation-delay: 200ms;
-  animation-duration: 1000ms; /* ajustado al timeout del JS */
-
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-  animation-fill-mode: both;
-  will-change: transform, opacity;
-}
-
-.animate-contract-vertically {
-  animation-name: contract-vertically;
-  animation-delay: 100ms;
-  animation-duration: 500ms;
-  animation-timing-function: ease-in-out;
-  animation-fill-mode: both;
-  will-change: transform, opacity;
-}
+/* ==========================================================================  
+   BOTON VER TODO/OCULTAR (ANIMACION GENERAL)
+   ========================================================================== */
 
 /* Nueva keyframe para colapso vertical */
 @keyframes contract-vertically {
@@ -486,30 +450,8 @@ animation: pulse-shadow 2s infinite; /* Apply pulse-shadow animation */
   }
 }
 
-.show-more-projects-btn {
-  display: inline-block;
-  transition:
-    transform 600ms cubic-bezier(0.2, 0.9, 0.25, 1),
-    margin 600ms cubic-bezier(0.2, 0.9, 0.25, 1),
-    opacity 300ms ease;
-  will-change: transform, margin, opacity;
-}
-
-/* ==========================================================================  
-   SHOW MORE BUTTON - Estilos para botón "Mostrar más" con efectos neón
-   
-   ========================================================================== */
-
-/* Variables específicas para el botón Show More */
-:root {
-  /* linea de borde animada */
-  --showmore-primary: #0091ff;
-  /* grosor de la linea */
-  --showmore-border-width: 1.5px;
-}
-
 /* ==========================================================================
-   BASE STYLES - Botón Show More con efectos neón
+   BASE STYLES - BOTON VER TODO/OCULTAR con efectos neón
    ========================================================================== */
 
 .neon-showmore-btn {

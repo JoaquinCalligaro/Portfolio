@@ -1,0 +1,229 @@
+/* ==========================================================================
+   ANIMACIONES KEYFRAME 
+   ========================================================================== */
+
+/* ==========================================================================  
+   SHOW MORE PROJECTS STYLES (migrated from show-more-projects.js)  
+   ========================================================================== */
+
+.show-more-projects-container {
+  transition:
+    max-height 0.6s ease-out,
+    opacity 0.45s ease-out,
+    margin 0.45s ease-out,
+    padding 0.45s ease-out;
+  overflow: hidden;
+}
+
+.animate-expand-vertically {
+  animation-name: expand-vertically;
+  animation-delay: 200ms;
+  animation-duration: 1000ms; /* ajustado al timeout del JS */
+
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+  will-change: transform, opacity;
+}
+
+.animate-contract-vertically {
+  animation-name: contract-vertically;
+  animation-delay: 100ms;
+  animation-duration: 500ms;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: both;
+  will-change: transform, opacity;
+}
+
+/* Nueva keyframe para colapso vertical */
+@keyframes contract-vertically {
+  0% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(0.9);
+    opacity: 0;
+  }
+}
+
+.show-more-projects-btn {
+  display: inline-block;
+  transition:
+    transform 600ms cubic-bezier(0.2, 0.9, 0.25, 1),
+    margin 600ms cubic-bezier(0.2, 0.9, 0.25, 1),
+    opacity 300ms ease;
+  will-change: transform, margin, opacity;
+}
+
+/* ==========================================================================  
+   SHOW MORE BUTTON - Estilos para botón "Mostrar más" con efectos neón
+   
+   ========================================================================== */
+
+/* Variables específicas para el botón Show More */
+:root {
+  /* linea de borde animada */
+  --showmore-primary: #0091ff;
+  /* grosor de la linea */
+  --showmore-border-width: 1.5px;
+}
+
+/* ==========================================================================
+   BASE STYLES - Botón Show More con efectos neón
+   ========================================================================== */
+
+.neon-showmore-btn {
+  /* Apariencia base */
+  overflow: hidden;
+
+  /* Transiciones suaves */
+  transition:
+    background-color 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    color 0.4s ease,
+    box-shadow 0.4s ease,
+    transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  /* Optimización */
+  will-change: transform, background-color, box-shadow;
+  transform-origin: center center;
+}
+
+/* Estados interactivos */
+.neon-showmore-btn:hover {
+  background: var(--showmore-primary);
+  color: var(--showmore-text-hover);
+  box-shadow:
+    0 0 10px var(--showmore-primary),
+    0 0 20px var(--showmore-primary),
+    0 0 40px var(--showmore-primary);
+
+  transform: translateY(-1px);
+
+  /* Reflejo sutil */
+  -webkit-box-reflect: below 1.5px
+    linear-gradient(transparent, rgba(0, 0, 0, 0.1));
+}
+
+.neon-showmore-btn__border {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+/* Borde superior */
+.neon-showmore-btn__border--top {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--showmore-border-width);
+  background: linear-gradient(90deg, transparent, var(--showmore-primary));
+  animation: showmore-border-top 2s linear infinite;
+  border-radius: var(--showmore-border-radius) var(--showmore-border-radius) 0 0; /* Añadir esta línea */
+}
+@keyframes showmore-border-top {
+  0% {
+    left: -100%;
+  }
+  50%,
+  100% {
+    left: 100%;
+  }
+}
+
+/* Borde derecho */
+.neon-showmore-btn__border--right {
+  top: -100%;
+  right: 0;
+  width: var(--showmore-border-width);
+  height: 100%;
+  background: linear-gradient(180deg, transparent, var(--showmore-primary));
+  animation: showmore-border-right 2s linear infinite;
+  animation-delay: 0.5s;
+  border-radius: 0 var(--showmore-border-radius) var(--showmore-border-radius) 0; /* Añadir esta línea */
+}
+
+@keyframes showmore-border-right {
+  0% {
+    top: -100%;
+  }
+  50%,
+  100% {
+    top: 100%;
+  }
+}
+
+/* Borde inferior */
+.neon-showmore-btn__border--bottom {
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: var(--showmore-border-width);
+  background: linear-gradient(270deg, transparent, var(--showmore-primary));
+  animation: showmore-border-bottom 2s linear infinite;
+  animation-delay: 1s;
+}
+
+@keyframes showmore-border-bottom {
+  0% {
+    right: -100%;
+  }
+  50%,
+  100% {
+    right: 100%;
+  }
+}
+
+/* Borde izquierdo */
+.neon-showmore-btn__border--left {
+  bottom: -100%;
+  left: 0;
+  width: var(--showmore-border-width);
+  height: 100%;
+  background: linear-gradient(180deg, transparent, var(--showmore-primary));
+  animation: showmore-border-left 2s linear infinite;
+  animation-delay: 1.5s;
+}
+
+@keyframes showmore-border-left {
+  0% {
+    bottom: -100%;
+  }
+  50%,
+  100% {
+    bottom: 100%;
+  }
+}
+
+/* ==========================================================================
+   ACCESIBILIDAD
+   ========================================================================== */
+
+/* Reducir animaciones */
+@media (prefers-reduced-motion: reduce) {
+  .neon-showmore-btn__border {
+    animation: none;
+  }
+
+  .neon-showmore-btn {
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .neon-showmore-btn:hover {
+    -webkit-box-reflect: none;
+    transform: none;
+  }
+}
+
+/* Alto contraste */
+@media (prefers-contrast: high) {
+  .neon-showmore-btn {
+    border: 1px solid var(--showmore-primary);
+  }
+
+  .neon-showmore-btn:hover {
+    border-color: var(--showmore-text-hover);
+  }
+}
