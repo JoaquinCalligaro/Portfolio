@@ -1,7 +1,7 @@
 /* eslint-env browser */
 /* global window */
 // show-more-init.js
-// 📄 Punto de entrada: importa la lógica core y expone initShowMore()
+//  Punto de entrada: importa la lógica core y expone initShowMore()
 // Separa configuración, inicialización y estado
 
 import {
