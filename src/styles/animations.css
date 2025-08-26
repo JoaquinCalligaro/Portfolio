@@ -233,7 +233,7 @@
 
 /* ==========================================================================  
    SHOW MORE BUTTON - Estilos para botón "Mostrar más" con efectos neón
-   Agrega esto al final de tu animations.css
+   
    ========================================================================== */
 
 /* Variables específicas para el botón Show More */
@@ -300,74 +300,6 @@
   -webkit-box-reflect: below 1px
     linear-gradient(transparent, rgba(0, 0, 0, 0.1));
 }
-
-.neon-showmore-btn:focus-visible {
-  outline: none;
-  background: var(--showmore-primary);
-  color: var(--showmore-text-hover);
-  box-shadow:
-    0 0 5px var(--showmore-primary),
-    0 0 15px var(--showmore-primary),
-    0 0 30px var(--showmore-primary);
-}
-
-.neon-showmore-btn:active {
-  transform: scale(0.95) translateY(0);
-  transition-duration: 0.1s;
-}
-
-/* Estado expandido */
-.neon-showmore-btn--expanded {
-  background: rgba(3, 233, 244, 0.1);
-  box-shadow: 0 0 5px rgba(3, 233, 244, 0.3);
-}
-
-.neon-showmore-btn--expanded:hover {
-  background: var(--showmore-primary);
-}
-
-/* ==========================================================================
-   VARIANTES DE COLOR
-   ========================================================================== */
-
-.neon-showmore-btn--purple {
-  filter: hue-rotate(270deg);
-}
-
-.neon-showmore-btn--green {
-  filter: hue-rotate(110deg);
-}
-
-/* ==========================================================================
-   TAMAÑOS
-   ========================================================================== */
-
-.neon-showmore-btn--small {
-  padding: 8px 16px;
-  font-size: 0.875rem;
-  letter-spacing: 0.5px;
-}
-
-.neon-showmore-btn--large {
-  padding: 16px 32px;
-  font-size: 1.125rem;
-  letter-spacing: 2px;
-}
-
-/* ==========================================================================
-   TEXTO DEL BOTÓN
-   ========================================================================== */
-
-.neon-showmore-btn__text {
-  position: relative;
-  z-index: 10;
-  display: block;
-  transition: opacity 0.3s ease;
-}
-
-/* ==========================================================================
-   BORDES ANIMADOS - Versión optimizada para Show More
-   ========================================================================== */
 
 .neon-showmore-btn__border {
   position: absolute;
@@ -460,54 +392,6 @@
 }
 
 /* ==========================================================================
-   INTEGRACIÓN CON SISTEMA EXISTENTE
-   ========================================================================== */
-
-/* Mantener compatibilidad con clases show-more-projects-btn existentes */
-.show-more-projects-btn.neon-showmore-btn {
-  /* Hereda todas las propiedades existentes y las combina con efectos neón */
-  display: inline-block;
-  transition:
-    transform 600ms cubic-bezier(0.2, 0.9, 0.25, 1),
-    margin 600ms cubic-bezier(0.2, 0.9, 0.25, 1),
-    opacity 300ms ease,
-    background-color 400ms ease,
-    box-shadow 400ms ease;
-  will-change: transform, margin, opacity, background-color, box-shadow;
-}
-
-/* ==========================================================================
-   RESPONSIVE DESIGN
-   ========================================================================== */
-
-@media (max-width: 768px) {
-  .neon-showmore-btn {
-    padding: 10px 20px;
-    font-size: 0.9rem;
-    letter-spacing: 0.5px;
-  }
-
-  .neon-showmore-btn--large {
-    padding: 12px 24px;
-    font-size: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .neon-showmore-btn {
-    padding: 8px 16px;
-    font-size: 0.8rem;
-    letter-spacing: 0.25px;
-    margin: 15px 0;
-  }
-
-  .neon-showmore-btn--small {
-    padding: 6px 12px;
-    font-size: 0.75rem;
-  }
-}
-
-/* ==========================================================================
    ACCESIBILIDAD
    ========================================================================== */
 
@@ -539,19 +423,3 @@
     border-color: var(--showmore-text-hover);
   }
 }
-
-/* ==========================================================================
-   MODO SIN EFECTOS NEÓN (FALLBACK)
-   ========================================================================== */
-
-/* Para cuando disableNeon=true */
-.show-more-projects-btn:not(.neon-showmore-btn) {
-  /* Mantiene el estilo original sin efectos neón */
-  transition: all 0.3s ease;
-}
-
-.show-more-projects-btn:not(.neon-showmore-btn):hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-/* End of animations for show-more and neon button */
