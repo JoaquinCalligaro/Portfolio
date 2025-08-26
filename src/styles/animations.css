@@ -2,6 +2,27 @@
    ANIMACIONES KEYFRAME 
    ========================================================================== */
 
+/* IMPORTANT - Visual regressed earlier
+   ----------------------------------------------------------------------
+   NOTE TO MAINTAINERS:
+   - Certain animation rules (previous versions of .animate-expand-vertically
+     and .animate-contract-vertically) were removed because they produced
+     a visual bug where cards/container and the show-more button jumped.
+   - Do NOT reintroduce the previous rules blindly. If you need to change
+     entry/exit animations, follow the manual test steps below and prefer
+     small, incremental changes.
+
+   Manual test steps after editing animations:
+   1) Open the page with the project grid and the show-more button.
+   2) Click "Ver todos" → observe entry animation and container expansion.
+   3) Click "Ocultar" → observe exit animation and container collapse.
+   4) Confirm the button does not jump and cards are hidden only after
+      the collapse transition finishes (test various viewport sizes).
+
+   If unsure, open an issue tagged: CSS_ANIMATIONS_VISUAL_BUG and request
+   a review. Keep this comment in place to avoid accidental regression.
+*/
+
 @keyframes glowing {
   0%,
   100% {
@@ -193,6 +214,56 @@
 /* Suavizar movimiento vertical del botón 'Mostrar más' para evitar saltos bruscos */
 .show-more-projects-btn {
   display: inline-block; /* asegurar que transform se aplica correctamente */
+  transition:
+    transform 600ms cubic-bezier(0.2, 0.9, 0.25, 1),
+    margin 600ms cubic-bezier(0.2, 0.9, 0.25, 1),
+    opacity 300ms ease;
+  will-change: transform, margin, opacity;
+}
+
+/* ==========================================================================  
+   SHOW MORE PROJECTS STYLES (migrated from show-more-projects.js)  
+   ========================================================================== */
+
+.show-more-projects-container {
+  transition:
+    max-height 0.6s ease-out,
+    opacity 0.45s ease-out,
+    margin 0.45s ease-out,
+    padding 0.45s ease-out;
+  overflow: hidden;
+}
+
+.animate-expand-vertically {
+  animation-name: expand-vertically;
+  animation-duration: 1000ms; /* ajustado al timeout del JS */
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+  will-change: transform, opacity;
+}
+
+.animate-contract-vertically {
+  animation-name: contract-vertically;
+  animation-duration: 500ms;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: both;
+  will-change: transform, opacity;
+}
+
+/* Nueva keyframe para colapso vertical */
+@keyframes contract-vertically {
+  0% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(0.9);
+    opacity: 0;
+  }
+}
+
+.show-more-projects-btn {
+  display: inline-block;
   transition:
     transform 600ms cubic-bezier(0.2, 0.9, 0.25, 1),
     margin 600ms cubic-bezier(0.2, 0.9, 0.25, 1),
