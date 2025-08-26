@@ -25,7 +25,7 @@ export function initSlider(sliderId) {
     if (!track || totalSlides <= 1) return; // No inicializar si no hay suficientes slides
 
     let currentIndex = 0; // Slide actual
-    let lastIndex = 0; // VARIABLE AÑADIDA - Slide anterior para tracking
+    let lastIndex = 0; // eslint-disable-line @typescript-eslint/no-unused-vars
     let autoplayTimer = null; // Timer para autoplay
     const animationDuration = '800ms'; // Duración de las animaciones para suavizar
 
