@@ -2,6 +2,7 @@
 @import 'tailwindcss';
 @custom-variant dark (&:where(.dark, .dark *));
 @import 'tailwindcss';
+/* stylelint-disable-next-line */
 @plugin "@midudev/tailwind-animations";
 /*! Importaciones */
 @import './navbar.css';
