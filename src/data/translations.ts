@@ -43,8 +43,8 @@ export const translations = {
       live: 'Demo',
     },
     showMore: {
-      showAll: 'Ver todos (${total})',
-      hide: 'Ocultar',
+      showAll: 'Ver Todos (${total}) ⭣',
+      hide: 'Ocultar  ⭡',
     },
   },
   EN: {

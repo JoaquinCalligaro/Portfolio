@@ -532,14 +532,12 @@ Modifica: keyframes contract-vertically, animate-* classes
 
 /* =========================================================== 
   ! SECCION BOTON VER TODOS/SHOW ALL - Estilos para botón "VER TODOS/SHOW ALL " con efectos neón
-  ======================================================== */
-
-/* Variables específicas para el botón VER TODOS/SHOW ALL  */
+  ========================================================  Variables específicas para el botón VER TODOS/SHOW ALL  */
 :root {
   /* linea de borde animada */
-  --showmore-primary: #0091ff;
+  --showmore-primary: #36acda9d;
   /* grosor de la linea */
-  --showmore-border-width: 1.5px;
+  --showmore-border-width: 1.8px;
 }
 
 /* ============================================================
@@ -564,12 +562,10 @@ Modifica: keyframes contract-vertically, animate-* classes
 
 /* Estados interactivos */
 .neon-showmore-btn:hover {
-  background: var(--showmore-primary);
-  color: var(--showmore-text-hover);
   box-shadow:
     0 0 10px var(--showmore-primary),
-    0 0 20px var(--showmore-primary),
-    0 0 40px var(--showmore-primary);
+    0 0 15px var(--showmore-primary),
+    0 0 30px var(--showmore-primary);
 
   transform: translateY(-1px);
 
@@ -593,7 +589,7 @@ Modifica: keyframes contract-vertically, animate-* classes
   height: var(--showmore-border-width);
   background: linear-gradient(90deg, transparent, var(--showmore-primary));
   animation: showmore-border-top 2s linear infinite;
-  border-radius: var(--showmore-border-radius) var(--showmore-border-radius) 0 0; /* Añadir esta línea */
+  border-radius: var(--showmore-border-radius);
 }
 @keyframes showmore-border-top {
   0% {
