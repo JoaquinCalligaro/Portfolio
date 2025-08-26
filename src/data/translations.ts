@@ -42,6 +42,10 @@ export const translations = {
       repo: 'Repositorio',
       live: 'Demo',
     },
+    showMore: {
+      showAll: 'Ver todos (${total})',
+      hide: 'Ocultar',
+    },
   },
   EN: {
     navbar: {
@@ -84,6 +88,10 @@ export const translations = {
     buttons: {
       repo: 'Repository',
       live: 'Live',
+    },
+    showMore: {
+      showAll: 'Show all (${total})',
+      hide: 'Hide',
     },
   },
 } as const;
