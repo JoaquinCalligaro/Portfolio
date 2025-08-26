@@ -12,7 +12,7 @@ const {
 
 <button
   id={id}
-  class={`show-more-projects-btn neon-showmore-btn ${cls}`}
+  class={`show-more-projects-btn border-1 rounded-2xl border-cyan-400/50 neon-showmore-btn  ${cls}`}
   type="button"
   aria-expanded="false"
 >
@@ -28,5 +28,5 @@ const {
   <span
     class="neon-showmore-btn__border neon-showmore-btn__border--left"
     aria-hidden="true"></span>
-  <span class="neon-showmore-btn__text">{text}</span>
+  <span class="neon-showmore-btn__text text-black dark:text-white">{text}</span>
 </button>

@@ -238,15 +238,14 @@
 
 /* Variables específicas para el botón Show More */
 :root {
-  --showmore-primary: #03e9f4;
-  --showmore-bg: transparent;
-  --showmore-text: #03e9f4;
+  /* linea de bore animada */
+  --showmore-primary: #03e4f4;
   --showmore-text-hover: #050801;
-  --showmore-border-width: 2px;
+  --showmore-border-width: 1px;
   --showmore-padding-x: 24px;
-  --showmore-padding-y: 12px;
+  --showmore-padding-y: 10px;
   --showmore-letter-spacing: 1px;
-  --showmore-border-radius: 0;
+  --showmore-border-radius: 12px;
 }
 
 /* ==========================================================================
@@ -254,24 +253,8 @@
    ========================================================================== */
 
 .neon-showmore-btn {
-  /* Layout */
-  position: relative;
-  display: inline-block;
-  padding: var(--showmore-padding-y) var(--showmore-padding-x);
-  margin: 20px 0;
-
-  /* Tipografía - hereda del sistema existente pero añade efectos */
-  font-weight: 600;
-  letter-spacing: var(--showmore-letter-spacing);
-  text-transform: uppercase;
-  color: var(--showmore-text);
-
   /* Apariencia base */
-  background: var(--showmore-bg);
-  border: none;
-  border-radius: var(--showmore-border-radius);
   overflow: hidden;
-  cursor: pointer;
 
   /* Transiciones suaves */
   transition:
@@ -297,7 +280,7 @@
   transform: translateY(-1px);
 
   /* Reflejo sutil */
-  -webkit-box-reflect: below 1px
+  -webkit-box-reflect: below 0.5px
     linear-gradient(transparent, rgba(0, 0, 0, 0.1));
 }
 
@@ -316,8 +299,8 @@
   height: var(--showmore-border-width);
   background: linear-gradient(90deg, transparent, var(--showmore-primary));
   animation: showmore-border-top 2s linear infinite;
+  border-radius: var(--showmore-border-radius) var(--showmore-border-radius) 0 0; /* Añadir esta línea */
 }
-
 @keyframes showmore-border-top {
   0% {
     left: -100%;
@@ -337,6 +320,7 @@
   background: linear-gradient(180deg, transparent, var(--showmore-primary));
   animation: showmore-border-right 2s linear infinite;
   animation-delay: 0.5s;
+  border-radius: 0 var(--showmore-border-radius) var(--showmore-border-radius) 0; /* Añadir esta línea */
 }
 
 @keyframes showmore-border-right {
@@ -376,7 +360,7 @@
   left: 0;
   width: var(--showmore-border-width);
   height: 100%;
-  background: linear-gradient(360deg, transparent, var(--showmore-primary));
+  background: linear-gradient(180deg, transparent, var(--showmore-primary));
   animation: showmore-border-left 2s linear infinite;
   animation-delay: 1.5s;
 }
