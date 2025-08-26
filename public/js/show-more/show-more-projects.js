@@ -17,7 +17,7 @@ export default function initShowMore(
     chunkSize: 999, // 🔧 CAMBIAR AQUÍ: Número de tarjetas que aparecen por click
     autoUpdate: true, // 🔧 CAMBIAR AQUÍ: true = detecta cambios automáticamente
     observerDelay: 100, // Delay antes de actualizar tras detectar cambios
-    containerTransitionDelay: 200, // 🆕 Delay antes de ocultar el contenedor
+    containerTransitionDelay: 400, // 🆕 Delay antes de ocultar el contenedor
     onShow: null,
     onHide: null,
     onCardsChanged: null,
@@ -81,7 +81,7 @@ function setupContainerTransitions(target) {
   if (target && target.style) {
     // Transición suave para la altura y opacidad
     target.style.transition =
-      'max-height 0.4s ease-out, opacity 0.3s ease-out, margin 0.3s ease-out, padding 0.3s ease-out';
+      'max-height 0.6s ease-out, opacity 0.45s ease-out, margin 0.45s ease-out, padding 0.45s ease-out';
     target.style.overflow = 'hidden';
   }
 }
@@ -245,7 +245,7 @@ function revealNextCards(cards, config, target) {
 
     // Expandir contenedor suavemente antes de esperar a las animaciones de cards
     try {
-      expandContainerSmoothly(target);
+      expandContainerSmoothly(target, config.hiddenClass);
     } catch {
       // noop
     }
@@ -301,7 +301,14 @@ function collapseAll(button, target, cards, config, state) {
 
   if (visibleCards.length === 0) {
     // No hay visibles: ocultar con transición suave
-    hideContainerSmoothly(button, target, config, state, cards.length);
+    hideContainerSmoothly(
+      button,
+      target,
+      config,
+      state,
+      cards.length,
+      []
+    ).catch(() => {});
     return;
   }
 
@@ -337,81 +344,103 @@ function collapseAll(button, target, cards, config, state) {
 
   // 🆕 Cuando todas las tarjetas han terminado de contraerse, ocultar contenedor suavemente
   Promise.all(promises).then(() => {
-    // hideContainerSmoothly ahora devuelve una Promise
-    hideContainerSmoothly(button, target, config, state, cards.length).then(
-      () => {
-        // Finalmente ocultar las tarjetas (ya que el contenedor terminó su transición)
-        visibleCards.forEach((card) => {
-          try {
-            if (!card.classList.contains(config.hiddenClass)) {
-              card.classList.add(config.hiddenClass);
-            }
-          } catch {
-            // noop
-          }
-        });
-      }
-    );
+    // hideContainerSmoothly ahora aceptará y ocultará las tarjetas visibles antes de resolver
+    hideContainerSmoothly(
+      button,
+      target,
+      config,
+      state,
+      cards.length,
+      visibleCards
+    ).catch(() => {});
   });
 }
 
 /**
  * 🆕 Oculta el contenedor con una transición suave
  */
-function hideContainerSmoothly(button, target, config, state, totalCards) {
-  // Obtener altura actual para la transición
-  const currentHeight = target.scrollHeight;
+function hideContainerSmoothly(
+  button,
+  target,
+  config,
+  state,
+  totalCards,
+  visibleCards = []
+) {
+  return new Promise((resolve) => {
+    // Obtener altura actual para la transición
+    const currentHeight = target.scrollHeight;
 
-  // Establecer altura actual explícitamente
-  target.style.maxHeight = currentHeight + 'px';
+    // Establecer altura actual explícitamente
+    target.style.maxHeight = currentHeight + 'px';
 
-  // Forzar reflow para que la altura se aplique
-  void target.offsetHeight;
+    // Forzar reflow para que la altura se aplique
+    void target.offsetHeight;
 
-  // Comenzar transición hacia altura 0 y opacidad 0
-  (
-    window.requestAnimationFrame ||
-    function (fn) {
-      return setTimeout(fn, 16);
-    }
-  )(() => {
-    target.style.maxHeight = '0px';
-    target.style.opacity = '0';
-    target.style.paddingTop = '0px';
-    target.style.paddingBottom = '0px';
-    target.style.marginTop = '0px';
-    target.style.marginBottom = '0px';
+    // Comenzar transición hacia altura 0 y opacidad 0
+    (
+      window.requestAnimationFrame ||
+      function (fn) {
+        return setTimeout(fn, 16);
+      }
+    )(() => {
+      target.style.maxHeight = '0px';
+      target.style.opacity = '0';
+      target.style.paddingTop = '0px';
+      target.style.paddingBottom = '0px';
+      target.style.marginTop = '0px';
+      target.style.marginBottom = '0px';
+    });
+
+    // Después del delay, ocultar completamente y resetear estilos
+    setTimeout(() => {
+      target.classList.add(config.hiddenClass);
+      button.setAttribute('aria-expanded', 'false');
+      state.isCollapsed = true;
+
+      // Resetear estilos para la próxima vez
+      target.style.maxHeight = '';
+      target.style.opacity = '';
+      target.style.paddingTop = '';
+      target.style.paddingBottom = '';
+      target.style.marginTop = '';
+      target.style.marginBottom = '';
+
+      // Ocultar las tarjetas visibles (si se pasaron)
+      try {
+        if (Array.isArray(visibleCards) && visibleCards.length > 0) {
+          visibleCards.forEach((card) => {
+            try {
+              if (!card.classList.contains(config.hiddenClass)) {
+                card.classList.add(config.hiddenClass);
+              }
+            } catch {
+              // noop
+            }
+          });
+        }
+      } catch {
+        // noop
+      }
+
+      // Actualizar texto del botón
+      const { showAllText } = getLocalizedStrings(button, totalCards);
+      button.textContent = showAllText.replace('${total}', totalCards);
+
+      // Ejecutar callback si existe
+      if (typeof config.onHide === 'function') {
+        config.onHide();
+      }
+
+      resolve();
+    }, config.containerTransitionDelay + 200); // Un poco más tiempo que la transición CSS
   });
-
-  // Después del delay, ocultar completamente y resetear estilos
-  setTimeout(() => {
-    target.classList.add(config.hiddenClass);
-    button.setAttribute('aria-expanded', 'false');
-    state.isCollapsed = true;
-
-    // Resetear estilos para la próxima vez
-    target.style.maxHeight = '';
-    target.style.opacity = '';
-    target.style.paddingTop = '';
-    target.style.paddingBottom = '';
-    target.style.marginTop = '';
-    target.style.marginBottom = '';
-
-    // Actualizar texto del botón
-    const { showAllText } = getLocalizedStrings(button, totalCards);
-    button.textContent = showAllText.replace('${total}', totalCards);
-
-    // Ejecutar callback si existe
-    if (typeof config.onHide === 'function') {
-      config.onHide();
-    }
-  }, config.containerTransitionDelay + 200); // Un poco más tiempo que la transición CSS
 }
 
 /**
  * 🆕 Expande el contenedor con una transición suave (para evitar salto del botón)
  */
-function expandContainerSmoothly(target) {
+function expandContainerSmoothly(target, hiddenClass = 'hidden') {
   if (!target || !target.style) return;
 
   // Asegurar overflow hidden y transición ya seteada en setupContainerTransitions
@@ -428,7 +457,7 @@ function expandContainerSmoothly(target) {
   void target.offsetHeight;
 
   // Remover hidden para que el contenido sea accesible
-  target.classList.remove('hidden');
+  target.classList.remove(hiddenClass);
 
   // Animar hacia la altura completa
   (
@@ -450,7 +479,7 @@ function expandContainerSmoothly(target) {
   setTimeout(() => {
     target.style.maxHeight = '';
     target.style.overflow = '';
-  }, 450);
+  }, 650);
 }
 
 /**
