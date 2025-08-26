@@ -2,7 +2,6 @@
   /* ==========================================================================
      BOTONES DE ACCIÓN - Solo hover/active effects
      ========================================================================== */
-
   .action-button {
     @apply cursor-pointer rounded-lg p-2 transition-all duration-300;
   }
@@ -17,9 +16,7 @@
 
   /* ==========================================================================
     BOTONES DE NAVEGACIÓN - MODO CLARO
-    Optimizados para fondos claros con tonos ámbar cálidos
     ========================================================================== */
-  /* Botones para fondos claros. Ajusta gradientes y border-color aquí. */
 
   .nav-hover-light {
     /* Estilo base */
@@ -76,9 +73,7 @@
 
   /* ==========================================================================
     BOTONES DE NAVEGACIÓN - MODO OSCURO
-    Optimizados para fondos oscuros con tonos dorados 
     ========================================================================== */
-  /* Botones para modo oscuro. Mantén contrastes altos para accesibilidad. */
 
   .nav-hover-dark {
     /* Estilo base */

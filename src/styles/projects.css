@@ -425,11 +425,11 @@ animation: pulse-shadow 2s infinite; /* Apply pulse-shadow animation */
   --icon-color-border-hover: #3178c6cc;
 }
 
-/* ==========================================================================  
-   BOTON VER TODO/OCULTAR - Estilos para botón "Mostrar más" con efectos neón
-   ========================================================================== */
+/* ============================================================
+   ! BOTON VER TODOS/SHOW ALL - Estilos Generales
+   =========================================================*/
 
-/* Variables específicas para el botón Show More */
+/* Variables específicas para el botón VER TODOS/SHOW ALL  */
 :root {
   /* linea de borde animada */
   --showmore-primary: #0091ff;
@@ -437,9 +437,9 @@ animation: pulse-shadow 2s infinite; /* Apply pulse-shadow animation */
   --showmore-border-width: 1.5px;
 }
 
-/* ==========================================================================  
-   BOTON VER TODO/OCULTAR (ANIMACION GENERAL)
-   ========================================================================== */
+/* ============================================================
+! BOTON VER TODOS/SHOW ALL (ANIMACION GENERAL)
+  ========================================================= */
 
 /* Nueva keyframe para colapso vertical */
 @keyframes contract-vertically {
@@ -453,9 +453,113 @@ animation: pulse-shadow 2s infinite; /* Apply pulse-shadow animation */
   }
 }
 
-/* ==========================================================================
-   BASE STYLES - BOTON VER TODO/OCULTAR con efectos neón
-   ========================================================================== */
+/* ============================================================
+  ! BASE STYLES - BOTON VER TODOS/SHOW ALL con efectos neón
+   ========================================================= */
+
+.show-more-projects-container {
+  transition:
+    max-height 0.6s ease-out,
+    opacity 0.45s ease-out,
+    margin 0.45s ease-out,
+    padding 0.45s ease-out;
+  overflow: hidden;
+}
+
+.animate-expand-vertically {
+  animation-name: expand-vertically;
+  animation-delay: 200ms;
+  animation-duration: 1000ms; /* ajustado al timeout del JS */
+
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+  will-change: transform, opacity;
+}
+
+.animate-contract-vertically {
+  animation-name: contract-vertically;
+  animation-delay: 100ms;
+  animation-duration: 500ms;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: both;
+  will-change: transform, opacity;
+}
+
+/* Nueva keyframe para colapso vertical */
+@keyframes contract-vertically {
+  0% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(0.9);
+    opacity: 0;
+  }
+}
+
+.show-more-projects-btn {
+  display: inline-block;
+  transition:
+    transform 600ms cubic-bezier(0.2, 0.9, 0.25, 1),
+    margin 600ms cubic-bezier(0.2, 0.9, 0.25, 1),
+    opacity 300ms ease;
+  will-change: transform, margin, opacity;
+}
+
+/* =========================================================== 
+  ! SECCION BOTON VER TODOS/SHOW ALL - Estilos para botón "VER TODOS/SHOW ALL " con efectos neón
+  ======================================================== */
+
+/* Variables específicas para el botón VER TODOS/SHOW ALL  */
+:root {
+  /* linea de borde animada */
+  --showmore-primary: #0091ff;
+  /* grosor de la linea */
+  --showmore-border-width: 1.5px;
+}
+
+/* ============================================================
+   !BASE STYLES - Botón VER TODOS/SHOW ALL  con efectos neón
+========================================================= */
+
+.neon-showmore-btn {
+  /* Apariencia base */
+  overflow: hidden;
+
+  /* Transiciones suaves */
+  transition:
+    background-color 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    color 0.4s ease,
+    box-shadow 0.4s ease,
+    transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  /* Optimización */
+  will-change: transform, background-color, box-shadow;
+  transform-origin: center center;
+}
+
+/* Estados interactivos */
+.neon-showmore-btn:hover {
+  background: var(--showmore-primary);
+  color: var(--showmore-text-hover);
+  box-shadow:
+    0 0 10px var(--showmore-primary),
+    0 0 20px var(--showmore-primary),
+    0 0 40px var(--showmore-primary);
+
+  transform: translateY(-1px);
+
+  /* Reflejo sutil */
+  -webkit-box-reflect: below 1.5px
+    linear-gradient(transparent, rgba(0, 0, 0, 0.1));
+}
+
+.neon-showmore-btn__border {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+  opacity: 0.8;
+}
 
 /* Borde superior */
 .neon-showmore-btn__border--top {
@@ -465,7 +569,7 @@ animation: pulse-shadow 2s infinite; /* Apply pulse-shadow animation */
   height: var(--showmore-border-width);
   background: linear-gradient(90deg, transparent, var(--showmore-primary));
   animation: showmore-border-top 2s linear infinite;
-  border-radius: var(--showmore-border-radius);
+  border-radius: var(--showmore-border-radius) var(--showmore-border-radius) 0 0; /* Añadir esta línea */
 }
 @keyframes showmore-border-top {
   0% {
@@ -541,9 +645,9 @@ animation: pulse-shadow 2s infinite; /* Apply pulse-shadow animation */
   }
 }
 
-/* ==========================================================================
-   ACCESIBILIDAD
-   ========================================================================== */
+/* ============================================================
+! ACCESIBILIDAD DEL BOTON VER TODOS/SHOW ALL
+=========================================================*/
 
 /* Reducir animaciones */
 @media (prefers-reduced-motion: reduce) {
