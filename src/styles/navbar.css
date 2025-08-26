@@ -1,7 +1,8 @@
 @layer navbar {
-  /* ==========================================================================
-     BOTONES DE ACCIÓN - Solo hover/active effects
-     ========================================================================== */
+  /* ==========================================================
+  ! Botones de acción
+  Modifica: .action-button, hover/active
+  ====================================================== */
   .action-button {
     @apply cursor-pointer rounded-lg p-2 transition-all duration-300;
   }
@@ -14,9 +15,10 @@
     @apply scale-95;
   }
 
-  /* ==========================================================================
-    BOTONES DE NAVEGACIÓN - MODO CLARO
-    ========================================================================== */
+  /* ==========================================================
+  ! Botones navegación - modo claro
+  Modifica: .nav-hover-light, .nav-hover-light:hover,nav-hover-light.active
+     =====================================================*/
 
   .nav-hover-light {
     /* Estilo base */
@@ -71,9 +73,10 @@
       0 1px 3px rgba(217, 119, 6, 0.2);
   }
 
-  /* ==========================================================================
-    BOTONES DE NAVEGACIÓN - MODO OSCURO
-    ========================================================================== */
+  /* ==========================================================
+  ! Botones navegación - modo oscuro
+  Modifica: .nav-hover-dark, .nav-hover-dark:hover,nav-hover-dark.active
+  ====================================================== */
 
   .nav-hover-dark {
     /* Estilo base */
