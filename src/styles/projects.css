@@ -98,10 +98,13 @@
   -webkit-backdrop-filter: blur(4px) saturate(1.03);
 
   box-shadow: 0 2px 10px rgba(2, 6, 23, 0.04);
+  /* More noticeable yet smoother transitions: slightly longer durations
+     and gentler cubic-bezier for background/transform; box-shadow eases
+     over a longer period for a soft, visible glow change. */
   transition:
-    transform 520ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 520ms cubic-bezier(0.2, 0.85, 0.25, 1),
     filter 520ms ease,
-    box-shadow 520ms ease;
+    box-shadow 680ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 /* sheen: pseudo-element desplazable que simula un reflejo sutil sin cambiar colores */
@@ -454,45 +457,6 @@ animation: pulse-shadow 2s infinite; /* Apply pulse-shadow animation */
    BASE STYLES - BOTON VER TODO/OCULTAR con efectos neón
    ========================================================================== */
 
-.neon-showmore-btn {
-  /* Apariencia base */
-  overflow: hidden;
-
-  /* Transiciones suaves */
-  transition:
-    background-color 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    color 0.4s ease,
-    box-shadow 0.4s ease,
-    transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-
-  /* Optimización */
-  will-change: transform, background-color, box-shadow;
-  transform-origin: center center;
-}
-
-/* Estados interactivos */
-.neon-showmore-btn:hover {
-  background: var(--showmore-primary);
-  color: var(--showmore-text-hover);
-  box-shadow:
-    0 0 10px var(--showmore-primary),
-    0 0 20px var(--showmore-primary),
-    0 0 40px var(--showmore-primary);
-
-  transform: translateY(-1px);
-
-  /* Reflejo sutil */
-  -webkit-box-reflect: below 1.5px
-    linear-gradient(transparent, rgba(0, 0, 0, 0.1));
-}
-
-.neon-showmore-btn__border {
-  position: absolute;
-  display: block;
-  pointer-events: none;
-  opacity: 0.8;
-}
-
 /* Borde superior */
 .neon-showmore-btn__border--top {
   top: 0;
@@ -501,7 +465,7 @@ animation: pulse-shadow 2s infinite; /* Apply pulse-shadow animation */
   height: var(--showmore-border-width);
   background: linear-gradient(90deg, transparent, var(--showmore-primary));
   animation: showmore-border-top 2s linear infinite;
-  border-radius: var(--showmore-border-radius) var(--showmore-border-radius) 0 0; /* Añadir esta línea */
+  border-radius: var(--showmore-border-radius);
 }
 @keyframes showmore-border-top {
   0% {
