@@ -178,8 +178,8 @@ function setupButtonListener(button, target, grid, config, state) {
       cards.forEach((card) => card.classList.add(config.hiddenClass));
     }
 
-  // Revelar siguiente grupo de tarjetas (esperar a que terminen las animaciones)
-  const revealed = await revealNextCards(cards, config, target);
+    // Revelar siguiente grupo de tarjetas (esperar a que terminen las animaciones)
+    const revealed = await revealNextCards(cards, config, target);
 
     // Actualizar texto del botón
     updateButtonText(
@@ -338,18 +338,20 @@ function collapseAll(button, target, cards, config, state) {
   // 🆕 Cuando todas las tarjetas han terminado de contraerse, ocultar contenedor suavemente
   Promise.all(promises).then(() => {
     // hideContainerSmoothly ahora devuelve una Promise
-    hideContainerSmoothly(button, target, config, state, cards.length).then(() => {
-      // Finalmente ocultar las tarjetas (ya que el contenedor terminó su transición)
-      visibleCards.forEach((card) => {
-        try {
-          if (!card.classList.contains(config.hiddenClass)) {
-            card.classList.add(config.hiddenClass);
+    hideContainerSmoothly(button, target, config, state, cards.length).then(
+      () => {
+        // Finalmente ocultar las tarjetas (ya que el contenedor terminó su transición)
+        visibleCards.forEach((card) => {
+          try {
+            if (!card.classList.contains(config.hiddenClass)) {
+              card.classList.add(config.hiddenClass);
+            }
+          } catch {
+            // noop
           }
-        } catch {
-          // noop
-        }
-      });
-    });
+        });
+      }
+    );
   });
 }
 
@@ -367,7 +369,12 @@ function hideContainerSmoothly(button, target, config, state, totalCards) {
   void target.offsetHeight;
 
   // Comenzar transición hacia altura 0 y opacidad 0
-  (window.requestAnimationFrame || function (fn) { return setTimeout(fn, 16); })(() => {
+  (
+    window.requestAnimationFrame ||
+    function (fn) {
+      return setTimeout(fn, 16);
+    }
+  )(() => {
     target.style.maxHeight = '0px';
     target.style.opacity = '0';
     target.style.paddingTop = '0px';
@@ -424,7 +431,12 @@ function expandContainerSmoothly(target) {
   target.classList.remove('hidden');
 
   // Animar hacia la altura completa
-  (window.requestAnimationFrame || function (fn) { return setTimeout(fn, 16); })(() => {
+  (
+    window.requestAnimationFrame ||
+    function (fn) {
+      return setTimeout(fn, 16);
+    }
+  )(() => {
     target.style.maxHeight = targetHeight + 'px';
     target.style.opacity = '1';
     // restaurar posibles paddings/margins por defecto (vacío permite CSS controlar)
