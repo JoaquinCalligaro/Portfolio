@@ -179,36 +179,8 @@
 
 .animate-expand-vertically {
   animation-name: expand-vertically;
-  animation-duration: 2000ms; /* solicitado */
+  animation-duration: 2500ms; /* solicitado */
   animation-timing-function: cubic-bezier(0.2, 0.9, 0.25, 1);
-  animation-fill-mode: both;
-  will-change: transform, opacity;
-}
-
-/* Animación para contraer verticalmente al ocultar cards
-   Clase utilizable desde JS: .animate-contract-vertically
-   Duración requerida: 1000ms */
-@keyframes contract-vertically {
-  0% {
-    transform: scaleY(1);
-    opacity: 1;
-    transform-origin: top;
-  }
-  40% {
-    transform: scaleY(0.98);
-    opacity: 0.9;
-  }
-  100% {
-    transform: scaleY(0);
-    opacity: 0;
-    transform-origin: top;
-  }
-}
-
-.animate-contract-vertically {
-  animation-name: contract-vertically;
-  animation-duration: 1000ms; /* solicitado */
-  animation-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
   animation-fill-mode: both;
   will-change: transform, opacity;
 }

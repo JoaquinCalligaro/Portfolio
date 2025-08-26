@@ -17,6 +17,7 @@ export default function initShowMore(
     chunkSize: 999, // 🔧 CAMBIAR AQUÍ: Número de tarjetas que aparecen por click
     autoUpdate: true, // 🔧 CAMBIAR AQUÍ: true = detecta cambios automáticamente
     observerDelay: 100, // Delay antes de actualizar tras detectar cambios
+    containerTransitionDelay: 200, // 🆕 Delay antes de ocultar el contenedor
     onShow: null,
     onHide: null,
     onCardsChanged: null,
@@ -28,6 +29,9 @@ export default function initShowMore(
   if (!elements) return;
 
   const { button, target, grid } = elements;
+
+  // 🆕 Agregar clases CSS para transiciones suaves al contenedor
+  setupContainerTransitions(target);
 
   // Estado del componente
   const state = {
@@ -67,6 +71,19 @@ export default function initShowMore(
     getRevealedCount: () =>
       getRevealedCount(Array.from(grid.children), config.hiddenClass),
   };
+}
+
+/**
+ * 🆕 Configura las transiciones CSS del contenedor para efectos suaves
+ */
+function setupContainerTransitions(target) {
+  // Agregar estilos CSS inline para transiciones suaves
+  if (target && target.style) {
+    // Transición suave para la altura y opacidad
+    target.style.transition =
+      'max-height 0.4s ease-out, opacity 0.3s ease-out, margin 0.3s ease-out, padding 0.3s ease-out';
+    target.style.overflow = 'hidden';
+  }
 }
 
 /**
@@ -134,7 +151,7 @@ function initializeCards(button, grid, hiddenClass, chunkSize, state) {
  * Configura el listener del botón principal
  */
 function setupButtonListener(button, target, grid, config, state) {
-  button.addEventListener('click', () => {
+  button.addEventListener('click', async () => {
     const cards = Array.from(grid.children);
     const revealedCount = getRevealedCount(cards, config.hiddenClass);
     const totalCards = cards.length;
@@ -161,8 +178,8 @@ function setupButtonListener(button, target, grid, config, state) {
       cards.forEach((card) => card.classList.add(config.hiddenClass));
     }
 
-    // Revelar siguiente grupo de tarjetas
-    const revealed = revealNextCards(cards, config);
+    // Revelar siguiente grupo de tarjetas (esperar a que terminen las animaciones)
+    const revealed = await revealNextCards(cards, config);
 
     // Actualizar texto del botón
     updateButtonText(
@@ -187,10 +204,13 @@ function getRevealedCount(cards, hiddenClass) {
 }
 
 /**
- * Muestra el contenedor principal si está oculto
+ * 🆕 Muestra el contenedor principal si está oculto con transición suave
  */
 function showContainer(button, target, hiddenClass) {
   if (target.classList.contains(hiddenClass)) {
+    // Preparar para mostrar con altura automática
+    target.style.maxHeight = 'none';
+    target.style.opacity = '1';
     target.classList.remove(hiddenClass);
     button.setAttribute('aria-expanded', 'true');
   }
@@ -200,100 +220,172 @@ function showContainer(button, target, hiddenClass) {
  * Revela el siguiente grupo de tarjetas
  */
 function revealNextCards(cards, config) {
-  const toShow = Math.min(
-    config.chunkSize,
-    cards.filter((card) => card.classList.contains(config.hiddenClass)).length
-  );
+  return new Promise((resolve) => {
+    const hiddenCards = cards.filter((card) =>
+      card.classList.contains(config.hiddenClass)
+    );
+    const toShow = Math.min(config.chunkSize, hiddenCards.length);
 
-  let revealed = 0;
+    if (toShow === 0) {
+      resolve(0);
+      return;
+    }
 
-  for (const card of cards) {
-    if (revealed >= toShow) break;
+    const revealedCards = [];
 
-    if (card.classList.contains(config.hiddenClass)) {
-      // Mostrar tarjeta
+    // Mostrar y preparar promesas por tarjeta
+    for (const card of hiddenCards) {
+      if (revealedCards.length >= toShow) break;
       card.classList.remove(config.hiddenClass);
-      revealed++;
-
-      // Añadir animación de expansión vertical solicitada
-      try {
-        if (!card.classList.contains('animate-expand-vertically')) {
-          card.classList.add('animate-expand-vertically');
-          // Limpiar la clase cuando termine la animación para evitar acumulación
-          const clearAnim = () => {
-            card.classList.remove('animate-expand-vertically');
-            card.removeEventListener('animationend', clearAnim);
-          };
-          card.addEventListener('animationend', clearAnim);
-        }
-      } catch {
-        // noop
-      }
+      revealedCards.push(card);
 
       // Inicializar slider si existe en la tarjeta
       initializeSliderIfExists(card);
     }
-  }
 
-  return revealed;
+    // Crear promesas que se resuelven al terminar la animación o tras fallback
+    const promises = revealedCards.map((card) => {
+      return new Promise((res) => {
+        try {
+          if (!card.classList.contains('animate-expand-vertically')) {
+            card.classList.add('animate-expand-vertically');
+          }
+
+          const onEnd = () => {
+            card.removeEventListener('animationend', onEnd);
+            // limpiar la clase para evitar acumulación
+            card.classList.remove('animate-expand-vertically');
+            res();
+          };
+
+          // Timeout fallback (un poco mayor que 1000ms)
+          const to = setTimeout(() => {
+            card.removeEventListener('animationend', onEnd);
+            card.classList.remove('animate-expand-vertically');
+            res();
+          }, 1100);
+
+          const wrapped = () => {
+            clearTimeout(to);
+            onEnd();
+          };
+
+          card.addEventListener('animationend', wrapped);
+        } catch {
+          res();
+        }
+      });
+    });
+
+    Promise.all(promises).then(() => {
+      resolve(revealedCards.length);
+    });
+  });
 }
 
 /**
- * Colapsa todas las tarjetas y resetea el estado
+ * 🆕 Colapsa todas las tarjetas y resetea el estado con transición suave
  */
 function collapseAll(button, target, cards, config, state) {
-  // Aplicar animación de contracción a las tarjetas visibles
+  // Esperar a que todas las animaciones de contracción terminen antes de ocultar
   const visibleCards = cards.filter(
     (c) => !c.classList.contains(config.hiddenClass)
   );
 
-  visibleCards.forEach((card) => {
-    try {
-      // Añadir clase de animación si no existe
-      if (!card.classList.contains('animate-contract-vertically')) {
-        card.classList.add('animate-contract-vertically');
+  if (visibleCards.length === 0) {
+    // No hay visibles: ocultar con transición suave
+    hideContainerSmoothly(button, target, config, state, cards.length);
+    return;
+  }
 
-        const finish = () => {
+  const promises = visibleCards.map((card) => {
+    return new Promise((resolve) => {
+      try {
+        // Añadir clase de animación (idempotente)
+        if (!card.classList.contains('animate-contract-vertically')) {
+          card.classList.add('animate-contract-vertically');
+        }
+
+        // Handler que limpia y resuelve
+        const wrappedDone = () => {
+          card.removeEventListener('animationend', wrappedDone);
           card.classList.remove('animate-contract-vertically');
-          card.classList.add(config.hiddenClass);
-          card.removeEventListener('animationend', finish);
+          if (!card.classList.contains(config.hiddenClass)) {
+            card.classList.add(config.hiddenClass);
+          }
+          clearTimeout(timeout);
+          resolve();
         };
 
-        // Escuchar fin de animación
-        card.addEventListener('animationend', finish);
-
-        // Fallback: asegurar que se oculta aunque no llegue animationend
-        setTimeout(() => {
+        // Timeout fallback
+        const timeout = setTimeout(() => {
+          card.removeEventListener('animationend', wrappedDone);
           if (!card.classList.contains(config.hiddenClass)) {
             card.classList.remove('animate-contract-vertically');
             card.classList.add(config.hiddenClass);
-            card.removeEventListener('animationend', finish);
           }
-        }, 600); // 600ms > 500ms duración de la animación
-      } else {
-        // Si ya tenía la clase, forzar ocultado
-        card.classList.add(config.hiddenClass);
+          resolve();
+        }, 1000); // un poco más que la duración de 500ms
+
+        card.addEventListener('animationend', wrappedDone);
+      } catch {
+        resolve();
       }
-    } catch {
-      // En caso de error, ocultar inmediatamente
-      card.classList.add(config.hiddenClass);
-    }
+    });
   });
 
-  // Ocultar contenedor y actualizar atributos
-  target.classList.add(config.hiddenClass);
-  button.setAttribute('aria-expanded', 'false');
+  // 🆕 Cuando todas las tarjetas han terminado de contraerse, ocultar contenedor suavemente
+  Promise.all(promises).then(() => {
+    hideContainerSmoothly(button, target, config, state, cards.length);
+  });
+}
 
-  state.isCollapsed = true;
+/**
+ * 🆕 Oculta el contenedor con una transición suave
+ */
+function hideContainerSmoothly(button, target, config, state, totalCards) {
+  // Obtener altura actual para la transición
+  const currentHeight = target.scrollHeight;
 
-  // Resetear texto del botón (localizado)
-  const { showAllText } = getLocalizedStrings(button, cards.length);
-  button.textContent = showAllText.replace('${total}', cards.length);
+  // Establecer altura actual explícitamente
+  target.style.maxHeight = currentHeight + 'px';
 
-  // Ejecutar callback si existe
-  if (typeof config.onHide === 'function') {
-    config.onHide();
-  }
+  // Forzar reflow para que la altura se aplique
+  target.offsetHeight;
+
+  // Comenzar transición hacia altura 0 y opacidad 0
+  requestAnimationFrame(() => {
+    target.style.maxHeight = '0px';
+    target.style.opacity = '0';
+    target.style.paddingTop = '0px';
+    target.style.paddingBottom = '0px';
+    target.style.marginTop = '0px';
+    target.style.marginBottom = '0px';
+  });
+
+  // Después del delay, ocultar completamente y resetear estilos
+  setTimeout(() => {
+    target.classList.add(config.hiddenClass);
+    button.setAttribute('aria-expanded', 'false');
+    state.isCollapsed = true;
+
+    // Resetear estilos para la próxima vez
+    target.style.maxHeight = '';
+    target.style.opacity = '';
+    target.style.paddingTop = '';
+    target.style.paddingBottom = '';
+    target.style.marginTop = '';
+    target.style.marginBottom = '';
+
+    // Actualizar texto del botón
+    const { showAllText } = getLocalizedStrings(button, totalCards);
+    button.textContent = showAllText.replace('${total}', totalCards);
+
+    // Ejecutar callback si existe
+    if (typeof config.onHide === 'function') {
+      config.onHide();
+    }
+  }, config.containerTransitionDelay + 200); // Un poco más tiempo que la transición CSS
 }
 
 /**
@@ -425,7 +517,7 @@ if (typeof window !== 'undefined') {
 }
 
 /**
- * 🔄 DETECCIÓN AUTOMÁTICA DE CAMBIOS EN TARJETAS
+ * 📄 DETECCIÓN AUTOMÁTICA DE CAMBIOS EN TARJETAS
  * Observa automáticamente cuando se agregan/quitan tarjetas del grid
  */
 function setupCardObserver(button, grid, config, state) {
@@ -487,7 +579,7 @@ function updateCardsState(button, grid, config, state) {
   const oldCount = state.currentCardCount;
 
   if (typeof console !== 'undefined') {
-    console.log(`🔄 Tarjetas detectadas: ${oldCount} → ${newCount}`);
+    console.log(`📄 Tarjetas detectadas: ${oldCount} → ${newCount}`);
   }
 
   // Actualizar estado
