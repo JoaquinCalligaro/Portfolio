@@ -1,123 +1,23 @@
-// (el eslint ignora los warnings)
 /* eslint-env browser */
-/* global document, window, console, MutationObserver, setTimeout, clearTimeout */
+//Lógica principal: manejo de tarjetas, animaciones y observer
+// No inicializa nada, solo provee funciones puras que usa el init
 
-// show-more-projects.js
-// Maneja la funcionalidad de mostrar/ocultar proyectos progresivamente
-// Requiere: contenedor con id="extra-projects" y botón con id="show-more-projects"
-
-export default function initShowMore(
-  buttonId = 'show-more-projects',
-  options = {}
-) {
-  // Configuración por defecto
-  const config = {
-    targetId: 'extra-projects',
-    hiddenClass: 'hidden',
-    chunkSize: 999, // 🔧 CAMBIAR AQUÍ: Número de tarjetas que aparecen por click
-    autoUpdate: true, // 🔧 CAMBIAR AQUÍ: true = detecta cambios automáticamente
-    observerDelay: 100, // Delay antes de actualizar tras detectar cambios
-    containerTransitionDelay: 400, // 🆕 Delay antes de ocultar el contenedor
-    onShow: null,
-    onHide: null,
-    onCardsChanged: null,
-    ...options,
-  };
-
-  // Validar elementos del DOM
-  const elements = getElements(buttonId, config);
-  if (!elements) return;
-
-  const { button, target, grid } = elements;
-
-  // 🆕 Agregar clase CSS para transiciones suaves al contenedor
-  setupContainerTransitions(target);
-
-  // Estado del componente
-  const state = {
-    currentCardCount: 0,
-    isCollapsed: true,
-  };
-
-  // Configurar estado inicial
-  initializeCards(button, grid, config.hiddenClass, config.chunkSize, state);
-
-  // Configurar evento del botón
-  setupButtonListener(button, target, grid, config, state);
-
-  // Configurar observador de cambios automático
-  if (config.autoUpdate) {
-    setupCardObserver(button, grid, config, state);
-  }
-
-  // Escuchar cambios de idioma globales y actualizar texto del botón
-  if (
-    typeof window !== 'undefined' &&
-    typeof window.addEventListener === 'function'
-  ) {
-    window.addEventListener('langChange', () => {
-      try {
-        updateCardsState(button, grid, config, state);
-      } catch {
-        // noop
-      }
-    });
-  }
-
-  // Retornar función para actualización manual
-  return {
-    updateCards: () => updateCardsManually(button, grid, config, state),
-    getCurrentCount: () => Array.from(grid.children).length,
-    getRevealedCount: () =>
-      getRevealedCount(Array.from(grid.children), config.hiddenClass),
-  };
-}
-
-/**
- * 🆕 Configura las transiciones CSS del contenedor para efectos suaves
- */
-function setupContainerTransitions(target) {
+export function setupContainerTransitions(target) {
   if (target && target.classList) {
     target.classList.add('show-more-projects-container');
   }
 }
 
-/**
- * Obtiene y valida los elementos del DOM necesarios
- */
-function getElements(buttonId, config) {
+export function getElements(buttonId, config) {
   const button = document.getElementById(buttonId);
-  if (!button) {
-    if (typeof console !== 'undefined') {
-      console.warn(`Botón con ID "${buttonId}" no encontrado`);
-    }
-    return null;
-  }
-
   const target = document.getElementById(config.targetId);
-  if (!target) {
-    if (typeof console !== 'undefined') {
-      console.warn(`Contenedor con ID "${config.targetId}" no encontrado`);
-    }
-    return null;
-  }
-
-  const grid = target.querySelector('.grid');
-  if (!grid) {
-    if (typeof console !== 'undefined') {
-      console.warn(
-        'Grid con clase ".grid" no encontrado dentro del contenedor'
-      );
-    }
-    return null;
-  }
-
+  const grid = target?.querySelector('.grid');
+  if (!button || !target || !grid) return null;
   return { button, target, grid };
 }
 
-/**
- * Configura el estado inicial de las tarjetas y el botón
- */
+// Implementaciones movidas desde show-more-projects.js (sin initShowMore)
+
 function initializeCards(button, grid, hiddenClass, chunkSize, state) {
   const cards = Array.from(grid.children);
   const totalCards = cards.length;
@@ -143,9 +43,6 @@ function initializeCards(button, grid, hiddenClass, chunkSize, state) {
   }
 }
 
-/**
- * Configura el listener del botón principal
- */
 function setupButtonListener(button, target, grid, config, state) {
   button.addEventListener('click', async () => {
     const cards = Array.from(grid.children);
@@ -192,16 +89,10 @@ function setupButtonListener(button, target, grid, config, state) {
   });
 }
 
-/**
- * Cuenta las tarjetas actualmente visibles
- */
 function getRevealedCount(cards, hiddenClass) {
   return cards.filter((card) => !card.classList.contains(hiddenClass)).length;
 }
 
-/**
- * 🆕 Muestra el contenedor principal si está oculto con transición suave
- */
 function showContainer(button, target, hiddenClass) {
   if (target.classList.contains(hiddenClass)) {
     target.style.maxHeight = 'none';
@@ -211,9 +102,6 @@ function showContainer(button, target, hiddenClass) {
   }
 }
 
-/**
- * Revela el siguiente grupo de tarjetas
- */
 function revealNextCards(cards, config, target) {
   return new Promise((resolve) => {
     const hiddenCards = cards.filter((card) =>
@@ -280,9 +168,6 @@ function revealNextCards(cards, config, target) {
   });
 }
 
-/**
- * 🆕 Colapsa todas las tarjetas y resetea el estado con transición suave
- */
 function collapseAll(button, target, cards, config, state) {
   const visibleCards = cards.filter(
     (c) => !c.classList.contains(config.hiddenClass)
@@ -339,9 +224,6 @@ function collapseAll(button, target, cards, config, state) {
   });
 }
 
-/**
- * 🆕 Oculta el contenedor con una transición suave
- */
 function hideContainerSmoothly(
   button,
   target,
@@ -405,9 +287,6 @@ function hideContainerSmoothly(
   });
 }
 
-/**
- * 🆕 Expande el contenedor con una transición suave (para evitar salto del botón)
- */
 function expandContainerSmoothly(target, hiddenClass = 'hidden') {
   if (!target || !target.style) return;
 
@@ -440,9 +319,6 @@ function expandContainerSmoothly(target, hiddenClass = 'hidden') {
   }, 650);
 }
 
-/**
- * Actualiza el texto del botón según el estado actual
- */
 function updateButtonText(button, total, revealed) {
   const remaining = total - revealed;
   const { showAllText, hideText } = getLocalizedStrings(button, total);
@@ -454,9 +330,6 @@ function updateButtonText(button, total, revealed) {
   }
 }
 
-/**
- * Obtiene los textos localizados para el botón
- */
 function getLocalizedStrings(button, total) {
   const lang =
     document.documentElement.lang ||
@@ -493,9 +366,6 @@ function getLocalizedStrings(button, total) {
   return { showAllText: showAll, hideText: hide };
 }
 
-/**
- * Inicializa slider dentro de una tarjeta si existe
- */
 function initializeSliderIfExists(card) {
   const slider = card.querySelector('[id^="slider-"]');
   if (!slider) return;
@@ -510,9 +380,6 @@ function initializeSliderIfExists(card) {
   loadSliderModule(slider);
 }
 
-/**
- * Inicializa un slider específico
- */
 function initSlider(sliderElement) {
   try {
     if (typeof window !== 'undefined' && window.initSlider) {
@@ -526,9 +393,6 @@ function initSlider(sliderElement) {
   }
 }
 
-/**
- * Carga el módulo del slider dinámicamente
- */
 function loadSliderModule(sliderElement) {
   const existingScript = document.querySelector('script[data-slider-module]');
   if (existingScript) {
@@ -556,14 +420,6 @@ function loadSliderModule(sliderElement) {
   document.head.appendChild(script);
 }
 
-// Exponer función globalmente
-if (typeof window !== 'undefined') {
-  window.initShowMore = initShowMore;
-}
-
-/**
- * 📄 DETECCIÓN AUTOMÁTICA DE CAMBIOS EN TARJETAS
- */
 function setupCardObserver(button, grid, config, state) {
   if (typeof MutationObserver === 'undefined') {
     if (typeof console !== 'undefined') {
@@ -609,9 +465,6 @@ function setupCardObserver(button, grid, config, state) {
   return observer;
 }
 
-/**
- * Actualiza el estado cuando cambia el número de tarjetas
- */
 function updateCardsState(button, grid, config, state) {
   const cards = Array.from(grid.children);
   const newCount = cards.length;
@@ -644,9 +497,26 @@ function updateCardsState(button, grid, config, state) {
   }
 }
 
-/**
- * Función para actualización manual
- */
 function updateCardsManually(button, grid, config, state) {
   updateCardsState(button, grid, config, state);
 }
+
+// Exportar las funciones necesarias para el init
+export {
+  initializeCards,
+  setupButtonListener,
+  setupCardObserver,
+  updateCardsState,
+  updateCardsManually,
+  getRevealedCount,
+  showContainer,
+  revealNextCards,
+  collapseAll,
+  hideContainerSmoothly,
+  expandContainerSmoothly,
+  updateButtonText,
+  getLocalizedStrings,
+  initializeSliderIfExists,
+  initSlider,
+  loadSliderModule,
+};
