@@ -241,7 +241,7 @@
   /* linea de borde animada */
   --showmore-primary: #0091ff;
   /* grosor de la linea */
-  --showmore-border-width: 2px;
+  --showmore-border-width: 1.5px;
 }
 
 /* ==========================================================================
