@@ -12,11 +12,21 @@ const {
 
 <button
   id={id}
-  class={`show-more-projects-btn ${cls}`}
+  class={`show-more-projects-btn neon-showmore-btn ${cls}`}
   type="button"
   aria-expanded="false"
 >
-  {text}
+  <span
+    class="neon-showmore-btn__border neon-showmore-btn__border--top"
+    aria-hidden="true"></span>
+  <span
+    class="neon-showmore-btn__border neon-showmore-btn__border--right"
+    aria-hidden="true"></span>
+  <span
+    class="neon-showmore-btn__border neon-showmore-btn__border--bottom"
+    aria-hidden="true"></span>
+  <span
+    class="neon-showmore-btn__border neon-showmore-btn__border--left"
+    aria-hidden="true"></span>
+  <span class="neon-showmore-btn__text">{text}</span>
 </button>
-
-<!-- El archivo JS que maneja la lógica está separado en public/js/show-more/show-more-init.js -->

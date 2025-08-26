@@ -230,3 +230,328 @@
     opacity 300ms ease;
   will-change: transform, margin, opacity;
 }
+
+/* ==========================================================================  
+   SHOW MORE BUTTON - Estilos para botón "Mostrar más" con efectos neón
+   Agrega esto al final de tu animations.css
+   ========================================================================== */
+
+/* Variables específicas para el botón Show More */
+:root {
+  --showmore-primary: #03e9f4;
+  --showmore-bg: transparent;
+  --showmore-text: #03e9f4;
+  --showmore-text-hover: #050801;
+  --showmore-border-width: 2px;
+  --showmore-padding-x: 24px;
+  --showmore-padding-y: 12px;
+  --showmore-letter-spacing: 1px;
+  --showmore-border-radius: 0;
+}
+
+/* ==========================================================================
+   BASE STYLES - Botón Show More con efectos neón
+   ========================================================================== */
+
+.neon-showmore-btn {
+  /* Layout */
+  position: relative;
+  display: inline-block;
+  padding: var(--showmore-padding-y) var(--showmore-padding-x);
+  margin: 20px 0;
+
+  /* Tipografía - hereda del sistema existente pero añade efectos */
+  font-weight: 600;
+  letter-spacing: var(--showmore-letter-spacing);
+  text-transform: uppercase;
+  color: var(--showmore-text);
+
+  /* Apariencia base */
+  background: var(--showmore-bg);
+  border: none;
+  border-radius: var(--showmore-border-radius);
+  overflow: hidden;
+  cursor: pointer;
+
+  /* Transiciones suaves */
+  transition:
+    background-color 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    color 0.4s ease,
+    box-shadow 0.4s ease,
+    transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  /* Optimización */
+  will-change: transform, background-color, box-shadow;
+  transform-origin: center center;
+}
+
+/* Estados interactivos */
+.neon-showmore-btn:hover {
+  background: var(--showmore-primary);
+  color: var(--showmore-text-hover);
+  box-shadow:
+    0 0 10px var(--showmore-primary),
+    0 0 20px var(--showmore-primary),
+    0 0 40px var(--showmore-primary);
+
+  transform: translateY(-1px);
+
+  /* Reflejo sutil */
+  -webkit-box-reflect: below 1px
+    linear-gradient(transparent, rgba(0, 0, 0, 0.1));
+}
+
+.neon-showmore-btn:focus-visible {
+  outline: none;
+  background: var(--showmore-primary);
+  color: var(--showmore-text-hover);
+  box-shadow:
+    0 0 5px var(--showmore-primary),
+    0 0 15px var(--showmore-primary),
+    0 0 30px var(--showmore-primary);
+}
+
+.neon-showmore-btn:active {
+  transform: scale(0.95) translateY(0);
+  transition-duration: 0.1s;
+}
+
+/* Estado expandido */
+.neon-showmore-btn--expanded {
+  background: rgba(3, 233, 244, 0.1);
+  box-shadow: 0 0 5px rgba(3, 233, 244, 0.3);
+}
+
+.neon-showmore-btn--expanded:hover {
+  background: var(--showmore-primary);
+}
+
+/* ==========================================================================
+   VARIANTES DE COLOR
+   ========================================================================== */
+
+.neon-showmore-btn--purple {
+  filter: hue-rotate(270deg);
+}
+
+.neon-showmore-btn--green {
+  filter: hue-rotate(110deg);
+}
+
+/* ==========================================================================
+   TAMAÑOS
+   ========================================================================== */
+
+.neon-showmore-btn--small {
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  letter-spacing: 0.5px;
+}
+
+.neon-showmore-btn--large {
+  padding: 16px 32px;
+  font-size: 1.125rem;
+  letter-spacing: 2px;
+}
+
+/* ==========================================================================
+   TEXTO DEL BOTÓN
+   ========================================================================== */
+
+.neon-showmore-btn__text {
+  position: relative;
+  z-index: 10;
+  display: block;
+  transition: opacity 0.3s ease;
+}
+
+/* ==========================================================================
+   BORDES ANIMADOS - Versión optimizada para Show More
+   ========================================================================== */
+
+.neon-showmore-btn__border {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+/* Borde superior */
+.neon-showmore-btn__border--top {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--showmore-border-width);
+  background: linear-gradient(90deg, transparent, var(--showmore-primary));
+  animation: showmore-border-top 2s linear infinite;
+}
+
+@keyframes showmore-border-top {
+  0% {
+    left: -100%;
+  }
+  50%,
+  100% {
+    left: 100%;
+  }
+}
+
+/* Borde derecho */
+.neon-showmore-btn__border--right {
+  top: -100%;
+  right: 0;
+  width: var(--showmore-border-width);
+  height: 100%;
+  background: linear-gradient(180deg, transparent, var(--showmore-primary));
+  animation: showmore-border-right 2s linear infinite;
+  animation-delay: 0.5s;
+}
+
+@keyframes showmore-border-right {
+  0% {
+    top: -100%;
+  }
+  50%,
+  100% {
+    top: 100%;
+  }
+}
+
+/* Borde inferior */
+.neon-showmore-btn__border--bottom {
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: var(--showmore-border-width);
+  background: linear-gradient(270deg, transparent, var(--showmore-primary));
+  animation: showmore-border-bottom 2s linear infinite;
+  animation-delay: 1s;
+}
+
+@keyframes showmore-border-bottom {
+  0% {
+    right: -100%;
+  }
+  50%,
+  100% {
+    right: 100%;
+  }
+}
+
+/* Borde izquierdo */
+.neon-showmore-btn__border--left {
+  bottom: -100%;
+  left: 0;
+  width: var(--showmore-border-width);
+  height: 100%;
+  background: linear-gradient(360deg, transparent, var(--showmore-primary));
+  animation: showmore-border-left 2s linear infinite;
+  animation-delay: 1.5s;
+}
+
+@keyframes showmore-border-left {
+  0% {
+    bottom: -100%;
+  }
+  50%,
+  100% {
+    bottom: 100%;
+  }
+}
+
+/* ==========================================================================
+   INTEGRACIÓN CON SISTEMA EXISTENTE
+   ========================================================================== */
+
+/* Mantener compatibilidad con clases show-more-projects-btn existentes */
+.show-more-projects-btn.neon-showmore-btn {
+  /* Hereda todas las propiedades existentes y las combina con efectos neón */
+  display: inline-block;
+  transition:
+    transform 600ms cubic-bezier(0.2, 0.9, 0.25, 1),
+    margin 600ms cubic-bezier(0.2, 0.9, 0.25, 1),
+    opacity 300ms ease,
+    background-color 400ms ease,
+    box-shadow 400ms ease;
+  will-change: transform, margin, opacity, background-color, box-shadow;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .neon-showmore-btn {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+  }
+
+  .neon-showmore-btn--large {
+    padding: 12px 24px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .neon-showmore-btn {
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    letter-spacing: 0.25px;
+    margin: 15px 0;
+  }
+
+  .neon-showmore-btn--small {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+  }
+}
+
+/* ==========================================================================
+   ACCESIBILIDAD
+   ========================================================================== */
+
+/* Reducir animaciones */
+@media (prefers-reduced-motion: reduce) {
+  .neon-showmore-btn__border {
+    animation: none;
+  }
+
+  .neon-showmore-btn {
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .neon-showmore-btn:hover {
+    -webkit-box-reflect: none;
+    transform: none;
+  }
+}
+
+/* Alto contraste */
+@media (prefers-contrast: high) {
+  .neon-showmore-btn {
+    border: 1px solid var(--showmore-primary);
+  }
+
+  .neon-showmore-btn:hover {
+    border-color: var(--showmore-text-hover);
+  }
+}
+
+/* ==========================================================================
+   MODO SIN EFECTOS NEÓN (FALLBACK)
+   ========================================================================== */
+
+/* Para cuando disableNeon=true */
+.show-more-projects-btn:not(.neon-showmore-btn) {
+  /* Mantiene el estilo original sin efectos neón */
+  transition: all 0.3s ease;
+}
+
+.show-more-projects-btn:not(.neon-showmore-btn):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+/* End of animations for show-more and neon button */

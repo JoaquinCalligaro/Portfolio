@@ -35,7 +35,7 @@ function initializeCards(button, grid, hiddenClass, chunkSize, state) {
 
   // Configurar texto inicial del botón usando los textos del componente
   const { showAllText } = getLocalizedStrings(button, totalCards);
-  button.textContent = showAllText.replace('${total}', totalCards);
+  setButtonText(button, showAllText.replace('${total}', totalCards));
 
   // Ocultar todas las tarjetas si el contenedor está oculto
   const target = grid.closest(`[id]`);
@@ -277,7 +277,7 @@ function hideContainerSmoothly(
       }
 
       const { showAllText } = getLocalizedStrings(button, totalCards);
-      button.textContent = showAllText.replace('${total}', totalCards);
+      setButtonText(button, showAllText.replace('${total}', totalCards));
 
       if (typeof config.onHide === 'function') {
         config.onHide();
@@ -325,9 +325,9 @@ function updateButtonText(button, total, revealed) {
   const { showAllText, hideText } = getLocalizedStrings(button, total);
 
   if (remaining > 0) {
-    button.textContent = showAllText.replace('${total}', total);
+    setButtonText(button, showAllText.replace('${total}', total));
   } else {
-    button.textContent = hideText;
+    setButtonText(button, hideText);
   }
 }
 
@@ -365,6 +365,25 @@ function getLocalizedStrings(button, total) {
   if (!hide) hide = lang === 'EN' ? 'Hide' : 'Ocultar';
 
   return { showAllText: showAll, hideText: hide };
+}
+
+// Preserve button inner markup when updating text (e.g. spans/icons)
+function setButtonText(button, text) {
+  try {
+    const textSpan = button.querySelector('.neon-showmore-btn__text');
+    if (textSpan) {
+      textSpan.textContent = text;
+      return;
+    }
+  } catch {
+    // noop
+  }
+
+  try {
+    button.textContent = text;
+  } catch {
+    // noop
+  }
 }
 
 function initializeSliderIfExists(card) {
@@ -487,7 +506,7 @@ function updateCardsState(button, grid, config, state) {
   if (state.isCollapsed) {
     cards.forEach((card) => card.classList.add(config.hiddenClass));
     const { showAllText } = getLocalizedStrings(button, newCount);
-    button.textContent = showAllText.replace('${total}', newCount);
+    setButtonText(button, showAllText.replace('${total}', newCount));
   } else {
     const revealedCount = getRevealedCount(cards, config.hiddenClass);
     updateButtonText(button, newCount, revealedCount);
