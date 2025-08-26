@@ -238,14 +238,10 @@
 
 /* Variables específicas para el botón Show More */
 :root {
-  /* linea de bore animada */
-  --showmore-primary: #03e4f4;
-  --showmore-text-hover: #050801;
+  /* linea de borde animada */
+  --showmore-primary: #00ccff;
+  /* grosor de la linea */
   --showmore-border-width: 1px;
-  --showmore-padding-x: 24px;
-  --showmore-padding-y: 10px;
-  --showmore-letter-spacing: 1px;
-  --showmore-border-radius: 12px;
 }
 
 /* ==========================================================================
@@ -280,7 +276,7 @@
   transform: translateY(-1px);
 
   /* Reflejo sutil */
-  -webkit-box-reflect: below 0.5px
+  -webkit-box-reflect: below 1.5px
     linear-gradient(transparent, rgba(0, 0, 0, 0.1));
 }
 
