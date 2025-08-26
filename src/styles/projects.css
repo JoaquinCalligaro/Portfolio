@@ -1,5 +1,6 @@
 /* ============================================================
-  ! Efecto glowing
+  ! Efecto glowing  
+  Modifica: .glow-effect, [class*='icon-']::before, animaciones 'glowing' y 'pulse-shadow'
   ============================================================ */
 @keyframes glowing {
   0%,
@@ -62,6 +63,7 @@
 }
 /* ============================================================
   ! Efectos de las cards
+  Modifica: .card-inner, .card-root, transiciones
   ============================================================ */
 .card-inner {
   transform-origin: center center;
@@ -77,6 +79,7 @@
 
 /* ============================================================
   ! Glassmorph ligero
+  Modifica: .glassmorph-effect, .glassmorph-effect::before, animación 'sheen-move'
   ============================================================ */
 @keyframes glassmorph-glow {
   0% {
@@ -164,6 +167,7 @@
 
 /* ============================================================
   ! Glow (iconos)
+  Modifica: .glow-effect, [class*='icon-'], animaciones 'glowing' y 'pulse-shadow'
   ============================================================ */
 .glow-effect {
   --icon-glow-color: #00b3ff2e;
@@ -277,7 +281,8 @@ animation: pulse-shadow 2s infinite;
   border: 1px solid var(--icon-color-border) !important;
 }
 
-/* Líneas animadas alrededor del borde (sutiles) */
+/* Líneas animadas alrededor del borde (sutiles)
+  Modifica: [class*='icon-']::after (líneas animadas) */
 [class*='icon-']::after {
   content: '';
   position: absolute;
@@ -442,8 +447,9 @@ animation: pulse-shadow 2s infinite;
 }
 
 /* ============================================================
-   ! BOTON VER TODOS/SHOW ALL - Estilos Generales
-   =========================================================*/
+  ! BOTON VER TODOS/SHOW ALL - Estilos Generales
+  Modifica: variables --showmore-*, .show-more-projects-container
+  =========================================================*/
 
 /* Variables específicas para el botón VER TODOS/SHOW ALL  */
 :root {
@@ -455,6 +461,7 @@ animation: pulse-shadow 2s infinite;
 
 /* ============================================================
 ! BOTON VER TODOS/SHOW ALL - ANIMACION GENERAL
+Modifica: keyframes contract-vertically, animate-* classes
   ========================================================= */
 
 /* Nueva keyframe para colapso vertical */
@@ -471,7 +478,8 @@ animation: pulse-shadow 2s infinite;
 
 /* ============================================================
   ! BASE STYLES - BOTON VER TODOS/SHOW ALL con efectos neón
-   ========================================================= */
+  Modifica: .neon-showmore-btn, .neon-showmore-btn__border, bordes animados
+  ========================================================= */
 
 .show-more-projects-container {
   transition:
