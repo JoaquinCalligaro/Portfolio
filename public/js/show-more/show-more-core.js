@@ -1,4 +1,5 @@
 /* eslint-env browser */
+/* global document, window, MutationObserver, setTimeout, clearTimeout, console */
 //Lógica principal: manejo de tarjetas, animaciones y observer
 // No inicializa nada, solo provee funciones puras que usa el init
 
