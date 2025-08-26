@@ -211,8 +211,24 @@ function revealNextCards(cards, config) {
     if (revealed >= toShow) break;
 
     if (card.classList.contains(config.hiddenClass)) {
+      // Mostrar tarjeta
       card.classList.remove(config.hiddenClass);
       revealed++;
+
+      // Añadir animación de expansión vertical solicitada
+      try {
+        if (!card.classList.contains('animate-expand-vertically')) {
+          card.classList.add('animate-expand-vertically');
+          // Limpiar la clase cuando termine la animación para evitar acumulación
+          const clearAnim = () => {
+            card.classList.remove('animate-expand-vertically');
+            card.removeEventListener('animationend', clearAnim);
+          };
+          card.addEventListener('animationend', clearAnim);
+        }
+      } catch {
+        // noop
+      }
 
       // Inicializar slider si existe en la tarjeta
       initializeSliderIfExists(card);
@@ -226,13 +242,51 @@ function revealNextCards(cards, config) {
  * Colapsa todas las tarjetas y resetea el estado
  */
 function collapseAll(button, target, cards, config, state) {
-  cards.forEach((card) => card.classList.add(config.hiddenClass));
+  // Aplicar animación de contracción a las tarjetas visibles
+  const visibleCards = cards.filter(
+    (c) => !c.classList.contains(config.hiddenClass)
+  );
+
+  visibleCards.forEach((card) => {
+    try {
+      // Añadir clase de animación si no existe
+      if (!card.classList.contains('animate-contract-vertically')) {
+        card.classList.add('animate-contract-vertically');
+
+        const finish = () => {
+          card.classList.remove('animate-contract-vertically');
+          card.classList.add(config.hiddenClass);
+          card.removeEventListener('animationend', finish);
+        };
+
+        // Escuchar fin de animación
+        card.addEventListener('animationend', finish);
+
+        // Fallback: asegurar que se oculta aunque no llegue animationend
+        setTimeout(() => {
+          if (!card.classList.contains(config.hiddenClass)) {
+            card.classList.remove('animate-contract-vertically');
+            card.classList.add(config.hiddenClass);
+            card.removeEventListener('animationend', finish);
+          }
+        }, 600); // 600ms > 500ms duración de la animación
+      } else {
+        // Si ya tenía la clase, forzar ocultado
+        card.classList.add(config.hiddenClass);
+      }
+    } catch {
+      // En caso de error, ocultar inmediatamente
+      card.classList.add(config.hiddenClass);
+    }
+  });
+
+  // Ocultar contenedor y actualizar atributos
   target.classList.add(config.hiddenClass);
   button.setAttribute('aria-expanded', 'false');
 
   state.isCollapsed = true;
 
-  // Resetear texto del botón
+  // Resetear texto del botón (localizado)
   const { showAllText } = getLocalizedStrings(button, cards.length);
   button.textContent = showAllText.replace('${total}', cards.length);
 
