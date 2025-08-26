@@ -6,9 +6,8 @@
 @plugin "@midudev/tailwind-animations";
 /*! Importaciones */
 @import './navbar.css';
-@import './animations.css';
 @import './techstack.css';
-@import './icon-effects.css';
+@import './projects.css';
 
 /*! Temas personalizados */
 @theme {
