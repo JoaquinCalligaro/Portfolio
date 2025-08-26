@@ -178,8 +178,8 @@ function setupButtonListener(button, target, grid, config, state) {
       cards.forEach((card) => card.classList.add(config.hiddenClass));
     }
 
-    // Revelar siguiente grupo de tarjetas (esperar a que terminen las animaciones)
-    const revealed = await revealNextCards(cards, config);
+  // Revelar siguiente grupo de tarjetas (esperar a que terminen las animaciones)
+  const revealed = await revealNextCards(cards, config, target);
 
     // Actualizar texto del botón
     updateButtonText(
@@ -219,7 +219,7 @@ function showContainer(button, target, hiddenClass) {
 /**
  * Revela el siguiente grupo de tarjetas
  */
-function revealNextCards(cards, config) {
+function revealNextCards(cards, config, target) {
   return new Promise((resolve) => {
     const hiddenCards = cards.filter((card) =>
       card.classList.contains(config.hiddenClass)
@@ -241,6 +241,13 @@ function revealNextCards(cards, config) {
 
       // Inicializar slider si existe en la tarjeta
       initializeSliderIfExists(card);
+    }
+
+    // Expandir contenedor suavemente antes de esperar a las animaciones de cards
+    try {
+      expandContainerSmoothly(target);
+    } catch {
+      // noop
     }
 
     // Crear promesas que se resuelven al terminar la animación o tras fallback
@@ -306,13 +313,10 @@ function collapseAll(button, target, cards, config, state) {
           card.classList.add('animate-contract-vertically');
         }
 
-        // Handler que limpia y resuelve
+        // Handler que limpia y resuelve (NO ocultar todavía para evitar salto)
         const wrappedDone = () => {
           card.removeEventListener('animationend', wrappedDone);
           card.classList.remove('animate-contract-vertically');
-          if (!card.classList.contains(config.hiddenClass)) {
-            card.classList.add(config.hiddenClass);
-          }
           clearTimeout(timeout);
           resolve();
         };
@@ -320,10 +324,7 @@ function collapseAll(button, target, cards, config, state) {
         // Timeout fallback
         const timeout = setTimeout(() => {
           card.removeEventListener('animationend', wrappedDone);
-          if (!card.classList.contains(config.hiddenClass)) {
-            card.classList.remove('animate-contract-vertically');
-            card.classList.add(config.hiddenClass);
-          }
+          card.classList.remove('animate-contract-vertically');
           resolve();
         }, 1000); // un poco más que la duración de 500ms
 
@@ -336,7 +337,19 @@ function collapseAll(button, target, cards, config, state) {
 
   // 🆕 Cuando todas las tarjetas han terminado de contraerse, ocultar contenedor suavemente
   Promise.all(promises).then(() => {
-    hideContainerSmoothly(button, target, config, state, cards.length);
+    // hideContainerSmoothly ahora devuelve una Promise
+    hideContainerSmoothly(button, target, config, state, cards.length).then(() => {
+      // Finalmente ocultar las tarjetas (ya que el contenedor terminó su transición)
+      visibleCards.forEach((card) => {
+        try {
+          if (!card.classList.contains(config.hiddenClass)) {
+            card.classList.add(config.hiddenClass);
+          }
+        } catch {
+          // noop
+        }
+      });
+    });
   });
 }
 
@@ -351,10 +364,10 @@ function hideContainerSmoothly(button, target, config, state, totalCards) {
   target.style.maxHeight = currentHeight + 'px';
 
   // Forzar reflow para que la altura se aplique
-  target.offsetHeight;
+  void target.offsetHeight;
 
   // Comenzar transición hacia altura 0 y opacidad 0
-  requestAnimationFrame(() => {
+  (window.requestAnimationFrame || function (fn) { return setTimeout(fn, 16); })(() => {
     target.style.maxHeight = '0px';
     target.style.opacity = '0';
     target.style.paddingTop = '0px';
@@ -386,6 +399,46 @@ function hideContainerSmoothly(button, target, config, state, totalCards) {
       config.onHide();
     }
   }, config.containerTransitionDelay + 200); // Un poco más tiempo que la transición CSS
+}
+
+/**
+ * 🆕 Expande el contenedor con una transición suave (para evitar salto del botón)
+ */
+function expandContainerSmoothly(target) {
+  if (!target || !target.style) return;
+
+  // Asegurar overflow hidden y transición ya seteada en setupContainerTransitions
+  target.style.overflow = 'hidden';
+
+  // Medir altura necesaria
+  const targetHeight = target.scrollHeight;
+
+  // Empezar desde 0 si está oculto
+  target.style.maxHeight = '0px';
+  target.style.opacity = '0';
+
+  // Forzar reflow
+  void target.offsetHeight;
+
+  // Remover hidden para que el contenido sea accesible
+  target.classList.remove('hidden');
+
+  // Animar hacia la altura completa
+  (window.requestAnimationFrame || function (fn) { return setTimeout(fn, 16); })(() => {
+    target.style.maxHeight = targetHeight + 'px';
+    target.style.opacity = '1';
+    // restaurar posibles paddings/margins por defecto (vacío permite CSS controlar)
+    target.style.paddingTop = '';
+    target.style.paddingBottom = '';
+    target.style.marginTop = '';
+    target.style.marginBottom = '';
+  });
+
+  // Limpiar el maxHeight después de la transición para permitir auto height
+  setTimeout(() => {
+    target.style.maxHeight = '';
+    target.style.overflow = '';
+  }, 450);
 }
 
 /**
