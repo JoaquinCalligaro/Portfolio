@@ -239,9 +239,9 @@
 /* Variables específicas para el botón Show More */
 :root {
   /* linea de borde animada */
-  --showmore-primary: #00ccff;
+  --showmore-primary: #0091ff;
   /* grosor de la linea */
-  --showmore-border-width: 1px;
+  --showmore-border-width: 2px;
 }
 
 /* ==========================================================================
