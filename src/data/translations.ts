@@ -37,6 +37,11 @@ export const translations = {
         description:
           'Aplicación Gif-App es una aplicación web que permite a los usuarios buscar, ver y compartir GIFs fácilmente. Utiliza la API de GIPHY para obtener GIFs en tendencia y populares',
       },
+      todolist: {
+        title: 'To do list App',
+        description:
+          'Permite agregar, marcar como completadas y eliminar tareas. Los datos se guardan en localStorage y cuenta con modo claro/oscuro para una mejor experiencia.',
+      },
     },
     buttons: {
       repo: 'Repositorio',
@@ -83,6 +88,11 @@ export const translations = {
         title: 'Gif App',
         description:
           'Gif-App is a web application that allows users to search, view, and share GIFs easily. It uses the GIPHY API to fetch trending and popular GIFs',
+      },
+      todolist: {
+        title: 'To do list App',
+        description:
+          'Allows users to add, mark as completed, and delete tasks. Data is saved in localStorage and it includes a light/dark mode for a better experience.',
       },
     },
     buttons: {
