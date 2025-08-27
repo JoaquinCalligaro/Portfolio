@@ -53,8 +53,8 @@ export const translations = {
       live: 'Demo',
     },
     showMore: {
-      showAll: 'Ver Todos (${total})  ⭣',
-      hide: 'Ocultar  ⭡',
+      showAll: 'Ver Todos (${total})',
+      hide: 'Ocultar',
     },
   },
   EN: {
@@ -111,8 +111,8 @@ export const translations = {
       live: 'Live',
     },
     showMore: {
-      showAll: 'Show all (${total})  ⭣',
-      hide: 'Hide ⭡',
+      showAll: 'Show all (${total})',
+      hide: 'Hide',
     },
   },
 } as const;
