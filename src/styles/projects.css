@@ -198,51 +198,40 @@ animation: pulse-shadow 2s infinite;
   z-index: -2;
   border-radius: inherit;
   /* capa de resplandor: base sutil */
-  opacity: 0.12;
+  opacity: 0.08;
   transform: scale(1);
-  /* reacciones más rápidas para hover in/out */
+  /* reacciones más rápidas para hover in/out (ligeramente más suaves) */
   transition:
-    transform 90ms ease,
-    opacity 90ms ease,
-    filter 90ms ease;
+    transform 120ms ease,
+    opacity 120ms ease,
+    filter 120ms ease;
   background: linear-gradient(
     45deg,
     var(--icon-color),
     var(--icon-color-alpha-hover)
   );
   background-size: 300% 300%;
-  filter: blur(20px);
+  filter: blur(12px);
   animation: glowing 5s ease-in-out infinite;
 }
 [class*='icon-']:hover::before {
-  /* intensificar resplandor en hover */
-  transform: scale(1.12);
-  opacity: 0.85;
-  filter: blur(48px);
-}
-[class*='icon-']:hover {
-  /* hover más pronunciado: resplandor mayor y borde más brillante */
-  box-shadow:
-    0 30px 120px rgba(0, 0, 0, 0.16),
-    0 0 160px 48px var(--icon-color-alpha-hover);
-  border-color: var(--icon-color-border-hover);
+  /* intensificar resplandor en hover (suavizado adicional) */
+  transform: scale(1.03);
+  opacity: 0.4;
+  filter: blur(16px);
 }
 [class*='icon-'] {
   --icon-glow-color: var(--icon-color-alpha-hover);
   /* aumentar el grosor visible del borde para que la línea quede más clara */
   border: 1px solid var(--icon-color-border) !important;
 }
+
 [class*='icon-']:hover {
-  /* hover más pronunciado: resplandor de color mayor y borde más brillante */
+  /* hover general atenuado: menos spread y opacidad para un resplandor sutil */
   box-shadow:
-    0 30px 120px rgba(0, 0, 0, 0.16),
-    0 0 160px 48px var(--icon-color-alpha-hover);
+    0 6px 18px rgba(0, 0, 0, 0.05),
+    0 0 20px 6px var(--icon-color-alpha-hover);
   border-color: var(--icon-color-border-hover);
-}
-[class*='icon-'] {
-  --icon-glow-color: var(--icon-color-alpha-hover);
-  /* increase visible border width to make the line clearer */
-  border: 1px solid var(--icon-color-border) !important;
 }
 
 /* Líneas animadas alrededor del borde (sutiles)
@@ -320,8 +309,10 @@ animation: pulse-shadow 2s infinite;
 
 /* Intensificar glow en hover para la línea exterior */
 .border-anim-only:hover::after {
-  /* intensificar el resplandor del borde también en hover */
-  box-shadow: 0 0 120px 16px var(--icon-color-alpha-hover);
+  /* intensificar el resplandor del borde también en hover (suave y reducido) */
+  box-shadow:
+    0 0 36px 6px rgba(0, 0, 0, 0),
+    0 0 36px 6px var(--icon-color-alpha-hover);
   border-color: var(--icon-color-border-hover);
 }
 
@@ -366,9 +357,9 @@ animation: pulse-shadow 2s infinite;
   }
   50% {
     box-shadow:
-      0 6px 28px -6px rgba(0, 0, 0, 0),
-      0 0 40px 4px var(--icon-color-alpha-hover);
-    transform: scale(1.01);
+      0 4px 18px -6px rgba(0, 0, 0, 0),
+      0 0 24px 2px var(--icon-color-alpha-hover);
+    transform: scale(1.005);
     opacity: 1;
   }
   100% {
