@@ -92,7 +92,7 @@ export const stacks: TechStackGroup[] = [
         hexAlpha: '#4479A133',
         icon: '/src/assets/MySQL.svg',
         color: 'text-gray-900 dark:text-white',
-        loading: 'lazy',
+        loading: 'eager',
       },
     ],
   },
