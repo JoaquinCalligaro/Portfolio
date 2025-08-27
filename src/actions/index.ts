@@ -1,7 +1,29 @@
 import { ActionError, defineAction } from 'astro:actions';
 import { z } from 'astro:schema';
 import { Resend } from 'resend';
-import SERVICES from '../assets/collections/services.json';
+// Load services collection at runtime so missing file doesn't break the dev server
+// (the collections folder was removed intentionally).
+import { existsSync, readFileSync as fsReadFileSync } from 'node:fs';
+import { join as pathJoin } from 'node:path';
+
+let SERVICES: Array<{ id: number; title?: string; [k: string]: unknown }> = [];
+try {
+  const servicesPath = pathJoin(
+    process.cwd(),
+    'src',
+    'assets',
+    'collections',
+    'services.json'
+  );
+  if (existsSync(servicesPath)) {
+    SERVICES = JSON.parse(fsReadFileSync(servicesPath, 'utf-8'));
+  } else {
+    SERVICES = [];
+  }
+} catch {
+  // If JSON parsing fails or read errors occur, default to empty array
+  SERVICES = [];
+}
 import Handlebars from 'handlebars';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
