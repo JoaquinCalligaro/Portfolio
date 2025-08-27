@@ -1,8 +1,6 @@
 export const translations = {
   ES: {
     navbar: {
-      // rotated: home <- old tech, tech <- old projects, projects <- old about, about <- old home
-      home: 'Tecnologias',
       tech: 'Proyectos',
       projects: 'Sobre Mí',
       about: 'Inicio',
@@ -103,8 +101,6 @@ export const translations = {
   },
   EN: {
     navbar: {
-      // rotated: home <- old tech, tech <- old projects, projects <- old about, about <- old home
-      home: 'Tech Stack',
       tech: 'Projects',
       projects: 'About',
       about: 'Home',
