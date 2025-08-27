@@ -9,6 +9,7 @@
 @import './projects.css';
 @import './aboutme.css';
 @import './GoToTopBtn.css';
+@import './CvDownloadBtn.css';
 
 /*! Temas personalizados */
 @theme {

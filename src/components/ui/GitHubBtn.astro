@@ -1,0 +1,18 @@
+---
+// GitHub Button Component with Glassmorphism Effect
+import { Image } from 'astro:assets';
+const { href = '#', label = null, className = '' } = Astro.props;
+import gitHubSvg from '../../assets/GitHub.svg';
+---
+
+<a
+  href={href}
+  class={`inline-flex items-center glassmorph-effect rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 transition-all hover:border-slate-800 hover:bg-slate-500/70 hover:text-white dark:border-gray-600 dark:bg-gray-400/10 dark:text-slate-100 dark:hover:bg-gray-600 ${className}`}
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  <Image src={gitHubSvg} alt="GitHub" class="h-4 w-4" loading="lazy" />
+  <span class="xl:25 inline-block w-22 text-center sm:w-22 md:w-24"
+    >{label ?? 'GitHub'}</span
+  >
+</a>
