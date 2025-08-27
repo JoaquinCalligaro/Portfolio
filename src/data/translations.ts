@@ -37,6 +37,11 @@ export const translations = {
         description:
           'Aplicación Gif-App es una aplicación web que permite a los usuarios buscar, ver y compartir GIFs fácilmente. Utiliza la API de GIPHY para obtener GIFs en tendencia y populares',
       },
+      jsCalculator: {
+        title: 'Calculadora',
+        description:
+          'Una calculadora sencilla desarrollada con HTML, CSS, Tailwind y JS. Permite realizar operaciones básicas en una interfaz moderna, responsiva y minimalista.',
+      },
       todolist: {
         title: 'To do list App',
         description:
@@ -93,6 +98,12 @@ export const translations = {
         title: 'To do list App',
         description:
           'Allows users to add, mark as completed, and delete tasks. Data is saved in localStorage and it includes a light/dark mode for a better experience.',
+      },
+
+      jsCalculator: {
+        title: 'Calculator',
+        description:
+          'A simple calculator built with HTML, CSS, Tailwind, and JavaScript. It allows performing basic operations within a modern, responsive, and minimalistic interface.',
       },
     },
     buttons: {

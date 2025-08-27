@@ -4,30 +4,26 @@ import RepositoryBtn from '../ui/RepositoryBtn.astro';
 import LiveBtn from '../ui/LiveBtn.astro';
 import '../../styles/projects.css';
 import '../../styles/projects.css';
-import img1 from '../../assets/images/gif-app/gif-app-1.webp';
-import img2 from '../../assets/images/gif-app/gif-app-2.webp';
-import img3 from '../../assets/images/gif-app/gif-app-3.webp';
+import img1 from '../../assets/images/js-calculator/js-calculator-1.webp';
+import img2 from '../../assets/images/js-calculator/js-calculator-2.webp';
 import HtmlIcon from '../icons/HtmlIcon.astro';
 import CssIcon from '../icons/CssIcon.astro';
 import JavascriptIcon from '../icons/JavascriptIcon.astro';
 import TailwindIcon from '../icons/TailwindIcon.astro';
-import ReactIcon from '../icons/ReactIcon.astro';
-import TypescriptIcon from '../icons/TypescriptIcon.astro';
 import LocalizedText from '../language/LocalizedText.astro';
 import { translations } from '../../data/translations';
 // Títulos y descripciones vienen de translations.ts (idioma fijo: ES)
 const props = Astro.props || {};
-const serverTitle = props.title ?? translations['ES'].projects.gifApp.title;
+const serverTitle =
+  props.title ?? translations['ES'].projects.jsCalculator.title;
 const title = props.title ?? null;
 const technologies = props.technologies ?? [
   'html',
   'css',
-  'js',
   'tailwind',
-  'react',
-  'typescript',
+  'javascript',
 ];
-const images = props.images ?? [img1, img2, img3];
+const images = props.images ?? [img1, img2];
 const repo = 'https://github.com/JoaquinCalligaro/Gif-App';
 const live = 'https://gif-app-beta.netlify.app/';
 const sliderId = `slider-${Math.random().toString(36).slice(2, 9)}`;
@@ -35,15 +31,12 @@ const sliderId = `slider-${Math.random().toString(36).slice(2, 9)}`;
 const iconMap = {
   html: HtmlIcon,
   css: CssIcon,
-  js: JavascriptIcon,
-  javascript: JavascriptIcon,
   tailwind: TailwindIcon,
-  react: ReactIcon,
-  typescript: TypescriptIcon,
+  javascript: JavascriptIcon,
 };
 
 const finalImages =
-  Array.isArray(images) && images.length > 0 ? images : [img1, img2, img3];
+  Array.isArray(images) && images.length > 0 ? images : [img1, img2];
 
 const resolveTechnology = (item) => {
   if (!item) return null;
@@ -150,7 +143,7 @@ const resolveTechnology = (item) => {
     <div class="mb-4 p-4">
       <div class="flex items-center">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-          {title ?? <LocalizedText key="projects.gifApp.title" />}
+          {title ?? <LocalizedText key="projects.jsCalculator.title" />}
         </h3>
       </div>
 
@@ -172,7 +165,7 @@ const resolveTechnology = (item) => {
       <p
         class="pt-1.5 text-sm leading-relaxed text-slate-600 dark:text-slate-300"
       >
-        <LocalizedText key="projects.gifApp.description" />
+        <LocalizedText key="projects.jsCalculator.description" />
       </p>
     </div>
 

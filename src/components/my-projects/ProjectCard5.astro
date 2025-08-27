@@ -19,7 +19,12 @@ import { translations } from '../../data/translations';
 const props = Astro.props || {};
 const serverTitle = props.title ?? translations['ES'].projects.todolist.title;
 const title = props.title ?? null;
-const technologies = props.technologies ?? ['html', 'css', 'js', 'tailwind'];
+const technologies = props.technologies ?? [
+  'html',
+  'css',
+  'tailwind',
+  'javascript',
+];
 const images = props.images ?? [img1, img2, img3, img4, img5];
 const repo = 'https://github.com/JoaquinCalligaro/Password-Generator';
 const live = 'https://password-generatorjc.netlify.app/';
@@ -28,7 +33,6 @@ const sliderId = `slider-${Math.random().toString(36).slice(2, 9)}`;
 const iconMap = {
   html: HtmlIcon,
   css: CssIcon,
-  js: JavascriptIcon,
   javascript: JavascriptIcon,
   tailwind: TailwindIcon,
 };
