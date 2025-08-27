@@ -451,7 +451,14 @@ Modifica: keyframes contract-vertically, animate-* classes
     opacity 0.45s ease-out,
     margin 0.45s ease-out,
     padding 0.45s ease-out;
+  /* keep overflow hidden while collapsed to allow smooth collapse animation */
   overflow: hidden;
+}
+
+/* When the container is expanded (no 'hidden' class), allow visible overflow so
+   scaled cards can exceed the container without being clipped. */
+.show-more-projects-container:not(.hidden) {
+  overflow: visible;
 }
 
 .animate-expand-vertically {
