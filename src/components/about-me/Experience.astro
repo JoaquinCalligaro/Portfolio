@@ -1,16 +1,19 @@
 ---
 import Card from '../cards/Card.astro';
 import TimelineItem from '../TimelineItem.astro';
-import EXPERIENCES from '../../assets/collections/experiences.json';
+import { getExperiences, getAboutMe } from '../../data/translations';
+const EXPERIENCES = getExperiences('ES');
+const t = getAboutMe('ES');
 ---
 
 <Card
-  className="flex-1 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+  className="flex-1 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
 >
   <h3
     class="mb-6 text-lg font-semibold text-gray-950 sm:text-xl dark:text-white"
+    data-i18n-key="aboutMe.experience.heading"
   >
-    Experiencia Profesional
+    {t.experience.heading}
   </h3>
   <ol class="relative border-s-2 border-gray-300 dark:border-neutral-700">
     {
@@ -29,4 +32,64 @@ import EXPERIENCES from '../../assets/collections/experiences.json';
       ))
     }
   </ol>
+  <script is:inline>
+    (function () {
+      const ol = document.currentScript?.previousElementSibling;
+      if (!ol || !ol.querySelector) return;
+
+      function buildList(lang) {
+        try {
+          const data =
+            (window.TRANSLATIONS &&
+              window.TRANSLATIONS[lang] &&
+              window.TRANSLATIONS[lang].experiences) ||
+            [];
+          // Clear
+          ol.innerHTML = '';
+
+          for (const exp of data) {
+            const li = document.createElement('li');
+            li.className = 'ms-8 mb-10';
+
+            const span = document.createElement('span');
+            span.className =
+              'absolute -start-3 flex size-6 items-center justify-center rounded-full bg-blue-300 ring-8 ring-blue-100 dark:bg-blue-800 dark:ring-blue-950/60';
+            span.innerHTML = exp.svgIcon || '';
+
+            const h3 = document.createElement('h3');
+            h3.className =
+              'mb-1 flex items-center text-lg font-semibold text-gray-950 dark:text-white';
+            h3.textContent = exp.company || '';
+
+            const time = document.createElement('time');
+            time.className =
+              'mb-2 block text-sm leading-none font-normal text-gray-500';
+            time.textContent = exp.dates || '';
+
+            const p = document.createElement('p');
+            p.className =
+              'mb-4 text-sm font-normal text-gray-600 sm:text-base dark:text-gray-400';
+            p.textContent = exp.description || '';
+
+            li.appendChild(span);
+            li.appendChild(h3);
+            li.appendChild(time);
+            li.appendChild(p);
+
+            ol.appendChild(li);
+          }
+        } catch {
+          // noop
+        }
+      }
+
+      window.addEventListener('langChange', (ev) => {
+        const lang = (ev && ev.detail) || document.documentElement.lang || 'ES';
+        buildList(lang);
+      });
+
+      // initial
+      buildList(document.documentElement.lang || 'ES');
+    })();
+  </script>
 </Card>
