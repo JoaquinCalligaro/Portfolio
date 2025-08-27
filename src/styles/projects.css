@@ -80,7 +80,10 @@
     box-shadow 680ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* Sheen: pseudo-elemento de reflejo */
+/* Sheen: pseudo-elemento de reflejo
+   Mobile-first: disable the animated sheen on small screens to avoid
+   performance and clipping issues; keep background/visuals (bg, border)
+   intact. The animated sheen is enabled in the MD+ media query below. */
 .glassmorph-effect::before {
   content: '';
   position: absolute;
@@ -95,37 +98,67 @@
     rgba(255, 255, 255, 0.04) 55%,
     rgba(255, 255, 255, 0) 100%
   );
+  /* Static and hidden on small screens to preserve performance */
   transform: rotate(-20deg);
   pointer-events: none;
-  mix-blend-mode: screen; /* mantiene colores base pero añade brillo */
-  opacity: 0.35;
+  mix-blend-mode: screen;
+  opacity: 0;
   filter: blur(3px);
-  transition:
-    opacity 520ms ease,
-    transform 520ms ease;
-  /* movimiento muy lento y sutil */
-  animation: sheen-move 10s ease-in-out infinite;
+  transition: none;
+  animation: none;
 }
 
-.glassmorph-effect:hover::before {
-  opacity: 0.65;
-  transform: rotate(-20deg) translateY(-2px) scale(1.005);
-}
+/* Re-activate the sheen and performance hints on medium+ screens */
+@media (min-width: 768px) {
+  .glassmorph-effect {
+    /* performance hints for complex visual effects */
+    will-change: transform, filter;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    transform-style: preserve-3d;
+  }
 
-@keyframes sheen-move {
-  0% {
-    transform: rotate(-20deg) translateX(-100%);
-    opacity: 0;
+  /* Make the sheen element wider and centered so the animated sweep
+     reliably crosses the visible area even after rotation. */
+  .glassmorph-effect::before {
+    opacity: 0.35;
+    transition:
+      opacity 520ms ease,
+      transform 520ms ease;
+    left: -50%;
+    width: 200%;
+    height: 220%;
+    transform-origin: center center;
+    transform: rotate(-20deg) translateZ(0);
+    will-change: transform, opacity;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    animation: sheen-move-md 10s ease-in-out infinite;
   }
-  30% {
-    opacity: 0.9;
+
+  .glassmorph-effect:hover::before {
+    opacity: 0.65;
+    transform: rotate(-20deg) translateY(-2px) scale(1.005);
   }
-  60% {
-    opacity: 0.9;
-  }
-  100% {
-    transform: rotate(-20deg) translateX(100%);
-    opacity: 0;
+
+  /* MD+ sheen keyframes: translate the (wider) pseudo-element fully left->right */
+  @keyframes sheen-move-md {
+    0% {
+      transform: rotate(-20deg) translate3d(-100%, 0, 0);
+      opacity: 0;
+    }
+    25% {
+      opacity: 0.9;
+    }
+    75% {
+      opacity: 0.9;
+    }
+    100% {
+      transform: rotate(-20deg) translate3d(100%, 0, 0);
+      opacity: 0;
+    }
   }
 }
 
