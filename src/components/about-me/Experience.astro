@@ -1,0 +1,32 @@
+---
+import Card from '../cards/Card.astro';
+import TimelineItem from '../TimelineItem.astro';
+import EXPERIENCES from '../../assets/collections/experiences.json';
+---
+
+<Card
+  className="flex-1 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+>
+  <h3
+    class="mb-6 text-lg font-semibold text-gray-950 sm:text-xl dark:text-white"
+  >
+    Experiencia Profesional
+  </h3>
+  <ol class="relative border-s-2 border-gray-300 dark:border-neutral-700">
+    {
+      EXPERIENCES.map((experience) => (
+        <TimelineItem
+          title={experience.company}
+          description={experience.description}
+          date={experience.dates}
+        >
+          <div
+            slot="icon"
+            class="flex h-full w-full items-center justify-center p-1 transition-all duration-300 group-hover:scale-110"
+            set:html={experience.svgIcon}
+          />
+        </TimelineItem>
+      ))
+    }
+  </ol>
+</Card>

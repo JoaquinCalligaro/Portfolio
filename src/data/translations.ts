@@ -11,6 +11,22 @@ export const translations = {
       description:
         'Soy desarrollador frontend junior con experiencia en HTML, CSS y JavaScript. Actualmente trabajo con React, Tailwind y Astro, creando proyectos prácticos que combinan diseño moderno, rendimiento y buenas prácticas de desarrollo.',
     },
+    aboutMe: {
+      title: 'Sobre Mí',
+      shortBio: {
+        heading: 'Biografía breve',
+        paragraphs: [
+          'Soy un desarrollador frontend con interés en crear interfaces limpias y accesibles. Me especializo en convertir diseños en experiencias web eficientes y responsivas.',
+          'Trabajo a diario con HTML, CSS y JavaScript, y me apoyo en herramientas modernas como Astro, Tailwind y frameworks componentizados para entregar productos mantenibles.',
+          'Me apasiona el rendimiento y las buenas prácticas; disfruto optimizar cargas, mejorar la experiencia de usuario y aprender nuevas técnicas para crear productos confiables.',
+        ],
+        cvHeading: 'Información CV',
+        cvDownload: 'Descargar CV',
+      },
+      experience: {
+        heading: 'Experiencia Profesional',
+      },
+    },
     techStack: {
       heading: 'Stack Tecnológico',
     },
@@ -69,6 +85,22 @@ export const translations = {
       description:
         'I am a junior frontend developer with experience in HTML, CSS and JavaScript. I work with React, Tailwind and Astro, building practical projects that combine modern design, performance and good development practices.',
     },
+    aboutMe: {
+      title: 'About Me',
+      shortBio: {
+        heading: 'Short Bio',
+        paragraphs: [
+          'I am a frontend developer focused on building clean, accessible interfaces. I turn visual designs into responsive web experiences that perform well across devices.',
+          'I work daily with HTML, CSS, and JavaScript, and use modern tools like Astro and Tailwind to ship maintainable, component-driven projects.',
+          'I enjoy improving performance, reducing load times, and applying best practices to create reliable user experiences.',
+        ],
+        cvHeading: 'CV Information',
+        cvDownload: 'Download CV',
+      },
+      experience: {
+        heading: 'Professional Experience',
+      },
+    },
     techStack: {
       heading: 'Tech Stack',
     },
@@ -118,3 +150,42 @@ export const translations = {
 } as const;
 
 export type Lang = keyof typeof translations;
+
+export type AboutMe = {
+  title: string;
+  shortBio: {
+    heading: string;
+    paragraphs: string[];
+    cvHeading: string;
+    cvDownload: string;
+  };
+  experience: {
+    heading: string;
+  };
+};
+
+/**
+ * Typed accessor for aboutMe translations.
+ * Use this in components to get a properly typed AboutMe object.
+ */
+export function getAboutMe(lang: Lang): AboutMe {
+  // translations is `as const` so indexing is safe at runtime.
+  // Provide a fallback minimal object to keep components robust.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const maybe = (translations as any)[lang]?.aboutMe as AboutMe | undefined;
+  return (
+    maybe ?? {
+      title: lang === 'ES' ? 'Sobre Mí' : 'About Me',
+      shortBio: {
+        heading: lang === 'ES' ? 'Biografía breve' : 'Short Bio',
+        paragraphs: [],
+        cvHeading: lang === 'ES' ? 'Información CV' : 'CV Information',
+        cvDownload: lang === 'ES' ? 'Descargar CV' : 'Download CV',
+      },
+      experience: {
+        heading:
+          lang === 'ES' ? 'Experiencia Profesional' : 'Professional Experience',
+      },
+    }
+  );
+}

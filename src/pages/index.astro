@@ -1,11 +1,8 @@
 ---
 // index.astro - Refactorizado usando principalmente Tailwind
-import Card from '../components/cards/Card.astro';
 import Layout from '../layouts/Layout.astro';
-import TimelineItem from '../components/TimelineItem.astro';
 import CardService from '../components/cards/CardService.astro';
 import TechStack from '../components/tech-stack/TechStack.astro';
-import EXPERIENCES from '../assets/collections/experiences.json';
 import SERVICES from '../assets/collections/services.json';
 import HireServiceModal from '../components/HireServiceModal.astro';
 import PersonalPresentation from '../components/PersonalPresentation.astro';
@@ -17,7 +14,10 @@ import ProjectCard4 from '../components/my-projects/ProjectCard4.astro';
 import ProjectCard5 from '../components/my-projects/ProjectCard5.astro';
 import ProjectCard6 from '../components/my-projects/ProjectCard6.astro';
 import ShowMoreBtn from '../components/ui/ShowMoreBtn.astro';
+import AboutMeTitle from '../components/about-me/AboutMeTitle.astro';
+import ShortBio from '../components/about-me/ShortBio.astro';
 import '../styles/global.css';
+import Experience from '../components/about-me/Experience.astro';
 ---
 
 <Layout>
@@ -55,236 +55,142 @@ import '../styles/global.css';
           </div>
         </div>
       </div>
+
       <!-- Sección Sobre Mí -->
-      <section id="about" class="flex flex-col py-16">
-        <h2
-          class="mb-8 text-2xl font-bold tracking-tight text-gray-950 md:text-4xl dark:text-white"
-        >
-          Sobre Mí
-        </h2>
-        <article class="flex flex-col gap-6 md:flex-row">
-          <!-- Bio y CV -->
-          <Card
-            className="flex-1 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+      <section id="about" class="py-16">
+        <div><AboutMeTitle /></div>
+        <div class="mx-auto w-full max-w-6xl">
+          <div
+            class="flex flex-col gap-8 md:flex-row md:items-start md:space-x-8"
           >
-            <div class="flex flex-col gap-6">
-              <div class="flex flex-col gap-4">
-                <h3
-                  class="flex items-center gap-2 text-lg font-semibold text-gray-950 sm:text-xl dark:text-white"
-                >
-                  Short Bio
-                  <span class="text-2xl">🧬</span>
-                </h3>
-                <div
-                  class="space-y-4 text-sm text-gray-600 sm:text-base dark:text-gray-400"
-                >
-                  <p class="leading-relaxed">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Iure illo distinctio inventore illum consequuntur eveniet
-                    nobis officiis sequi aspernatur optio nulla, quisquam sit
-                    voluptatibus velit cum, minima excepturi, numquam explicabo.
-                  </p>
-                  <p class="leading-relaxed">
-                    Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                    Enim molestias adipisci illum quam eaque perspiciatis saepe
-                    rerum voluptates cum consectetur? Accusantium reiciendis
-                    adipisci error corrupti pariatur exercitationem quaerat
-                    porro eveniet!
-                  </p>
-                  <p class="leading-relaxed">
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                    Vel animi enim rerum perferendis. Distinctio itaque dolores
-                    mollitia id, vitae necessitatibus earum sed maxime illum
-                    sequi impedit nihil. Minus, quos non!
-                  </p>
-                </div>
-              </div>
-
-              <!-- CV Download -->
-              <div class="flex flex-col gap-3">
-                <h3
-                  class="text-lg font-semibold text-gray-950 sm:text-xl dark:text-white"
-                >
-                  Información CV
-                </h3>
-                <a
-                  href="/docs/cv.pdf"
-                  role="button"
-                  aria-label="Descargar CV"
-                  download
-                  class="inline-flex w-fit items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-lg focus:ring-4 focus:ring-blue-200 focus:outline-none dark:bg-blue-700 dark:hover:bg-blue-800 dark:focus:ring-blue-900"
-                >
-                  <svg
-                    class="h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                    ></path>
-                  </svg>
-                  Descargar CV
-                </a>
-              </div>
+            <div class="md:w-1/2">
+              <ShortBio />
             </div>
-          </Card>
-
-          <!-- Timeline de Experiencia -->
-          <Card
-            className="flex-1 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
-          >
-            <h3
-              class="mb-6 text-lg font-semibold text-gray-950 sm:text-xl dark:text-white"
-            >
-              Experiencia Profesional
-            </h3>
-            <ol
-              class="relative border-s-2 border-gray-300 dark:border-neutral-700"
-            >
-              {
-                EXPERIENCES.map((experience) => (
-                  <TimelineItem
-                    title={experience.company}
-                    description={experience.description}
-                    date={experience.dates}
-                  >
-                    <div
-                      slot="icon"
-                      class="flex h-full w-full items-center justify-center p-1 transition-all duration-300 group-hover:scale-110"
-                      set:html={experience.svgIcon}
-                    />
-                  </TimelineItem>
-                ))
-              }
-            </ol>
-          </Card>
-        </article>
+            <div class="md:w-1/2">
+              <Experience />
+            </div>
+          </div>
+        </div>
       </section>
-
-      <!-- Sección Servicios -->
-      <section id="services" class="flex flex-col overflow-hidden py-16">
-        <h2
-          class="mb-8 text-2xl font-bold tracking-tight text-gray-950 md:text-4xl dark:text-white"
-        >
-          Mis Servicios
-        </h2>
-        <article class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {
-            SERVICES.map((service) => (
-              <div class="transition-all duration-300 hover:-translate-y-1">
-                <CardService service={service} />
-              </div>
-            ))
-          }
-        </article>
-      </section>
-
-      <HireServiceModal />
     </article>
 
-    <script>
-      import { animate, inView, stagger } from 'motion';
+    <!-- Sección Servicios -->
+    <section id="services" class="flex flex-col overflow-hidden py-16">
+      <h2
+        class="mb-8 text-2xl font-bold tracking-tight text-gray-950 md:text-4xl dark:text-white"
+      >
+        Mis Servicios
+      </h2>
+      <article class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          SERVICES.map((service) => (
+            <div class="transition-all duration-300 hover:-translate-y-1">
+              <CardService service={service} />
+            </div>
+          ))
+        }
+      </article>
+    </section>
 
-      document.addEventListener('DOMContentLoaded', () => {
-        // Animación para servicios
-        inView('#services', () => {
-          animate(
-            '.card-service',
-            {
-              opacity: [0, 1],
-              transform: ['translateY(50px)', 'translateY(0px)'],
-            },
-            {
-              delay: stagger(0.15),
-              duration: 0.6,
-              easing: [0.4, 0, 0.2, 1],
-            }
-          );
-        });
+    <HireServiceModal />
+  </section>
 
-        // Animación para tech stack
-        inView('.tech-stack-card', () => {
-          animate(
-            '.tech-card-enter',
-            {
-              opacity: [0, 1],
-              transform: ['translateY(30px)', 'translateY(0px)'],
-            },
-            {
-              delay: stagger(0.1),
-              duration: 0.5,
-              easing: [0.4, 0, 0.2, 1],
-            }
-          );
-        });
+  <script>
+    import { animate, inView, stagger } from 'motion';
 
-        // Animación para proyectos
-        inView('#projects', () => {
-          animate(
-            '#projects .grid > *',
-            {
-              opacity: [0, 1],
-              transform: ['translateY(40px)', 'translateY(0px)'],
-            },
-            {
-              delay: stagger(0.2),
-              duration: 0.6,
-              easing: [0.4, 0, 0.2, 1],
-            }
-          );
-        });
+    document.addEventListener('DOMContentLoaded', () => {
+      // Animación para servicios
+      inView('#services', () => {
+        animate(
+          '.card-service',
+          {
+            opacity: [0, 1],
+            transform: ['translateY(50px)', 'translateY(0px)'],
+          },
+          {
+            delay: stagger(0.15),
+            duration: 0.6,
+            easing: [0.4, 0, 0.2, 1],
+          }
+        );
       });
 
-      // Inicializar show-more button (usa window.initShowMore o inyecta script desde /js)
-      (function ensureInitShowMore() {
-        function run() {
-          try {
-            if (typeof window === 'undefined') return;
-            if (!Object.prototype.hasOwnProperty.call(window, 'initShowMore'))
-              return;
-            const fn = (window as unknown)['initShowMore'];
-            if (typeof fn === 'function')
-              fn('show-more-projects', {
-                targetId: 'extra-projects',
-                hiddenClass: 'hidden',
-              });
-          } catch {
-            // noop
+      // Animación para tech stack
+      inView('.tech-stack-card', () => {
+        animate(
+          '.tech-card-enter',
+          {
+            opacity: [0, 1],
+            transform: ['translateY(30px)', 'translateY(0px)'],
+          },
+          {
+            delay: stagger(0.1),
+            duration: 0.5,
+            easing: [0.4, 0, 0.2, 1],
           }
-        }
+        );
+      });
 
-        try {
-          if (
-            typeof window !== 'undefined' &&
-            Object.prototype.hasOwnProperty.call(window, 'initShowMore')
-          ) {
-            run();
-            return;
+      // Animación para proyectos
+      inView('#projects', () => {
+        animate(
+          '#projects .grid > *',
+          {
+            opacity: [0, 1],
+            transform: ['translateY(40px)', 'translateY(0px)'],
+          },
+          {
+            delay: stagger(0.2),
+            duration: 0.6,
+            easing: [0.4, 0, 0.2, 1],
           }
+        );
+      });
+    });
+
+    // Inicializar show-more button (usa window.initShowMore o inyecta script desde /js)
+    (function ensureInitShowMore() {
+      function run() {
+        try {
+          if (typeof window === 'undefined') return;
+          if (!Object.prototype.hasOwnProperty.call(window, 'initShowMore'))
+            return;
+          const fn = (window as unknown)['initShowMore'];
+          if (typeof fn === 'function')
+            fn('show-more-projects', {
+              targetId: 'extra-projects',
+              hiddenClass: 'hidden',
+            });
         } catch {
           // noop
         }
+      }
 
-        const existing = document.querySelector(
-          'script[data-show-more-module]'
-        );
-        if (existing) {
-          existing.addEventListener('load', run);
+      try {
+        if (
+          typeof window !== 'undefined' &&
+          Object.prototype.hasOwnProperty.call(window, 'initShowMore')
+        ) {
+          run();
           return;
         }
+      } catch {
+        // noop
+      }
 
-        const script = document.createElement('script');
-        script.type = 'module';
-        script.src = '/js/show-more/show-more-init.js';
-        script.setAttribute('data-show-more-module', '');
-        script.addEventListener('load', run);
-        script.addEventListener('error', () => {});
-        document.head.appendChild(script);
-      })();
-    </script>
-  </section></Layout
->
+      const existing = document.querySelector('script[data-show-more-module]');
+      if (existing) {
+        existing.addEventListener('load', run);
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.type = 'module';
+      script.src = '/js/show-more/show-more-init.js';
+      script.setAttribute('data-show-more-module', '');
+      script.addEventListener('load', run);
+      script.addEventListener('error', () => {});
+      document.head.appendChild(script);
+    })();
+  </script>
+</Layout>
