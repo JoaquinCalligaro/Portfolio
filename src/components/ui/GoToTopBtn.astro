@@ -1,0 +1,83 @@
+---
+// Go to Top Button Component with Professional Glassmorphism Effect
+---
+
+<button
+  id="go-to-top-btn"
+  class="go-to-top-btn pointer-events-none invisible fixed right-8 bottom-6 z-50 mx-3 flex h-15 w-15 items-center justify-center rounded-full border-1 border-gray-400/50 text-black opacity-0 transition-all duration-300 dark:border-gray-800/50 dark:text-white"
+  aria-label="Go to top"
+>
+  <span class="relative z-10 text-xl">↑</span>
+</button>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const goToTopBtn = document.getElementById('go-to-top-btn');
+
+    if (!goToTopBtn) return;
+
+    const toggleButton = () => {
+      const scrollPosition =
+        window.pageYOffset || document.documentElement.scrollTop;
+
+      if (scrollPosition > 300) {
+        // Mostrar botón
+        goToTopBtn.classList.remove(
+          'opacity-0',
+          'invisible',
+          'pointer-events-none',
+          'translate-y-2'
+        );
+        goToTopBtn.classList.add(
+          'opacity-100',
+          'visible',
+          'pointer-events-auto',
+          'translate-y-0'
+        );
+      } else {
+        // Ocultar botón
+        goToTopBtn.classList.remove(
+          'opacity-100',
+          'visible',
+          'pointer-events-auto',
+          'translate-y-0'
+        );
+        goToTopBtn.classList.add(
+          'opacity-0',
+          'invisible',
+          'pointer-events-none',
+          'translate-y-2'
+        );
+      }
+    };
+
+    // Optimizar scroll con throttling
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          toggleButton();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    // Event listeners
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    goToTopBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+
+      // Blur focus para mejor UX
+      goToTopBtn.blur();
+    });
+
+    // Verificar posición inicial
+    toggleButton();
+  });
+</script>

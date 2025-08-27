@@ -1,0 +1,227 @@
+/* Professional Glassmorphism Go to Top Button */
+
+.go-to-top-btn {
+  /* Premium glassmorphism base */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.25) 0%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(255, 255, 255, 0.08) 100%
+  );
+
+  /* Advanced blur and saturation */
+  backdrop-filter: blur(16px) saturate(1.4) brightness(1.1);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4) brightness(1.1);
+
+  /* Multi-layered border with subtle gradient */
+
+  background-clip: padding-box;
+  position: relative;
+
+  /* Professional shadow system */
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    0 2px 12px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+
+  /* Smooth professional transitions */
+  transition:
+    all 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.3s ease,
+    backdrop-filter 0.3s ease;
+
+  cursor: pointer;
+  overflow: hidden;
+
+  /* Ensure proper positioning */
+  position: fixed !important;
+  right: 1rem !important;
+  bottom: 1.5rem !important;
+  z-index: 50 !important;
+}
+
+/* Pseudo-element for the border gradient effect */
+.go-to-top-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.25) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: xor;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  z-index: -1;
+  transition: all 0.3s ease;
+}
+
+/* Subtle shine effect */
+.go-to-top-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 70%
+  );
+  transform: rotate(45deg) translateX(-100%);
+  transition: transform 0.6s ease;
+  pointer-events: none;
+}
+
+/* Hover state - Professional enhancement */
+.go-to-top-btn:hover {
+  /* Enhanced glassmorphism */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0.25) 50%,
+    rgba(255, 255, 255, 0.15) 100%
+  );
+
+  backdrop-filter: blur(20px) saturate(1.6) brightness(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6) brightness(1.2);
+
+  /* Premium shadow on hover */
+  box-shadow:
+    0 12px 48px rgba(0, 0, 0, 0.12),
+    0 4px 20px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.03),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+
+  /* Subtle lift and scale */
+  transform: translateY(-3px) scale(1.02);
+}
+
+/* Enhanced border on hover */
+.go-to-top-btn:hover::before {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.15) 100%
+  );
+}
+
+/* Shine animation on hover */
+.go-to-top-btn:hover::after {
+  transform: rotate(45deg) translateX(100%);
+}
+
+/* Active/pressed state */
+.go-to-top-btn:active {
+  transform: translateY(-1px) scale(0.98);
+  transition-duration: 0.1s;
+
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* Focus state for accessibility */
+.go-to-top-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+
+/* Dark mode styles - Compatible with Tailwind's dark: prefix */
+:is(.dark *) .go-to-top-btn {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.04) 50%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 2px 12px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+:is(.dark *) .go-to-top-btn::before {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+}
+
+:is(.dark *) .go-to-top-btn:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+
+  box-shadow:
+    0 12px 48px rgba(0, 0, 0, 0.4),
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+:is(.dark *) .go-to-top-btn:hover::before {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(255, 255, 255, 0.08) 100%
+  );
+}
+
+/* Fallback for browsers without backdrop-filter support */
+@supports not (backdrop-filter: blur(1px)) {
+  .go-to-top-btn {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  :is(.dark *) .go-to-top-btn {
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* Accessibility: Reduce motion if preferred */
+@media (prefers-reduced-motion: reduce) {
+  .go-to-top-btn,
+  .go-to-top-btn::before,
+  .go-to-top-btn::after {
+    transition: none;
+    animation: none;
+  }
+
+  .go-to-top-btn:hover {
+    transform: none;
+  }
+
+  .go-to-top-btn::after {
+    display: none;
+  }
+}
