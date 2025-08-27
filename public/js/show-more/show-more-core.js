@@ -390,7 +390,13 @@ function initializeSliderIfExists(card) {
   const slider = card.querySelector('[id^="slider-"]');
   if (!slider) return;
 
-  if (slider.dataset.sliderInitialized === 'true') return;
+  // Si ya está inicializándose o inicializado, no hacer nada
+  if (
+    slider.dataset &&
+    (slider.dataset.sliderInitialized === 'true' ||
+      slider.dataset.sliderInitialized === 'initializing')
+  )
+    return;
 
   if (window.initSlider) {
     initSlider(slider);
@@ -403,8 +409,22 @@ function initializeSliderIfExists(card) {
 function initSlider(sliderElement) {
   try {
     if (typeof window !== 'undefined' && window.initSlider) {
+      // Marca como inicializando para evitar llamadas concurrentes
+      try {
+        if (sliderElement.dataset)
+          sliderElement.dataset.sliderInitialized = 'initializing';
+      } catch {
+        void 0;
+      }
+
       window.initSlider(sliderElement.id || sliderElement);
-      sliderElement.dataset.sliderInitialized = 'true';
+
+      try {
+        if (sliderElement.dataset)
+          sliderElement.dataset.sliderInitialized = 'true';
+      } catch {
+        void 0;
+      }
     }
   } catch (error) {
     if (typeof console !== 'undefined') {

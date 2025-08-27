@@ -12,6 +12,13 @@ export function initSlider(sliderId) {
         : sliderId;
     if (!root) return;
 
+    // Evitar múltiples inicializaciones sobre el mismo elemento
+    try {
+      if (root.dataset && root.dataset.sliderInitialized === 'true') return;
+    } catch {
+      /* noop */
+    }
+
     // Seleccionar todos los elementos necesarios del DOM
     const container = root.querySelector('.group') || root;
     const track = root.querySelector('.slider-track');
@@ -32,33 +39,87 @@ export function initSlider(sliderId) {
     // Función para ajustar tamaños del slider según el contenedor
     function setSizes() {
       const cw = container.clientWidth || root.clientWidth || 0;
+      // Si el contenedor está oculto (ej. display:none) evitamos establecer anchos a 0
+      if (!cw) return;
       track.style.width = `${cw * totalSlides}px`; // Ancho total = ancho contenedor × número de slides
       slides.forEach((s) => (s.style.width = `${cw}px`)); // Cada slide ocupa el ancho completo
       track.style.transform = `translateX(${-currentIndex * cw}px)`; // Posicionar en slide actual
     }
 
-    // Esperar a que las imágenes carguen para calcular tamaños correctamente
+    // Observador/fallback para cuando el slider está inicialmente dentro de un
+    // contenedor oculto (por ejemplo el panel "extra-projects" con la clase "hidden").
+    // Si el ancho es 0, aguardamos a que el contenedor sea visible antes de llamar a setSizes.
+    function waitForVisibilityAndSetSizes(cb) {
+      const cw = container.clientWidth || root.clientWidth || 0;
+      if (cw) {
+        cb();
+        return;
+      }
+
+      // Observador de cambios de atributos (clase/style) en el root para detectar cuando se muestre
+      const observer = new MutationObserver(() => {
+        const cw2 = container.clientWidth || root.clientWidth || 0;
+        if (cw2) {
+          observer.disconnect();
+          clearInterval(poll);
+          cb();
+        }
+      });
+      observer.observe(root, {
+        attributes: true,
+        subtree: true,
+        attributeFilter: ['class', 'style'],
+      });
+
+      // Fallback por si no se producen mutations (chequeo periódico)
+      const poll = setInterval(() => {
+        const cw3 = container.clientWidth || root.clientWidth || 0;
+        if (cw3) {
+          try {
+            observer.disconnect();
+          } catch {
+            try {
+              observer.disconnect();
+            } catch {
+              void 0;
+            }
+          }
+          clearInterval(poll);
+          cb();
+        }
+      }, 200);
+    }
+
+    // Esperar a que las imágenes carguen para ajustar tamaños correctamente.
+    // Si el slider está dentro de un contenedor oculto (display:none), deferimos
+    // el primer cálculo hasta que el contenedor sea visible para evitar establecer
+    // anchos a 0 y provocar saltos/parpadeos.
     const imgs = root.querySelectorAll('img');
     let loaded = 0;
-    if (imgs.length === 0) {
-      setTimeout(setSizes, 50); // Si no hay imágenes, ajustar tamaño inmediatamente
-    } else {
-      imgs.forEach((img) => {
-        if (img.complete) {
+    imgs.forEach((img) => {
+      if (img.complete) {
+        loaded++;
+      } else {
+        img.addEventListener('load', () => {
           loaded++;
-        } else {
-          img.addEventListener('load', () => {
-            loaded++;
-            if (loaded === imgs.length) setTimeout(setSizes, 50); // Cuando todas las imágenes carguen
-          });
-        }
+          // ajustar tamaños cuando todas las imágenes hayan cargado y el contenedor sea visible
+          if (loaded === imgs.length) {
+            waitForVisibilityAndSetSizes(() => setTimeout(setSizes, 50));
+          }
+        });
+      }
+    });
+
+    // Si no hay imágenes, o ya están completas, asegurar que llamamos a setSizes
+    if (imgs.length === 0 || loaded === imgs.length) {
+      waitForVisibilityAndSetSizes(() => {
+        setSizes();
+        setTimeout(setSizes, 200); // Segundo ajuste por seguridad
       });
     }
 
-    // Configurar tamaños iniciales y al redimensionar ventana
-    setSizes();
-    setTimeout(setSizes, 200); // Segundo ajuste por seguridad
-    window.addEventListener('resize', setSizes); // Reajustar al cambiar tamaño de ventana
+    // Reajustar al cambiar tamaño de ventana
+    window.addEventListener('resize', setSizes);
 
     // Función para actualizar el estado visual de los dots (puntos indicadores)
     function updateActiveDot(activeIndex) {
@@ -259,6 +320,11 @@ export function initSlider(sliderId) {
     // Inicialización: activar primer dot y comenzar autoplay
     updateActiveDot(0);
     applyFadeEffect(0, 0, 'next'); // Aplicar efecto al slide inicial
+    try {
+      if (root.dataset) root.dataset.sliderInitialized = 'true';
+    } catch {
+      void 0;
+    }
     startAutoplay();
 
     // (hover control removed – animations will be handled via Tailwind utility classes)
