@@ -74,23 +74,24 @@ import LocalizedText from './language/LocalizedText.astro';
       class="flex flex-col items-center gap-8 font-semibold sm:flex-row sm:gap-6 md:gap-7 lg:gap-8 xl:gap-8"
     >
       <li>
-        <a href="#home" class="nav-hover-light nav-hover-dark"
-          ><LocalizedText key="navbar.home" fallback="Home" /></a
-        >
-      </li>
-      <li>
         <a href="#tech-stack" class="nav-hover-light nav-hover-dark"
-          ><LocalizedText key="navbar.tech" fallback="Tech" /></a
+          ><LocalizedText key="navbar.home" fallback="Tech Stack" /></a
         >
       </li>
       <li>
         <a href="#projects" class="nav-hover-light nav-hover-dark"
-          ><LocalizedText key="navbar.projects" fallback="Projects" /></a
+          ><LocalizedText key="navbar.tech" fallback="Projects" /></a
         >
       </li>
       <li>
-        <a href="#services" class="nav-hover-light nav-hover-dark"
-          ><LocalizedText key="navbar.services" fallback="Services" /></a
+        <a href="#about" class="nav-hover-light nav-hover-dark"
+          ><LocalizedText key="navbar.projects" fallback="About" /></a
+        >
+      </li>
+      <!-- Home button removed as requested -->
+      <li>
+        <a href="#contact" class="nav-hover-light nav-hover-dark"
+          ><LocalizedText key="navbar.contact" fallback="Contact" /></a
         >
       </li>
     </ul>

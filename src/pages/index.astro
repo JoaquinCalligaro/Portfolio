@@ -72,25 +72,28 @@ import Experience from '../components/about-me/Experience.astro';
     </article>
   </section>
 
+  <!-- Sección Contact -->
+  <section id="contact" class="py-16">
+    <div class="mx-auto w-full max-w-4xl text-center">
+      <h2 class="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
+        Contact
+      </h2>
+      <p class="mb-6 text-gray-600 dark:text-gray-400">
+        If you'd like to work together or ask a question, send me an email.
+      </p>
+      <a
+        href="mailto:you@example.com"
+        class="inline-block rounded-md bg-blue-600 px-6 py-2 text-white"
+        >Contactame</a
+      >
+    </div>
+  </section>
+
   <script>
     import { animate, inView, stagger } from 'motion';
 
     document.addEventListener('DOMContentLoaded', () => {
-      // Animación para servicios
-      inView('#services', () => {
-        animate(
-          '.card-service',
-          {
-            opacity: [0, 1],
-            transform: ['translateY(50px)', 'translateY(0px)'],
-          },
-          {
-            delay: stagger(0.15),
-            duration: 0.6,
-            easing: [0.4, 0, 0.2, 1],
-          }
-        );
-      });
+      // (services section removed) no-op
 
       // Animación para tech stack
       inView('.tech-stack-card', () => {

@@ -1,10 +1,12 @@
 export const translations = {
   ES: {
     navbar: {
-      home: 'Inicio',
-      tech: 'Tecnologias',
-      projects: 'Proyectos',
-      services: 'Servicios',
+      // rotated: home <- old tech, tech <- old projects, projects <- old about, about <- old home
+      home: 'Tecnologias',
+      tech: 'Proyectos',
+      projects: 'Sobre Mí',
+      about: 'Inicio',
+      contact: 'Contactame',
     },
     personal: {
       name: 'Joaquin Calligaro',
@@ -101,10 +103,12 @@ export const translations = {
   },
   EN: {
     navbar: {
-      home: 'Home',
-      tech: 'Tech Stack',
-      projects: 'Projects',
-      services: 'Services',
+      // rotated: home <- old tech, tech <- old projects, projects <- old about, about <- old home
+      home: 'Tech Stack',
+      tech: 'Projects',
+      projects: 'About',
+      about: 'Home',
+      contact: 'Contact',
     },
     personal: {
       name: 'Joaquin Calligaro',
