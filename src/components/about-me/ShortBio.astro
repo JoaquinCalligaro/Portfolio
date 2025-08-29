@@ -39,19 +39,10 @@ const t = getAboutMe('ES');
       </div>
 
       <!-- CV Download y Redes Sociales -->
-      <div class="flex flex-col gap-3">
-        <h3
-          class="text-lg font-semibold text-gray-950 sm:text-xl dark:text-white"
-        >
-          {t.shortBio.cvHeading}
-        </h3>
-
-        <!-- Todos los botones en la misma línea horizontal -->
-        <div class="flex flex-nowrap items-center gap-3">
-          <CvDownloadBtn />
-          <GitHubBtn />
-          <LinkedInBtn />
-        </div>
+      <div class="flex flex-nowrap items-center gap-3">
+        <CvDownloadBtn />
+        <GitHubBtn />
+        <LinkedInBtn />
       </div>
     </div>
   </Card>

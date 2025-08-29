@@ -1,4 +1,7 @@
 ---
+// import specific SVG assets as raw strings so the component can own the icon
+import Education from '../icons/Education.astro';
+
 interface Props {
   title: string;
   date: string;
@@ -7,12 +10,15 @@ interface Props {
 }
 
 const { title, date, description, badgeText } = Astro.props;
+
+// Icon rendering is done with explicit conditionals below
 ---
 
 <li class="ms-8 mb-10">
   <span
     class="absolute -start-3 flex size-6 items-center justify-center rounded-full bg-blue-300 ring-8 ring-blue-100 dark:bg-blue-800 dark:ring-blue-950/60"
   >
+    <Education class="size-4 text-gray-600 dark:text-gray-400" />
     <slot name="icon" />
   </span>
   <h3
