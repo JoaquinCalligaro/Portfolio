@@ -4,9 +4,14 @@ import { translations, type Lang } from '../../data/translations';
 interface Props {
   key: string;
   fallback?: string;
+  class?: string;
 }
 
-const { key: i18nKey, fallback = '' } = Astro.props as Props;
+const {
+  key: i18nKey,
+  fallback = '',
+  class: className = '',
+} = Astro.props as Props;
 
 function resolve(lang: Lang, k: string) {
   return k.split('.').reduce(
@@ -28,7 +33,7 @@ const serverLang: Lang = 'ES';
 const resolved = resolve(serverLang, i18nKey) ?? fallback ?? '';
 ---
 
-<span data-i18n-key={i18nKey}>{resolved}</span>
+<span class={className} data-i18n-key={i18nKey}>{resolved}</span>
 
 <script is:inline>
   (function () {
