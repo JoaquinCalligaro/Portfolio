@@ -182,7 +182,7 @@ animation: pulse-shadow 2s infinite;
   position: relative;
   border-radius: 0.375rem;
   /* borde visible usando color del icono */
-  border: 2px solid var(--icon-color-border) !important;
+  border: 2px solid var(--icon-color-border);
   /* glassmorphism: fondo semitransparente + degradado del color */
   background-color: rgba(255, 255, 255, 0.04);
   background-image: linear-gradient(
@@ -256,7 +256,7 @@ animation: pulse-shadow 2s infinite;
 [class*='icon-'] {
   --icon-glow-color: var(--icon-color-alpha-hover);
   /* aumentar el grosor visible del borde para que la línea quede más clara */
-  border: 1px solid var(--icon-color-border) !important;
+  border: 1px solid var(--icon-color-border);
 }
 
 [class*='icon-']:hover {

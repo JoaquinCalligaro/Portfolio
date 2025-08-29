@@ -35,10 +35,10 @@
   overflow: hidden;
 
   /* Ensure proper positioning */
-  position: fixed !important;
-  right: 1rem !important;
-  bottom: 1.5rem !important;
-  z-index: 50 !important;
+  position: fixed;
+  right: 1rem;
+  bottom: 1.5rem;
+  z-index: 50;
 }
 
 /* Pseudo-element for the border gradient effect */
