@@ -24,7 +24,7 @@ export const translations = {
         cvDownload: 'Descargar CV',
       },
       experience: {
-        heading: 'Experiencia Profesional',
+        heading: 'Educación',
       },
     },
     techStack: {
@@ -118,7 +118,7 @@ export const translations = {
         cvDownload: 'Download CV',
       },
       experience: {
-        heading: 'Professional Experience',
+        heading: 'Education',
       },
     },
     techStack: {
@@ -223,8 +223,7 @@ export function getAboutMe(lang: Lang): AboutMe {
         cvDownload: lang === 'ES' ? 'Descargar CV' : 'Download CV',
       },
       experience: {
-        heading:
-          lang === 'ES' ? 'Experiencia Profesional' : 'Professional Experience',
+        heading: lang === 'ES' ? 'Educación' : 'Education',
       },
     }
   );

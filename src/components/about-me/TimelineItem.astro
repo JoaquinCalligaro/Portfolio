@@ -1,24 +1,43 @@
 ---
-// import specific SVG assets as raw strings so the component can own the icon
+// TimelineItem.astro
+// Entrada reutilizable para la línea de tiempo (Experiencia).
+// - Icono por defecto: `Education.astro`. Sobrescribible con el slot `icon`.
+// - Props: title, date, description, badgeText, iconClass?, iconLabel?.
+// - Accesibilidad: por defecto el icono es decorativo (aria-hidden). Si se
+//   pasa `iconLabel` se añade role="img" y aria-label.
+
 import Education from '../icons/Education.astro';
 
 interface Props {
-  title: string;
-  date: string;
-  description: string;
-  badgeText?: string;
+  title: string; // headline/company
+  date: string; // dates string
+  description: string; // short description for the item
+  badgeText?: string; // optional pill next to the title
+  // class to apply to the icon component (keeps presentation customizable)
+  iconClass?: string;
+  // when provided, the icon becomes semantic: role="img" + aria-label
+  iconLabel?: string;
 }
 
-const { title, date, description, badgeText } = Astro.props;
+const { title, date, description, badgeText, iconClass, iconLabel } =
+  Astro.props as Props;
 
-// Icon rendering is done with explicit conditionals below
+// Nota: use el slot `icon` para reemplazar el icono por item. Ejemplo:
+// <TimelineItem title="Foo" date="..">
+//   <MyIcon slot="icon" class="h-5 w-5" />
+// </TimelineItem>
 ---
 
 <li class="ms-8 mb-10">
   <span
     class="absolute -start-3 flex size-6 items-center justify-center rounded-full bg-blue-300 ring-8 ring-blue-100 dark:bg-blue-800 dark:ring-blue-950/60"
   >
-    <Education class="size-4 text-gray-600 dark:text-gray-400" />
+    <Education
+      class={`${iconClass || 'size-4 text-gray-600 dark:text-gray-400'}`}
+      {...iconLabel
+        ? { role: 'img', 'aria-label': iconLabel }
+        : { 'aria-hidden': 'true' }}
+    />
     <slot name="icon" />
   </span>
   <h3
