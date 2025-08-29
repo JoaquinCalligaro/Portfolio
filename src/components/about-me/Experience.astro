@@ -12,7 +12,6 @@ const t = getAboutMe('ES');
 >
   <h3
     class="mb-6 flex items-center gap-2 text-lg font-semibold text-gray-950 sm:text-xl dark:text-white"
-    data-i18n-key="aboutMe.experience.heading"
   >
     <span data-i18n-key="aboutMe.experience.heading"
       >{t.experience.heading}</span
@@ -30,7 +29,7 @@ const t = getAboutMe('ES');
           <div
             slot="icon"
             class="flex h-full w-full items-center justify-center p-1 transition-all duration-300 group-hover:scale-110"
-            set:html={experience.svgIcon}
+            set:html={(experience as any).svgIcon}
           />
         </TimelineItem>
       ))
