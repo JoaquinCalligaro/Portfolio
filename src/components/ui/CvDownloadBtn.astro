@@ -1,25 +1,26 @@
 ---
-interface Props {
-  ariaLabel: string;
-  href?: string;
-}
-const { ariaLabel, href = '/docs/cv.pdf' } = Astro.props;
+// CV Download Button Component with Glassmorphism Effect
+const { href = '/docs/cv.pdf5j3', label = null, className = '' } = Astro.props;
 ---
 
 <a
   href={href}
-  role="button"
-  aria-label={ariaLabel}
-  download
-  class="cv-download-btn glassmorph-effect mt-5 inline-flex w-fit items-center gap-2 rounded-lg px-4 py-2.5 font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg focus:ring-4 focus:ring-blue-200 focus:outline-none dark:bg-blue-700 dark:hover:bg-blue-800 dark:focus:ring-blue-900"
+  class={`inline-flex items-center glassmorph-effect rounded-lg border border-slate-300 bg-white px-2 py-2 text-sm font-medium text-slate-800 transition-all hover:border-slate-800 hover:bg-slate-500/70 hover:text-white dark:border-gray-600 dark:bg-gray-400/10 dark:text-slate-100 dark:hover:bg-gray-600 ${className}`}
+  target="_blank"
+  rel="noopener noreferrer"
 >
-  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <!-- Inline SVG icon (document) to match GitHub/LinkedIn icon style -->
+  <svg
+    class="h-4 w-4"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+  >
     <path
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2"
-      d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+      d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM13 3.5L18.5 9H13V3.5zM8 12h8v1H8v-1zm0 3h8v1H8v-1z"
     ></path>
   </svg>
-  <slot />
+  <span class="xl:25 inline-block w-22 text-center sm:w-22 md:w-24"
+    >{label ?? 'Descargar CV'}</span
+  >
 </a>
