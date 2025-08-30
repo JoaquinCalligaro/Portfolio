@@ -12,10 +12,78 @@ if (
   } catch {
     captcha = null;
   }
-  // Contact form client logic extracted from Contact.astro
-  // This file is loaded as a module from /js/contact.js
 
   const doc = globalThis.document;
+
+  // Read translations injected by LanguageToggle into window.TRANSLATIONS
+  const translations =
+    globalThis.TRANSLATIONS && typeof globalThis.TRANSLATIONS === 'object'
+      ? globalThis.TRANSLATIONS
+      : {};
+
+  // Get current language (LanguageToggle sets document.documentElement.lang to 'ES' or 'EN')
+  const htmlLang =
+    doc && doc.documentElement && doc.documentElement.lang
+      ? String(doc.documentElement.lang)
+      : 'ES';
+  const lang = String(htmlLang).toUpperCase() === 'EN' ? 'EN' : 'ES';
+
+  // Helper to resolve dotted keys like 'contact.nameRequired' against translations[lang]
+  // Default fallback translations (used if window.TRANSLATIONS not yet available or missing keys)
+  const DEFAULT_TRANSLATIONS = {
+    ES: {
+      contact: {
+        nameRequired: 'El nombre es requerido.',
+        nameShort: 'El nombre es muy corto.',
+        nameLong: 'El nombre es muy largo.',
+        emailRequired: 'El email es requerido.',
+        emailLong: 'El email es demasiado largo.',
+        invalidEmail: 'Formato de email inválido.',
+        messageRequired: 'El mensaje es requerido.',
+        messageMinLength: 'El mensaje debe tener al menos 10 caracteres.',
+        messageMaxLength: 'El mensaje excede la longitud máxima.',
+      },
+    },
+    EN: {
+      contact: {
+        nameRequired: 'Name is required.',
+        nameShort: 'Name is too short.',
+        nameLong: 'Name is too long.',
+        emailRequired: 'Email is required.',
+        emailLong: 'Email is too long.',
+        invalidEmail: 'Invalid email format.',
+        messageRequired: 'Message is required.',
+        messageMinLength: 'The message must be at least 10 characters.',
+        messageMaxLength: 'The message exceeds the maximum length.',
+      },
+    },
+  };
+
+  function t(key) {
+    try {
+      const root = translations && translations[lang] ? translations[lang] : {};
+      const found = String(key)
+        .split('.')
+        .reduce(
+          (o, k) =>
+            o && Object.prototype.hasOwnProperty.call(o, k) ? o[k] : undefined,
+          root
+        );
+      if (found) return found;
+      // fallback to default translations
+      const defRoot = DEFAULT_TRANSLATIONS[lang] || {};
+      const defFound = String(key)
+        .split('.')
+        .reduce(
+          (o, k) =>
+            o && Object.prototype.hasOwnProperty.call(o, k) ? o[k] : undefined,
+          defRoot
+        );
+      return defFound || '';
+    } catch {
+      return '';
+    }
+  }
   // Frontend-only demo mode: allow testing the form without a backend.
   // Enable by adding `data-frontend-only="true"` to the form, by using
   // the URL query `?mockContact=1`, or by setting localStorage `contact:mock=1`.
@@ -85,6 +153,29 @@ if (
         (el.id === 'message-error' && messageEditor) ||
         null;
       if (input) input.setAttribute('aria-invalid', !!msg);
+      // add visual cue to the input (if it's an <input> or textarea)
+      try {
+        if (input && input.classList) {
+          if (msg) {
+            input.classList.add('border-red-500');
+          } else {
+            input.classList.remove('border-red-500');
+          }
+        }
+      } catch {
+        /* ignore */
+      }
+      // ensure error container is visible (some CSS collapses empty nodes)
+      try {
+        if (msg) {
+          el.style.display = '';
+        } else {
+          // keep the element in the flow but empty
+          el.style.display = '';
+        }
+      } catch {
+        /* ignore */
+      }
     } catch {
       /* ignore */
     }
@@ -94,15 +185,15 @@ if (
     if (!nameInput) return true;
     const v = nameInput.value.trim();
     if (!v) {
-      setFieldError(nameError, 'El nombre es requerido.');
+      setFieldError(nameError, t('contact.nameRequired'));
       return false;
     }
     if (v.length < 2) {
-      setFieldError(nameError, 'El nombre es muy corto.');
+      setFieldError(nameError, t('contact.nameShort'));
       return false;
     }
     if (v.length > 100) {
-      setFieldError(nameError, 'El nombre es muy largo.');
+      setFieldError(nameError, t('contact.nameLong'));
       return false;
     }
     setFieldError(nameError, '');
@@ -113,13 +204,13 @@ if (
     if (!emailInput) return true;
     const v = emailInput.value.trim();
     if (!v) {
-      setFieldError(emailError, 'El email es requerido.');
+      setFieldError(emailError, t('contact.emailRequired'));
       return false;
     }
 
     // sensible length limits (RFC allows up to 254 total)
     if (v.length > 254) {
-      setFieldError(emailError, 'El email es demasiado largo.');
+      setFieldError(emailError, t('contact.emailLong'));
       return false;
     }
 
@@ -129,7 +220,7 @@ if (
         typeof emailInput.checkValidity === 'function' &&
         !emailInput.checkValidity()
       ) {
-        setFieldError(emailError, 'Formato de email inválido.');
+        setFieldError(emailError, t('contact.invalidEmail'));
         return false;
       }
     } catch {
@@ -140,7 +231,7 @@ if (
     const strictRe =
       /^[A-Za-z0-9!#$%&'*+\-/=?^_`{|}~]+(?:\.[A-Za-z0-9!#$%&'*+\-/=?^_`{|}~]+)*@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z]{2,})+$/;
     if (!strictRe.test(v)) {
-      setFieldError(emailError, 'Formato de email inválido.');
+      setFieldError(emailError, t('contact.invalidEmail'));
       return false;
     }
 
@@ -152,18 +243,15 @@ if (
     if (!messageEditor) return true;
     const v = (messageEditor.innerText || '').trim();
     if (!v) {
-      setFieldError(messageError, 'El mensaje es requerido.');
+      setFieldError(messageError, t('contact.messageRequired'));
       return false;
     }
     if (v.length < 10) {
-      setFieldError(
-        messageError,
-        'El mensaje debe tener al menos 10 caracteres.'
-      );
+      setFieldError(messageError, t('contact.messageMinLength'));
       return false;
     }
     if (v.length > 5000) {
-      setFieldError(messageError, 'El mensaje excede la longitud máxima.');
+      setFieldError(messageError, t('contact.messageMaxLength'));
       return false;
     }
     setFieldError(messageError, '');
@@ -382,12 +470,15 @@ if (
         // keep UX consistent: show alert and status
         try {
           if (typeof globalThis.alert === 'function')
-            globalThis.alert('Bot detectado (honeypot)');
+            globalThis.alert(
+              t('contact.spamDetected') || 'Bot detectado (honeypot)'
+            );
         } catch {
           /* ignore */
         }
         if (status) {
-          status.textContent = 'Envío detectado como spam.';
+          status.textContent =
+            t('contact.spamDetected') || 'Envío detectado como spam.';
           status.classList.add('text-red-600');
         }
         return;
@@ -399,12 +490,16 @@ if (
       if (elapsed < 2500) {
         try {
           if (typeof globalThis.alert === 'function')
-            globalThis.alert('Demasiado rápido, parece bot');
+            globalThis.alert(
+              t('contact.tooFast') || 'Demasiado rápido, parece bot'
+            );
         } catch {
           /* ignore */
         }
         if (status) {
-          status.textContent = 'Envío demasiado rápido (posible bot).';
+          status.textContent =
+            t('contact.tooFastStatus') ||
+            'Envío demasiado rápido (posible bot).';
           status.classList.add('text-red-600');
         }
         return;
@@ -413,7 +508,9 @@ if (
       // rate limit (client-side)
       if (!allowedByRateLimit()) {
         if (status) {
-          status.textContent = 'Espera un momento antes de volver a enviar.';
+          status.textContent =
+            t('contact.rateLimit') ||
+            'Espera un momento antes de volver a enviar.';
           status.classList.add('text-red-600');
         }
         return;
@@ -423,6 +520,7 @@ if (
       if (!formToken) {
         if (status) {
           status.textContent =
+            t('contact.invalidForm') ||
             'Formulario inválido. Refresca la página e intenta de nuevo.';
           status.classList.add('text-red-600');
         }
@@ -446,12 +544,16 @@ if (
           try {
             try {
               if (typeof globalThis.alert === 'function')
-                globalThis.alert('Por favor completa el captcha.');
+                globalThis.alert(
+                  t('contact.captchaRequired') ||
+                    'Por favor completa el captcha.'
+                );
             } catch {
               /* ignore */
             }
             if (status) {
               status.textContent =
+                t('contact.captchaRequired') ||
                 'Por favor completa el captcha antes de enviar.';
               status.classList.add('text-red-600');
             }
@@ -466,7 +568,9 @@ if (
       // final validation before sending
       if (!validateForm()) {
         if (status) {
-          status.textContent = 'Por favor corrige los errores antes de enviar.';
+          status.textContent =
+            t('contact.fixErrors') ||
+            'Por favor corrige los errores antes de enviar.';
           status.classList.add('text-red-600');
         }
         return;
@@ -551,7 +655,8 @@ if (
         const success = res && res.ok && json && json.ok !== false;
         if (success) {
           if (status) {
-            status.textContent = 'Mensaje enviado. Gracias!';
+            status.textContent =
+              t('contact.sentSuccess') || 'Mensaje enviado. Gracias!';
             status.classList.add('text-green-600');
             status.classList.remove('text-red-600');
           }
@@ -593,7 +698,8 @@ if (
                 attemptedFallback = true;
                 // reflect success in UI since native POST will reach Formspree
                 if (status) {
-                  status.textContent = 'Mensaje enviado. Gracias!';
+                  status.textContent =
+                    t('contact.sentSuccess') || 'Mensaje enviado. Gracias!';
                   status.classList.add('text-green-600');
                   status.classList.remove('text-red-600');
                 }
@@ -650,6 +756,7 @@ if (
                 status.textContent = 'Respuesta del servidor: ' + excerpt;
               } else {
                 status.textContent =
+                  t('contact.sendError') ||
                   'Ocurrió un error al enviar. Intenta de nuevo.';
               }
               status.classList.add('text-red-600');
@@ -673,6 +780,7 @@ if (
       } catch {
         if (status) {
           status.textContent =
+            t('contact.networkError') ||
             'Ocurrió un error de conexión. Intenta más tarde.';
           status.classList.add('text-red-600');
           status.classList.remove('text-green-600');
