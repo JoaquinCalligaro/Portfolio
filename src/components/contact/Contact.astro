@@ -5,12 +5,14 @@ import LocalizedText from '../language/LocalizedText.astro';
 import SubmitBtn from '../ui/SubmitBtn.astro';
 const SITE_KEY =
   import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '0x4AAAAAABwHlflWrLMpjcOh';
+// Formspree action must be provided via env
+const FORMSPREE_ACTION = import.meta.env.PUBLIC_FORMSPREE_ACTION;
 ---
 
 <Card className="rounded-xl">
   <form
     id="contact-form"
-    action="/api/contact"
+    action={FORMSPREE_ACTION}
     method="post"
     class="contact-form w-full space-y-4 rounded-xl"
     novalidate
@@ -154,17 +156,22 @@ const SITE_KEY =
       data-expired-callback="turnstileOnExpired"
     >
     </div>
-    <div class="flex items-center justify-start gap-3">
-      <SubmitBtn id="submit-btn"><LocalizedText key="contact.send" /></SubmitBtn
-      >
+
+    <!-- Status message shown below the captcha and above the submit button -->
+    <div class="w-full text-center">
       <div
         id="form-status"
         role="status"
         aria-live="polite"
-        class="text-sm"
+        class="mb-3 text-sm"
         style="min-height:1rem"
       >
       </div>
+    </div>
+
+    <div class="flex items-center justify-start gap-3">
+      <SubmitBtn id="submit-btn"><LocalizedText key="contact.send" /></SubmitBtn
+      >
     </div>
   </form>
 

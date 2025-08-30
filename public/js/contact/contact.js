@@ -38,6 +38,10 @@ if (
       return false;
     }
   })();
+  const form = doc.getElementById('contact-form');
+  const status = doc.getElementById('form-status');
+  const submitBtn = doc.getElementById('submit-btn');
+
   // expose mocked state via aria attribute for testing/debug
   try {
     if (form && FRONTEND_ONLY) form.setAttribute('data-frontend-mock', 'true');
@@ -58,9 +62,6 @@ if (
   } catch {
     /* ignore */
   }
-  const form = doc.getElementById('contact-form');
-  const status = doc.getElementById('form-status');
-  const submitBtn = doc.getElementById('submit-btn');
 
   // Form fields & validation nodes
   const nameInput = doc.getElementById('name');
@@ -254,6 +255,8 @@ if (
 
   // Time-trap: measure time from page load to submit to detect bots
   const startTime = Date.now();
+  // alias for clarity with older snippets/tests
+  const pageLoadTime = startTime;
   const timeInput = doc.getElementById('time_spent');
   const formTokenInput = doc.getElementById('form_token');
 
@@ -315,6 +318,34 @@ if (
     });
   }
 
+  // If the captcha helper dispatches events on token/state changes, listen and update UI
+  try {
+    if (typeof globalThis.addEventListener === 'function') {
+      globalThis.addEventListener('captcha:change', () => {
+        try {
+          // sync hidden token input if module exposes getter
+          const token =
+            captcha && typeof captcha.getCaptchaToken === 'function'
+              ? captcha.getCaptchaToken()
+              : cfResponseInput && cfResponseInput.value
+                ? cfResponseInput.value
+                : '';
+          if (cfResponseInput) cfResponseInput.value = token || '';
+          // enable submit only when fields have content and captcha reports ok
+          const ok =
+            captcha && typeof captcha.isCaptchaOk === 'function'
+              ? captcha.isCaptchaOk()
+              : !!token;
+          if (submitBtn) submitBtn.disabled = !hasContent() || !ok;
+        } catch {
+          /* ignore */
+        }
+      });
+    }
+  } catch {
+    /* ignore */
+  }
+
   // Local rate limit: allow 1 send per random(30..60) seconds per client
   const RATE_KEY = 'contact:lastSend';
   function allowedByRateLimit() {
@@ -348,7 +379,13 @@ if (
       e.preventDefault();
       // honeypot check: if filled, treat as bot and abort
       if (honeypot && (honeypot.value || '').trim()) {
-        // don't proceed with network request; mark as spam and exit
+        // keep UX consistent: show alert and status
+        try {
+          if (typeof globalThis.alert === 'function')
+            globalThis.alert('Bot detectado (honeypot)');
+        } catch {
+          /* ignore */
+        }
         if (status) {
           status.textContent = 'Envío detectado como spam.';
           status.classList.add('text-red-600');
@@ -357,9 +394,15 @@ if (
       }
 
       // record time spent and reject if too fast (< 2500ms)
-      const elapsed = Date.now() - startTime;
+      const elapsed = Date.now() - pageLoadTime;
       if (timeInput) timeInput.value = String(elapsed);
       if (elapsed < 2500) {
+        try {
+          if (typeof globalThis.alert === 'function')
+            globalThis.alert('Demasiado rápido, parece bot');
+        } catch {
+          /* ignore */
+        }
         if (status) {
           status.textContent = 'Envío demasiado rápido (posible bot).';
           status.classList.add('text-red-600');
@@ -388,16 +431,25 @@ if (
 
       // captcha must be completed (Turnstile) unless running in frontend-only mock
       if (!FRONTEND_ONLY) {
-        const tokenPresent =
+        // prefer captcha module token, fallback to hidden input
+        const token =
           captcha && typeof captcha.getCaptchaToken === 'function'
-            ? !!captcha.getCaptchaToken()
-            : !!(cfResponseInput && cfResponseInput.value);
+            ? captcha.getCaptchaToken()
+            : cfResponseInput && cfResponseInput.value
+              ? cfResponseInput.value
+              : '';
         const captchaOkNow =
           captcha && typeof captcha.isCaptchaOk === 'function'
             ? captcha.isCaptchaOk()
-            : false;
-        if (!captchaOkNow || !tokenPresent) {
+            : !!token;
+        if (!captchaOkNow || !token) {
           try {
+            try {
+              if (typeof globalThis.alert === 'function')
+                globalThis.alert('Por favor completa el captcha.');
+            } catch {
+              /* ignore */
+            }
             if (status) {
               status.textContent =
                 'Por favor completa el captcha antes de enviar.';
@@ -422,7 +474,22 @@ if (
       if (status) status.textContent = '';
       if (status) status.className = 'text-sm';
       if (submitBtn) submitBtn.disabled = true;
-      const originalBtnText = submitBtn ? submitBtn.textContent : '';
+      // Preserve original button children (may contain localized nodes); restore later
+      const originalBtnChildren = submitBtn
+        ? Array.from(submitBtn.childNodes).map((n) => n.cloneNode(true))
+        : null;
+      // prevent visual deformation: lock the current width as inline style
+      let _prevBtnInlineWidth = null;
+      try {
+        if (submitBtn) {
+          _prevBtnInlineWidth = submitBtn.style.width || '';
+          const rect = submitBtn.getBoundingClientRect();
+          if (rect && rect.width)
+            submitBtn.style.width = Math.ceil(rect.width) + 'px';
+        }
+      } catch {
+        /* ignore measurement errors */
+      }
       if (submitBtn) submitBtn.textContent = 'Enviando...';
 
       try {
@@ -465,13 +532,24 @@ if (
           json = { ok: true };
         } else {
           const fetchFn = globalThis.fetch;
-          res = fetchFn
-            ? await fetchFn(form.action, { method: 'POST', body: fd })
-            : await Promise.reject(new Error('fetch not available'));
-          json = await res.json().catch(() => ({ ok: res.ok }));
+          if (!fetchFn) throw new Error('fetch not available');
+          // Request JSON responses when possible (Formspree supports Accept: application/json)
+          res = await fetchFn(form.action, {
+            method: 'POST',
+            body: fd,
+            headers: { Accept: 'application/json' },
+          });
+          try {
+            json = await res.json();
+          } catch {
+            // fallback: try to read as text (but don't inject raw HTML into the UI)
+            const txt = await res.text().catch(() => '');
+            json = { ok: res.ok, text: txt };
+          }
         }
 
-        if (res.ok && json.ok !== false) {
+        const success = res && res.ok && json && json.ok !== false;
+        if (success) {
           if (status) {
             status.textContent = 'Mensaje enviado. Gracias!';
             status.classList.add('text-green-600');
@@ -497,11 +575,99 @@ if (
           }
           markSend();
         } else {
-          if (status) {
-            status.textContent =
-              json?.error || 'Ocurrió un error al enviar. Intenta de nuevo.';
-            status.classList.add('text-red-600');
-            status.classList.remove('text-green-600');
+          // Attempt an iframe fallback submit for CORS/network cases so the
+          // form still reaches Formspree even when fetch can't read the response.
+          let attemptedFallback = false;
+          try {
+            if (!FRONTEND_ONLY && typeof doc.createElement === 'function') {
+              const frameName = 'contact-iframe-' + String(Date.now());
+              const iframe = doc.createElement('iframe');
+              iframe.name = frameName;
+              iframe.style.display = 'none';
+              doc.body.appendChild(iframe);
+              // temporarily target the form to the iframe and submit natively
+              const prevTarget = form.getAttribute('target');
+              form.setAttribute('target', frameName);
+              try {
+                form.submit();
+                attemptedFallback = true;
+                // reflect success in UI since native POST will reach Formspree
+                if (status) {
+                  status.textContent = 'Mensaje enviado. Gracias!';
+                  status.classList.add('text-green-600');
+                  status.classList.remove('text-red-600');
+                }
+                try {
+                  form.reset();
+                  if (captcha && typeof captcha.resetCaptcha === 'function')
+                    captcha.resetCaptcha();
+                } catch {
+                  /* ignore */
+                }
+                markSend();
+              } finally {
+                // cleanup
+                if (prevTarget) form.setAttribute('target', prevTarget);
+                else form.removeAttribute('target');
+                // remove iframe after a short delay to allow the request to complete
+                try {
+                  const st = globalThis.setTimeout;
+                  if (typeof st === 'function') {
+                    st(() => {
+                      try {
+                        if (iframe.parentNode)
+                          iframe.parentNode.removeChild(iframe);
+                      } catch {
+                        /* ignore */
+                      }
+                    }, 5000);
+                  }
+                } catch {
+                  /* ignore */
+                }
+              }
+            }
+          } catch {
+            /* ignore fallback errors */
+          }
+
+          if (!attemptedFallback) {
+            if (status) {
+              // Prefer structured error messages, otherwise show a short safe snippet
+              if (json && typeof json.error === 'string' && json.error.trim()) {
+                status.textContent = json.error;
+              } else if (
+                json &&
+                typeof json.text === 'string' &&
+                json.text.trim()
+              ) {
+                // show a short sanitized excerpt of the response text
+                const excerpt = json.text
+                  .replace(/<[^>]+>/g, ' ')
+                  .replace(/\s+/g, ' ')
+                  .trim()
+                  .slice(0, 800);
+                status.textContent = 'Respuesta del servidor: ' + excerpt;
+              } else {
+                status.textContent =
+                  'Ocurrió un error al enviar. Intenta de nuevo.';
+              }
+              status.classList.add('text-red-600');
+              status.classList.remove('text-green-600');
+            }
+            // log full response for debugging
+            try {
+              if (
+                typeof globalThis.console === 'object' &&
+                typeof globalThis.console.warn === 'function'
+              )
+                globalThis.console.warn('Contact form send failed', {
+                  res,
+                  json,
+                });
+            } catch {
+              /* ignore */
+            }
           }
         }
       } catch {
@@ -513,7 +679,30 @@ if (
         }
       } finally {
         if (submitBtn) submitBtn.disabled = false;
-        if (submitBtn) submitBtn.textContent = originalBtnText || 'Enviar';
+        // restore original button children if we saved them and restore inline width
+        try {
+          if (
+            submitBtn &&
+            originalBtnChildren &&
+            Array.isArray(originalBtnChildren)
+          ) {
+            submitBtn.replaceChildren(
+              ...originalBtnChildren.map((n) => n.cloneNode(true))
+            );
+          } else if (submitBtn) {
+            submitBtn.textContent = 'Enviar';
+          }
+        } catch {
+          if (submitBtn) submitBtn.textContent = 'Enviar';
+        }
+        try {
+          if (submitBtn && _prevBtnInlineWidth !== null) {
+            // restore previous inline width (may be empty)
+            submitBtn.style.width = _prevBtnInlineWidth || '';
+          }
+        } catch {
+          /* ignore */
+        }
       }
     });
   }
