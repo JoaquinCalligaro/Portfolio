@@ -89,6 +89,9 @@ export const translations = {
       sentSuccess: 'Mensaje enviado. Gracias!',
       sendError: 'Ocurrió un error al enviar. Intenta de nuevo.',
       networkError: 'Ocurrió un error de conexión. Intenta más tarde.',
+      captchaChecking: 'Esperando verificación del captcha...',
+      recheckingIn: 'Reintentando en',
+      attemptsLeft: 'intentos restantes',
       messageMinLength: 'El mensaje debe tener al menos 10 caracteres.',
     },
     showMore: {
@@ -205,6 +208,9 @@ export const translations = {
       sentSuccess: 'Message sent. Thank you!',
       sendError: 'An error occurred while sending. Try again.',
       networkError: 'Connection error. Try again later.',
+      captchaChecking: 'Waiting for captcha verification...',
+      recheckingIn: 'Rechecking in',
+      attemptsLeft: 'attempts left',
       messageMinLength: 'The message must be at least 10 characters.',
     },
     showMore: {

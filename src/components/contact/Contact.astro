@@ -167,6 +167,14 @@ const FORMSPREE_ACTION = import.meta.env.PUBLIC_FORMSPREE_ACTION;
         style="min-height:1rem"
       >
       </div>
+      <!-- Indicator shown while periodic captcha checks are running -->
+      <div
+        id="captcha-checking"
+        class="mb-2 text-xs text-yellow-400"
+        style="display:none"
+      >
+        <LocalizedText key="contact.captchaChecking" />
+      </div>
     </div>
 
     <div class="flex items-center justify-start gap-3">
