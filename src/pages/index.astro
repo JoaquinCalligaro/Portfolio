@@ -15,6 +15,8 @@ import AboutMeTitle from '../components/about-me/AboutMeTitle.astro';
 import ShortBio from '../components/about-me/ShortBio.astro';
 import '../styles/global.css';
 import Experience from '../components/about-me/Experience.astro';
+import Contact from '../components/contact/Contact.astro';
+import ContactTitle from '../components/contact/ContactTitle.astro';
 ---
 
 <Layout>
@@ -67,6 +69,12 @@ import Experience from '../components/about-me/Experience.astro';
               <Experience />
             </div>
           </div>
+        </div>
+      </section>
+      <section class="py-16">
+        <div><ContactTitle /></div>
+        <div>
+          <Contact />
         </div>
       </section>
     </article>
