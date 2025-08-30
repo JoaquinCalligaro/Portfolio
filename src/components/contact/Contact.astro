@@ -1,14 +1,15 @@
 ---
 import Card from '../cards/Card.astro';
-import ContactBtn from '../ui/ContactBtn.astro';
+
+import SubmitBtn from '../ui/SubmitBtn.astro';
 ---
 
-<Card>
+<Card className="rounded-xl">
   <form
     id="contact-form"
     action="/api/contact"
     method="post"
-    class="contact-form w-full space-y-4"
+    class="contact-form w-full space-y-4 rounded-xl"
     novalidate
   >
     <div>
@@ -154,7 +155,7 @@ import ContactBtn from '../ui/ContactBtn.astro';
     />
 
     <div class="flex items-center justify-start gap-3">
-      <ContactBtn id="submit-btn" text="Enviar" />
+      <SubmitBtn id="submit-btn" text="Enviar" />
       <div
         id="form-status"
         role="status"
