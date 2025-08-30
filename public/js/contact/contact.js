@@ -3,17 +3,64 @@ if (
   typeof globalThis !== 'undefined' &&
   typeof globalThis.document !== 'undefined'
 ) {
+  // import captcha helpers (dynamic import to keep SSR safe)
+  let captcha = null;
+  try {
+    // dynamic import path relative to public
+    // Note: bundlers may inline this; runtime guard ensures server won't execute it
+    captcha = await import('/js/contact/captcha.js');
+  } catch {
+    captcha = null;
+  }
   // Contact form client logic extracted from Contact.astro
   // This file is loaded as a module from /js/contact.js
 
   const doc = globalThis.document;
+  // Frontend-only demo mode: allow testing the form without a backend.
+  // Enable by adding `data-frontend-only="true"` to the form, by using
+  // the URL query `?mockContact=1`, or by setting localStorage `contact:mock=1`.
+  const FRONTEND_ONLY = (() => {
+    try {
+      if (!doc) return false;
+      const qs =
+        typeof globalThis.location !== 'undefined' &&
+        typeof globalThis.URL !== 'undefined'
+          ? new globalThis.URL(globalThis.location.href).searchParams
+          : null;
+      const formAttr = (doc.getElementById('contact-form') || {}).dataset;
+      const fromAttrFlag = formAttr && formAttr.frontendOnly === 'true';
+      const qsFlag = qs && qs.get('mockContact') === '1';
+      const lsFlag =
+        globalThis.localStorage &&
+        globalThis.localStorage.getItem('contact:mock') === '1';
+      return Boolean(fromAttrFlag || qsFlag || lsFlag);
+    } catch {
+      return false;
+    }
+  })();
+  // expose mocked state via aria attribute for testing/debug
+  try {
+    if (form && FRONTEND_ONLY) form.setAttribute('data-frontend-mock', 'true');
+  } catch {
+    /* ignore */
+  }
+  // Show a small UI hint so testers know they are in mock mode
+  try {
+    if (form && FRONTEND_ONLY && status) {
+      const hint = doc.createElement('div');
+      hint.className =
+        'mt-2 rounded-md bg-yellow-50 px-2 py-1 text-xs text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+      hint.textContent =
+        'Modo de pruebas (frontend-only): el envío se simula localmente.';
+      if (status.parentNode)
+        status.parentNode.insertBefore(hint, status.nextSibling || status);
+    }
+  } catch {
+    /* ignore */
+  }
   const form = doc.getElementById('contact-form');
   const status = doc.getElementById('form-status');
   const submitBtn = doc.getElementById('submit-btn');
-  const fileInput = doc.getElementById('file-input');
-  const dropArea = doc.getElementById('drop-area');
-  const attachmentsList = doc.getElementById('attachments-list');
-  const attachmentsSummary = doc.getElementById('attachments-summary');
 
   // Form fields & validation nodes
   const nameInput = doc.getElementById('name');
@@ -23,11 +70,7 @@ if (
   const messageEditor = doc.getElementById('message-editor');
   const messageError = doc.getElementById('message-error');
   const honeypot = doc.getElementById('website');
-
-  // attachments state
-  const MAX_FILES = 5;
-  const MAX_SIZE_MB = 5; // per file
-  let attachments = []; // { file, id }
+  const cfResponseInput = doc.getElementById('cf-turnstile-response');
 
   // previous simple regex removed; we now use HTML5 checkValidity + a stricter fallback
 
@@ -153,7 +196,15 @@ if (
   }
 
   function updateSubmitPresence() {
-    if (submitBtn) submitBtn.disabled = !hasContent();
+    try {
+      const ok =
+        captcha && typeof captcha.isCaptchaOk === 'function'
+          ? captcha.isCaptchaOk()
+          : false;
+      if (submitBtn) submitBtn.disabled = !hasContent() || !ok;
+    } catch {
+      if (submitBtn) submitBtn.disabled = !hasContent();
+    }
   }
 
   // Keep submit disabled initially if fields empty
@@ -164,121 +215,6 @@ if (
   if (emailInput) emailInput.addEventListener('input', updateSubmitPresence);
   if (messageEditor)
     messageEditor.addEventListener('input', updateSubmitPresence);
-
-  function updateAttachmentsUI() {
-    if (!attachmentsList) return;
-    attachmentsList.innerHTML = '';
-    attachments.forEach((a) => {
-      const li = doc.createElement('li');
-      li.className =
-        'flex items-center justify-between gap-3 rounded-md bg-gray-50 p-2 dark:bg-gray-800';
-
-      const info = doc.createElement('div');
-      info.className = 'flex items-center gap-3';
-
-      if (a.file.type.startsWith('image/')) {
-        const img = doc.createElement('img');
-        img.src = globalThis.URL ? globalThis.URL.createObjectURL(a.file) : '';
-        img.className = 'h-12 w-12 rounded-md object-cover';
-        info.appendChild(img);
-      }
-
-      const meta = doc.createElement('div');
-      meta.innerHTML = `<div class="text-sm font-medium text-gray-900 dark:text-gray-100">${a.file.name}</div><div class="text-xs text-gray-500 dark:text-gray-400">${(a.file.size / 1024 / 1024).toFixed(2)} MB</div>`;
-      info.appendChild(meta);
-
-      const removeBtn = doc.createElement('button');
-      removeBtn.type = 'button';
-      removeBtn.className = 'ml-auto text-sm text-red-600 dark:text-red-400';
-      removeBtn.innerText = 'Eliminar';
-      removeBtn.addEventListener('click', () => {
-        if (
-          globalThis.URL &&
-          typeof globalThis.URL.revokeObjectURL === 'function'
-        )
-          globalThis.URL.revokeObjectURL(a.file);
-        attachments = attachments.filter((x) => x.id !== a.id);
-        updateAttachmentsUI();
-      });
-
-      li.appendChild(info);
-      li.appendChild(removeBtn);
-      attachmentsList.appendChild(li);
-    });
-
-    if (attachmentsSummary) {
-      attachmentsSummary.textContent = attachments.length
-        ? `${attachments.length} archivo(s) adjuntado(s)`
-        : '';
-    }
-  }
-
-  function handleFiles(files) {
-    const toAdd = Array.from(files);
-    for (const f of toAdd) {
-      if (attachments.length >= MAX_FILES) break;
-      if (f.size / 1024 / 1024 > MAX_SIZE_MB) {
-        if (globalThis.alert)
-          globalThis.alert(
-            `El archivo ${f.name} excede el tamaño máximo de ${MAX_SIZE_MB}MB`
-          );
-        continue;
-      }
-      attachments.push({
-        file: f,
-        id:
-          globalThis.crypto &&
-          typeof globalThis.crypto.randomUUID === 'function'
-            ? globalThis.crypto.randomUUID()
-            : Date.now() + Math.random(),
-      });
-    }
-    updateAttachmentsUI();
-  }
-
-  // file input change
-  if (fileInput) {
-    fileInput.addEventListener('change', (ev) => {
-      handleFiles(ev.target.files || []);
-      fileInput.value = '';
-    });
-  }
-
-  // drag & drop
-  if (dropArea) {
-    ['dragenter', 'dragover'].forEach((evt) => {
-      dropArea.addEventListener(evt, (e) => {
-        e.preventDefault();
-        // highlight for light and dark
-        dropArea.classList.add(
-          'bg-gray-100',
-          'ring-2',
-          'ring-indigo-400',
-          'dark:ring-indigo-500',
-          'dark:bg-gray-800'
-        );
-      });
-    });
-    ['dragleave', 'drop'].forEach((evt) => {
-      dropArea.addEventListener(evt, (e) => {
-        e.preventDefault();
-        dropArea.classList.remove(
-          'bg-gray-100',
-          'ring-2',
-          'ring-indigo-400',
-          'dark:ring-indigo-500',
-          'dark:bg-gray-800'
-        );
-      });
-    });
-    dropArea.addEventListener('drop', (e) => {
-      const dt = e.dataTransfer;
-      if (dt && dt.files) handleFiles(dt.files);
-    });
-    // allow clicking the label to trigger file input
-    const label = dropArea.querySelector('label[for="file-input"]');
-    if (label) label.addEventListener('click', () => fileInput.click());
-  }
 
   // Rich text editor toolbar
   const editor = messageEditor;
@@ -307,8 +243,9 @@ if (
     fontSize.addEventListener('change', (e) =>
       exec('fontSize', e.target.value)
     );
-  if (toolbarAttach)
-    toolbarAttach.addEventListener('click', () => fileInput.click());
+  if (toolbarAttach) {
+    // no-op: attachments support removed
+  }
 
   // ensure editor content is submitted
   function syncEditor() {
@@ -335,6 +272,36 @@ if (
     }
   }
   generateToken();
+
+  // If captcha helper loaded, wire events; otherwise fall back to local no-op
+  if (captcha) {
+    try {
+      // rebind internal cf response input reference inside captcha module if needed
+      if (typeof captcha.setCaptchaState === 'function') {
+        // nothing to call now; captcha module attaches its own global callbacks
+      }
+    } catch {
+      /* ignore */
+    }
+  } else {
+    // fallback: no-op global callbacks to avoid runtime errors
+    globalThis.turnstileOnSuccess = function (token) {
+      try {
+        if (cfResponseInput) cfResponseInput.value = token || '';
+        if (submitBtn) submitBtn.disabled = !hasContent();
+      } catch {
+        /* ignore */
+      }
+    };
+    globalThis.turnstileOnExpired = function () {
+      try {
+        if (cfResponseInput) cfResponseInput.value = '';
+        if (submitBtn) submitBtn.disabled = true;
+      } catch {
+        /* ignore */
+      }
+    };
+  }
 
   // Invalidate token when switching tabs (discourages token reuse across tabs)
   if (doc && typeof doc.addEventListener === 'function') {
@@ -419,6 +386,31 @@ if (
         return;
       }
 
+      // captcha must be completed (Turnstile) unless running in frontend-only mock
+      if (!FRONTEND_ONLY) {
+        const tokenPresent =
+          captcha && typeof captcha.getCaptchaToken === 'function'
+            ? !!captcha.getCaptchaToken()
+            : !!(cfResponseInput && cfResponseInput.value);
+        const captchaOkNow =
+          captcha && typeof captcha.isCaptchaOk === 'function'
+            ? captcha.isCaptchaOk()
+            : false;
+        if (!captchaOkNow || !tokenPresent) {
+          try {
+            if (status) {
+              status.textContent =
+                'Por favor completa el captcha antes de enviar.';
+              status.classList.add('text-red-600');
+            }
+            if (submitBtn) submitBtn.disabled = true;
+          } catch {
+            /* ignore */
+          }
+          return;
+        }
+      }
+
       // final validation before sending
       if (!validateForm()) {
         if (status) {
@@ -455,17 +447,29 @@ if (
 
         const FD = globalThis.FormData;
         const fd = FD ? new FD(form) : null;
-        // append attachments
-        attachments.forEach((a) =>
-          fd.append('attachments', a.file, a.file.name)
-        );
 
         // progressive enhancement: use fetch to send FormData (server expects form-type)
-        const fetchFn = globalThis.fetch;
-        const res = fetchFn
-          ? await fetchFn(form.action, { method: 'POST', body: fd })
-          : await Promise.reject(new Error('fetch not available'));
-        const json = await res.json().catch(() => ({ ok: res.ok }));
+        // If running in frontend-only mock mode, simulate network & success
+        let res = null;
+        let json = null;
+        if (FRONTEND_ONLY) {
+          // simulate a short network delay
+          await new Promise((r) => {
+            const st = globalThis.setTimeout;
+            if (typeof st === 'function')
+              return st(r, 700 + Math.random() * 800);
+            // fallback immediately resolve
+            return r();
+          });
+          res = { ok: true };
+          json = { ok: true };
+        } else {
+          const fetchFn = globalThis.fetch;
+          res = fetchFn
+            ? await fetchFn(form.action, { method: 'POST', body: fd })
+            : await Promise.reject(new Error('fetch not available'));
+          json = await res.json().catch(() => ({ ok: res.ok }));
+        }
 
         if (res.ok && json.ok !== false) {
           if (status) {
@@ -474,6 +478,23 @@ if (
             status.classList.remove('text-red-600');
           }
           form.reset();
+          // clear captcha state when form resets
+          try {
+            if (captcha && typeof captcha.resetCaptcha === 'function')
+              captcha.resetCaptcha();
+            else if (
+              globalThis.turnstile &&
+              typeof globalThis.turnstile.reset === 'function'
+            ) {
+              try {
+                globalThis.turnstile.reset();
+              } catch {
+                /* ignore */
+              }
+            }
+          } catch {
+            /* ignore */
+          }
           markSend();
         } else {
           if (status) {

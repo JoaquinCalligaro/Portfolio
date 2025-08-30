@@ -16,6 +16,39 @@ pnpm-debug.log*
 .env
 .env.*.local
 
+# Sensitive env and secret files (do not commit)
+.env.local
+.env.*
+!.env.example
+.env.production
+.env.test
+.env.*.secret
+.env.*.private
+.envrc
+
+# Service account / credentials
+service-account*.json
+*-service-account.json
+*-credentials.json
+credentials.json
+google-services.json
+GoogleService-Info.plist
+firebase*.json
+
+# Private keys & certs
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.jks
+
+# Cloud provider credentials
+.aws/
+.aws/credentials
+.gcloud/
+.azure/
+
 # OS files
 .DS_Store
 Thumbs.db

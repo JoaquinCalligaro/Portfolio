@@ -125,39 +125,12 @@ const SITE_KEY =
       <input type="hidden" id="time_spent" name="time_spent" />
       <!-- Simple form token to make automated submissions harder -->
       <input type="hidden" id="form_token" name="form_token" />
-    </div>
-
-    <!-- Attachments area -->
-    <div>
-      <label
-        for="file-input"
-        class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-        ><LocalizedText key="contact.attachments" /></label
-      >
-
-      <div
-        id="drop-area"
-        class="mt-1 flex max-w-full flex-col gap-2 rounded-md border-2 border-dashed border-gray-300 p-4 text-sm text-gray-600 transition-colors duration-150 dark:border-neutral-700 dark:bg-gray-900 dark:text-gray-300"
-      >
-        <p class="mb-2"><LocalizedText key="contact.dragDropText" /></p>
-        <div class="flex items-center gap-3">
-          <label
-            for="file-input"
-            class="inline-flex cursor-pointer items-center rounded-md bg-white px-3 py-1 text-sm font-medium text-gray-800 ring-1 ring-gray-200 transition-colors duration-150 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-700 dark:hover:bg-gray-700"
-            ><LocalizedText key="contact.attachButton" /></label
-          >
-          <input
-            id="file-input"
-            name="attachments"
-            type="file"
-            multiple
-            class="hidden"
-          />
-          <span id="attachments-summary" class="text-sm text-gray-500"></span>
-        </div>
-
-        <ul id="attachments-list" class="mt-2 flex flex-col gap-2"></ul>
-      </div>
+      <!-- Turnstile token (populated by widget callback) -->
+      <input
+        type="hidden"
+        id="cf-turnstile-response"
+        name="cf-turnstile-response"
+      />
     </div>
 
     <!-- Honeypot: bots will fill this; real users won't. Use sr-only for accessibility -->
@@ -171,7 +144,16 @@ const SITE_KEY =
       class="sr-only"
     />
 
-    <div class="cf-turnstile" data-sitekey={SITE_KEY}></div>
+    <h3 class="p-5 text-center text-xl font-bold text-red-500">
+      Completa el Captcha para continuar
+    </h3>
+    <div
+      class="cf-turnstile mt-2 flex w-full items-center justify-center text-center"
+      data-sitekey={SITE_KEY}
+      data-callback="turnstileOnSuccess"
+      data-expired-callback="turnstileOnExpired"
+    >
+    </div>
     <div class="flex items-center justify-start gap-3">
       <SubmitBtn id="submit-btn"><LocalizedText key="contact.send" /></SubmitBtn
       >

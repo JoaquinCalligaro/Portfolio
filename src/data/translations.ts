@@ -74,10 +74,6 @@ export const translations = {
       message: 'Mensaje',
       font: 'Fuente',
       size: 'Tamaño',
-      attachments: 'Adjuntos',
-      attachButton: 'Adjuntar',
-      dragDropText:
-        'Arrastra y suelta archivos aquí o haz clic en "Adjuntar". (Imágenes, PDF, docx, txt)',
       send: 'Enviar',
     },
     showMore: {
@@ -180,10 +176,6 @@ export const translations = {
       message: 'Message',
       font: 'Font',
       size: 'Size',
-      attachments: 'Attachments',
-      attachButton: 'Attach',
-      dragDropText:
-        'Drag and drop files here or click "Attach". (Images, PDF, docx, txt)',
       send: 'Send',
     },
     showMore: {
