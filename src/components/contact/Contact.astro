@@ -26,6 +26,8 @@ import SubmitBtn from '../ui/SubmitBtn.astro';
         required
         class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm transition-colors duration-150 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-neutral-700 dark:bg-gray-800 dark:text-gray-100"
       />
+      <p id="name-error" class="mt-1 text-sm text-red-600" aria-live="polite">
+      </p>
     </div>
 
     <div>
@@ -41,6 +43,8 @@ import SubmitBtn from '../ui/SubmitBtn.astro';
         required
         class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm transition-colors duration-150 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-neutral-700 dark:bg-gray-800 dark:text-gray-100"
       />
+      <p id="email-error" class="mt-1 text-sm text-red-600" aria-live="polite">
+      </p>
     </div>
 
     <div>
@@ -106,8 +110,19 @@ import SubmitBtn from '../ui/SubmitBtn.astro';
       >
       </div>
 
+      <p
+        id="message-error"
+        class="mt-1 text-sm text-red-600"
+        aria-live="polite"
+      >
+      </p>
+
       <!-- Hidden input to submit HTML content -->
       <input type="hidden" id="message" name="message" />
+      <!-- Time-trap hidden field (ms spent before submit) -->
+      <input type="hidden" id="time_spent" name="time_spent" />
+      <!-- Simple form token to make automated submissions harder -->
+      <input type="hidden" id="form_token" name="form_token" />
     </div>
 
     <!-- Attachments area -->
@@ -168,201 +183,5 @@ import SubmitBtn from '../ui/SubmitBtn.astro';
     </div>
   </form>
 
-  <script type="module">
-    const form = document.getElementById('contact-form');
-    const status = document.getElementById('form-status');
-    const submitBtn = document.getElementById('submit-btn');
-    const fileInput = document.getElementById('file-input');
-    const dropArea = document.getElementById('drop-area');
-    const attachmentsList = document.getElementById('attachments-list');
-    const attachmentsSummary = document.getElementById('attachments-summary');
-
-    // attachments state
-    const MAX_FILES = 5;
-    const MAX_SIZE_MB = 5; // per file
-    let attachments = []; // { file, id }
-
-    function updateAttachmentsUI() {
-      attachmentsList.innerHTML = '';
-      attachments.forEach((a) => {
-        const li = document.createElement('li');
-        li.className =
-          'flex items-center justify-between gap-3 rounded-md bg-gray-50 p-2 dark:bg-gray-800';
-
-        const info = document.createElement('div');
-        info.className = 'flex items-center gap-3';
-
-        if (a.file.type.startsWith('image/')) {
-          const img = document.createElement('img');
-          img.src = URL.createObjectURL(a.file);
-          img.className = 'h-12 w-12 rounded-md object-cover';
-          info.appendChild(img);
-        }
-
-        const meta = document.createElement('div');
-        meta.innerHTML = `<div class="text-sm font-medium text-gray-900 dark:text-gray-100">${a.file.name}</div><div class="text-xs text-gray-500 dark:text-gray-400">${(a.file.size / 1024 / 1024).toFixed(2)} MB</div>`;
-        info.appendChild(meta);
-
-        const removeBtn = document.createElement('button');
-        removeBtn.type = 'button';
-        removeBtn.className = 'ml-auto text-sm text-red-600 dark:text-red-400';
-        removeBtn.innerText = 'Eliminar';
-        removeBtn.addEventListener('click', () => {
-          URL.revokeObjectURL(a.file);
-          attachments = attachments.filter((x) => x.id !== a.id);
-          updateAttachmentsUI();
-        });
-
-        li.appendChild(info);
-        li.appendChild(removeBtn);
-        attachmentsList.appendChild(li);
-      });
-
-      attachmentsSummary.textContent = attachments.length
-        ? `${attachments.length} archivo(s) adjuntado(s)`
-        : '';
-    }
-
-    function handleFiles(files) {
-      const toAdd = Array.from(files);
-      for (const f of toAdd) {
-        if (attachments.length >= MAX_FILES) break;
-        if (f.size / 1024 / 1024 > MAX_SIZE_MB) {
-          alert(
-            `El archivo ${f.name} excede el tamaño máximo de ${MAX_SIZE_MB}MB`
-          );
-          continue;
-        }
-        attachments.push({
-          file: f,
-          id: crypto.randomUUID
-            ? crypto.randomUUID()
-            : Date.now() + Math.random(),
-        });
-      }
-      updateAttachmentsUI();
-    }
-
-    // file input change
-    if (fileInput) {
-      fileInput.addEventListener('change', (ev) => {
-        handleFiles(ev.target.files || []);
-        fileInput.value = '';
-      });
-    }
-
-    // drag & drop
-    if (dropArea) {
-      ['dragenter', 'dragover'].forEach((evt) => {
-        dropArea.addEventListener(evt, (e) => {
-          e.preventDefault();
-          // highlight for light and dark
-          dropArea.classList.add(
-            'bg-gray-100',
-            'ring-2',
-            'ring-indigo-400',
-            'dark:ring-indigo-500',
-            'dark:bg-gray-800'
-          );
-        });
-      });
-      ['dragleave', 'drop'].forEach((evt) => {
-        dropArea.addEventListener(evt, (e) => {
-          e.preventDefault();
-          dropArea.classList.remove(
-            'bg-gray-100',
-            'ring-2',
-            'ring-indigo-400',
-            'dark:ring-indigo-500',
-            'dark:bg-gray-800'
-          );
-        });
-      });
-      dropArea.addEventListener('drop', (e) => {
-        const dt = e.dataTransfer;
-        if (dt && dt.files) handleFiles(dt.files);
-      });
-      // allow clicking the label to trigger file input
-      dropArea
-        .querySelector('label[for="file-input"]')
-        .addEventListener('click', () => fileInput.click());
-    }
-
-    // Rich text editor toolbar
-    const editor = document.getElementById('message-editor');
-    const hiddenMessage = document.getElementById('message');
-    const toolbarAttach = document.getElementById('toolbar-attach');
-    const fontFamily = document.getElementById('font-family');
-    const fontSize = document.getElementById('font-size');
-
-    function exec(cmd, value = null) {
-      document.execCommand(cmd, false, value);
-      editor.focus();
-    }
-
-    document.querySelectorAll('[data-cmd]').forEach((btn) => {
-      btn.addEventListener('click', () => exec(btn.dataset.cmd));
-    });
-
-    if (fontFamily)
-      fontFamily.addEventListener('change', (e) =>
-        exec('fontName', e.target.value)
-      );
-    if (fontSize)
-      fontSize.addEventListener('change', (e) =>
-        exec('fontSize', e.target.value)
-      );
-    if (toolbarAttach)
-      toolbarAttach.addEventListener('click', () => fileInput.click());
-
-    // ensure editor content is submitted
-    function syncEditor() {
-      if (hiddenMessage) hiddenMessage.value = editor ? editor.innerHTML : '';
-    }
-
-    if (form) {
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        status.textContent = '';
-        status.className = 'text-sm';
-        submitBtn.disabled = true;
-        const originalBtnText = submitBtn.textContent;
-        submitBtn.textContent = 'Enviando...';
-
-        try {
-          // sync rich editor to hidden input
-          syncEditor();
-          const fd = new FormData(form);
-          // append attachments
-          attachments.forEach((a) =>
-            fd.append('attachments', a.file, a.file.name)
-          );
-
-          // progressive enhancement: use fetch to send FormData (server expects form-type)
-          const res = await fetch(form.action, { method: 'POST', body: fd });
-          const json = await res.json().catch(() => ({ ok: res.ok }));
-
-          if (res.ok && json.ok !== false) {
-            status.textContent = 'Mensaje enviado. Gracias!';
-            status.classList.add('text-green-600');
-            status.classList.remove('text-red-600');
-            form.reset();
-          } else {
-            status.textContent =
-              json?.error || 'Ocurrió un error al enviar. Intenta de nuevo.';
-            status.classList.add('text-red-600');
-            status.classList.remove('text-green-600');
-          }
-        } catch {
-          status.textContent =
-            'Ocurrió un error de conexión. Intenta más tarde.';
-          status.classList.add('text-red-600');
-          status.classList.remove('text-green-600');
-        } finally {
-          submitBtn.disabled = false;
-          submitBtn.textContent = originalBtnText || 'Enviar';
-        }
-      });
-    }
-  </script>
+  <script type="module" src="/js/contact/contact.js"></script>
 </Card>
