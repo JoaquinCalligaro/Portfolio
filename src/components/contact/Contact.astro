@@ -3,6 +3,8 @@ import Card from '../cards/Card.astro';
 import LocalizedText from '../language/LocalizedText.astro';
 
 import SubmitBtn from '../ui/SubmitBtn.astro';
+const SITE_KEY =
+  import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '0x4AAAAAABwHlflWrLMpjcOh';
 ---
 
 <Card className="rounded-xl">
@@ -169,6 +171,7 @@ import SubmitBtn from '../ui/SubmitBtn.astro';
       class="sr-only"
     />
 
+    <div class="cf-turnstile" data-sitekey={SITE_KEY}></div>
     <div class="flex items-center justify-start gap-3">
       <SubmitBtn id="submit-btn"><LocalizedText key="contact.send" /></SubmitBtn
       >
