@@ -68,6 +68,18 @@ export const translations = {
       repo: 'Repositorio',
       live: 'Demo',
     },
+    contact: {
+      name: 'Nombre',
+      email: 'Email',
+      message: 'Mensaje',
+      font: 'Fuente',
+      size: 'Tamaño',
+      attachments: 'Adjuntos',
+      attachButton: 'Adjuntar',
+      dragDropText:
+        'Arrastra y suelta archivos aquí o haz clic en "Adjuntar". (Imágenes, PDF, docx, txt)',
+      send: 'Enviar',
+    },
     showMore: {
       showAll: 'Ver Todos (${total})',
       hide: 'Ocultar',
@@ -161,6 +173,18 @@ export const translations = {
     buttons: {
       repo: 'Repository',
       live: 'Live',
+    },
+    contact: {
+      name: 'Name',
+      email: 'Email',
+      message: 'Message',
+      font: 'Font',
+      size: 'Size',
+      attachments: 'Attachments',
+      attachButton: 'Attach',
+      dragDropText:
+        'Drag and drop files here or click "Attach". (Images, PDF, docx, txt)',
+      send: 'Send',
     },
     showMore: {
       showAll: 'Show all (${total})',

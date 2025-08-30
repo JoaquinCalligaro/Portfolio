@@ -1,5 +1,6 @@
 ---
 import Card from '../cards/Card.astro';
+import LocalizedText from '../language/LocalizedText.astro';
 
 import SubmitBtn from '../ui/SubmitBtn.astro';
 ---
@@ -16,7 +17,7 @@ import SubmitBtn from '../ui/SubmitBtn.astro';
       <label
         for="name"
         class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-        >Nombre</label
+        ><LocalizedText key="contact.name" /></label
       >
       <input
         id="name"
@@ -31,7 +32,7 @@ import SubmitBtn from '../ui/SubmitBtn.astro';
       <label
         for="email"
         class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-        >Email</label
+        ><LocalizedText key="contact.email" /></label
       >
       <input
         id="email"
@@ -46,7 +47,7 @@ import SubmitBtn from '../ui/SubmitBtn.astro';
       <label
         for="message-editor"
         class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-        >Mensaje</label
+        ><LocalizedText key="contact.message" /></label
       >
 
       <!-- Toolbar -->
@@ -74,7 +75,7 @@ import SubmitBtn from '../ui/SubmitBtn.astro';
           id="font-family"
           class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 transition-colors duration-150 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-700"
         >
-          <option value="inherit">Fuente</option>
+          <option value="inherit"><LocalizedText key="contact.font" /></option>
           <option value="Arial">Arial</option>
           <option value="Georgia">Georgia</option>
           <option value="Times New Roman">Times New Roman</option>
@@ -85,7 +86,7 @@ import SubmitBtn from '../ui/SubmitBtn.astro';
           id="font-size"
           class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 transition-colors duration-150 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-700"
         >
-          <option value="3">Tamaño</option>
+          <option value="3"><LocalizedText key="contact.size" /></option>
           <option value="1">XS</option>
           <option value="2">S</option>
           <option value="3">M</option>
@@ -111,23 +112,22 @@ import SubmitBtn from '../ui/SubmitBtn.astro';
 
     <!-- Attachments area -->
     <div>
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-        >Adjuntos</label
+      <label
+        for="file-input"
+        class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        ><LocalizedText key="contact.attachments" /></label
       >
 
       <div
         id="drop-area"
         class="mt-1 flex max-w-full flex-col gap-2 rounded-md border-2 border-dashed border-gray-300 p-4 text-sm text-gray-600 transition-colors duration-150 dark:border-neutral-700 dark:bg-gray-900 dark:text-gray-300"
       >
-        <p class="mb-2">
-          Arrastra y suelta archivos aquí o haz clic en "Adjuntar". (Imágenes,
-          PDF, docx, txt)
-        </p>
+        <p class="mb-2"><LocalizedText key="contact.dragDropText" /></p>
         <div class="flex items-center gap-3">
           <label
             for="file-input"
             class="inline-flex cursor-pointer items-center rounded-md bg-white px-3 py-1 text-sm font-medium text-gray-800 ring-1 ring-gray-200 transition-colors duration-150 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-700 dark:hover:bg-gray-700"
-            >Adjuntar</label
+            ><LocalizedText key="contact.attachButton" /></label
           >
           <input
             id="file-input"
@@ -155,7 +155,8 @@ import SubmitBtn from '../ui/SubmitBtn.astro';
     />
 
     <div class="flex items-center justify-start gap-3">
-      <SubmitBtn id="submit-btn" text="Enviar" />
+      <SubmitBtn id="submit-btn"><LocalizedText key="contact.send" /></SubmitBtn
+      >
       <div
         id="form-status"
         role="status"
