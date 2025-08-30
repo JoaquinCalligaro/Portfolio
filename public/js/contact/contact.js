@@ -6,8 +6,6 @@ if (
   // import captcha helpers (dynamic import to keep SSR safe)
   let captcha = null;
   try {
-    // dynamic import path relative to public
-    // Note: bundlers may inline this; runtime guard ensures server won't execute it
     captcha = await import('/js/contact/captcha.js');
   } catch {
     captcha = null;
@@ -21,15 +19,14 @@ if (
       ? globalThis.TRANSLATIONS
       : {};
 
-  // Get current language (LanguageToggle sets document.documentElement.lang to 'ES' or 'EN')
+  // Get current language
   const htmlLang =
     doc && doc.documentElement && doc.documentElement.lang
       ? String(doc.documentElement.lang)
       : 'ES';
   const lang = String(htmlLang).toUpperCase() === 'EN' ? 'EN' : 'ES';
 
-  // Helper to resolve dotted keys like 'contact.nameRequired' against translations[lang]
-  // Default fallback translations (used if window.TRANSLATIONS not yet available or missing keys)
+  // Default translations
   const DEFAULT_TRANSLATIONS = {
     ES: {
       contact: {
@@ -42,6 +39,8 @@ if (
         messageRequired: 'El mensaje es requerido.',
         messageMinLength: 'El mensaje debe tener al menos 10 caracteres.',
         messageMaxLength: 'El mensaje excede la longitud máxima.',
+        captchaRequired: 'Por favor completa el captcha antes de enviar.',
+        captchaChecking: 'Verificando captcha...',
       },
     },
     EN: {
@@ -55,6 +54,8 @@ if (
         messageRequired: 'Message is required.',
         messageMinLength: 'The message must be at least 10 characters.',
         messageMaxLength: 'The message exceeds the maximum length.',
+        captchaRequired: 'Please complete the captcha before submitting.',
+        captchaChecking: 'Verifying captcha...',
       },
     },
   };
@@ -70,7 +71,7 @@ if (
           root
         );
       if (found) return found;
-      // fallback to default translations
+
       const defRoot = DEFAULT_TRANSLATIONS[lang] || {};
       const defFound = String(key)
         .split('.')
@@ -84,9 +85,8 @@ if (
       return '';
     }
   }
-  // Frontend-only demo mode: allow testing the form without a backend.
-  // Enable by adding `data-frontend-only="true"` to the form, by using
-  // the URL query `?mockContact=1`, or by setting localStorage `contact:mock=1`.
+
+  // Frontend-only demo mode
   const FRONTEND_ONLY = (() => {
     try {
       if (!doc) return false;
@@ -110,27 +110,7 @@ if (
   const form = doc.getElementById('contact-form');
   const status = doc.getElementById('form-status');
   const submitBtn = doc.getElementById('submit-btn');
-
-  // expose mocked state via aria attribute for testing/debug
-  try {
-    if (form && FRONTEND_ONLY) form.setAttribute('data-frontend-mock', 'true');
-  } catch {
-    /* ignore */
-  }
-  // Show a small UI hint so testers know they are in mock mode
-  try {
-    if (form && FRONTEND_ONLY && status) {
-      const hint = doc.createElement('div');
-      hint.className =
-        'mt-2 rounded-md bg-yellow-50 px-2 py-1 text-xs text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-      hint.textContent =
-        'Modo de pruebas (frontend-only): el envío se simula localmente.';
-      if (status.parentNode)
-        status.parentNode.insertBefore(hint, status.nextSibling || status);
-    }
-  } catch {
-    /* ignore */
-  }
+  const cfResponseInput = doc.getElementById('cf-turnstile-response');
 
   // Form fields & validation nodes
   const nameInput = doc.getElementById('name');
@@ -140,9 +120,6 @@ if (
   const messageEditor = doc.getElementById('message-editor');
   const messageError = doc.getElementById('message-error');
   const honeypot = doc.getElementById('website');
-  const cfResponseInput = doc.getElementById('cf-turnstile-response');
-
-  // previous simple regex removed; we now use HTML5 checkValidity + a stricter fallback
 
   function setFieldError(el, msg) {
     if (!el) return;
@@ -154,28 +131,13 @@ if (
         (el.id === 'message-error' && messageEditor) ||
         null;
       if (input) input.setAttribute('aria-invalid', !!msg);
-      // add visual cue to the input (if it's an <input> or textarea)
-      try {
-        if (input && input.classList) {
-          if (msg) {
-            input.classList.add('border-red-500');
-          } else {
-            input.classList.remove('border-red-500');
-          }
-        }
-      } catch {
-        /* ignore */
-      }
-      // ensure error container is visible (some CSS collapses empty nodes)
-      try {
+
+      if (input && input.classList) {
         if (msg) {
-          el.style.display = '';
+          input.classList.add('border-red-500');
         } else {
-          // keep the element in the flow but empty
-          el.style.display = '';
+          input.classList.remove('border-red-500');
         }
-      } catch {
-        /* ignore */
       }
     } catch {
       /* ignore */
@@ -209,13 +171,11 @@ if (
       return false;
     }
 
-    // sensible length limits (RFC allows up to 254 total)
     if (v.length > 254) {
       setFieldError(emailError, t('contact.emailLong'));
       return false;
     }
 
-    // prefer native HTML5 validation when available (type="email" or pattern)
     try {
       if (
         typeof emailInput.checkValidity === 'function' &&
@@ -225,10 +185,9 @@ if (
         return false;
       }
     } catch {
-      // ignore and fall back to regex
+      // fallback to regex
     }
 
-    // stricter regex fallback to catch common invalid forms
     const strictRe =
       /^[A-Za-z0-9!#$%&'*+\-/=?^_`{|}~]+(?:\.[A-Za-z0-9!#$%&'*+\-/=?^_`{|}~]+)*@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z]{2,})+$/;
     if (!strictRe.test(v)) {
@@ -261,21 +220,105 @@ if (
 
   function validateForm() {
     const ok = validateName() && validateEmail() && validateMessage();
-    if (submitBtn) submitBtn.disabled = !ok;
+    updateSubmitButtonState();
     return ok;
   }
 
-  // wire up revalidation on user input
-  if (nameInput) nameInput.addEventListener('input', validateForm);
-  if (emailInput) emailInput.addEventListener('input', validateForm);
-  if (messageEditor) {
-    messageEditor.addEventListener('input', validateForm);
-    messageEditor.addEventListener('blur', validateForm);
+  // Función mejorada para verificar el estado del captcha - Compatible con móviles
+  function isCaptchaValid() {
+    if (FRONTEND_ONLY) return true; // Skip captcha in demo mode
+
+    try {
+      let token = '';
+      let isOk = false;
+
+      // Verificar usando el módulo captcha si está disponible
+      if (captcha && typeof captcha.isCaptchaOk === 'function') {
+        isOk = captcha.isCaptchaOk();
+        token = captcha.getCaptchaToken();
+      }
+
+      // Fallback: verificar directamente el input hidden
+      if (!token && cfResponseInput) {
+        token = cfResponseInput.value || '';
+      }
+
+      // En móviles, solo verificar que el token existe y no esté vacío
+      // Los tokens de Turnstile pueden variar en longitud
+      const hasValidToken = !!token && token.length > 5; // Más flexible para móviles
+
+      console.log('Captcha validation:', {
+        isOk,
+        hasToken: !!token,
+        tokenLength: token ? token.length : 0,
+        hasValidToken,
+        isMobile:
+          /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+            navigator.userAgent
+          ),
+      });
+
+      // Para mayor compatibilidad, considerar válido si hay token válido, incluso si isOk es false
+      return hasValidToken;
+    } catch (error) {
+      console.error('Error checking captcha:', error);
+      return false;
+    }
   }
 
-  // Lightweight presence check (does not show validation errors) so the submit
-  // button starts disabled while fields are empty.
-  function hasContent() {
+  // Función mejorada para actualizar el estado del botón submit
+  function updateSubmitButtonState() {
+    if (!submitBtn) return;
+
+    const hasContent = hasContentInFields();
+    const formValid = hasContent;
+    const captchaValid = isCaptchaValid();
+    const cooldownActive = getRemainingCooldown() > 0;
+
+    // El botón solo se habilita si TODAS las condiciones se cumplen
+    const shouldEnable = formValid && captchaValid && !cooldownActive;
+
+    console.log('Submit button state check:', {
+      hasContent,
+      formValid,
+      captchaValid,
+      cooldownActive,
+      shouldEnable,
+    });
+
+    // Siempre deshabilitar si no hay captcha válido
+    if (!captchaValid && !FRONTEND_ONLY) {
+      submitBtn.disabled = true;
+
+      // En móviles, mostrar botón de verificación manual si hay contenido en campos
+      const isMobile =
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent
+        );
+      const forceButton = doc.getElementById('force-captcha-check');
+      if (isMobile && forceButton && hasContent) {
+        // Verificar si realmente hay token pero el estado no se actualiza
+        const token = cfResponseInput ? cfResponseInput.value : '';
+        if (token && token.length > 5) {
+          forceButton.style.display = 'inline-block';
+        } else {
+          forceButton.style.display = 'none';
+        }
+      }
+      return;
+    }
+
+    // Ocultar botón de verificación manual si todo está bien
+    const forceButton = doc.getElementById('force-captcha-check');
+    if (forceButton) {
+      forceButton.style.display = 'none';
+    }
+
+    // Aplicar el estado calculado
+    submitBtn.disabled = !shouldEnable;
+  }
+
+  function hasContentInFields() {
     const n = nameInput && nameInput.value ? nameInput.value.trim() : '';
     const e = emailInput && emailInput.value ? emailInput.value.trim() : '';
     const m =
@@ -285,33 +328,23 @@ if (
     return n.length > 0 && e.length > 0 && m.length > 0;
   }
 
-  function updateSubmitPresence() {
-    try {
-      const ok =
-        captcha && typeof captcha.isCaptchaOk === 'function'
-          ? captcha.isCaptchaOk()
-          : false;
-      if (submitBtn) submitBtn.disabled = !hasContent() || !ok;
-    } catch {
-      if (submitBtn) submitBtn.disabled = !hasContent();
-    }
+  // Wire up event listeners
+  if (nameInput) nameInput.addEventListener('input', validateForm);
+  if (emailInput) emailInput.addEventListener('input', validateForm);
+  if (messageEditor) {
+    messageEditor.addEventListener('input', validateForm);
+    messageEditor.addEventListener('blur', validateForm);
   }
 
-  // Keep submit disabled initially if fields empty
-  updateSubmitPresence();
+  // Initial state - asegurar que el botón esté deshabilitado hasta completar captcha
+  if (submitBtn) {
+    submitBtn.disabled = true; // Inicialmente deshabilitado
+  }
+  updateSubmitButtonState();
 
-  // Update presence state on input without immediately showing validation errors
-  if (nameInput) nameInput.addEventListener('input', updateSubmitPresence);
-  if (emailInput) emailInput.addEventListener('input', updateSubmitPresence);
-  if (messageEditor)
-    messageEditor.addEventListener('input', updateSubmitPresence);
-
-  // Rich text editor toolbar
+  // Rich text editor setup (simplificado)
   const editor = messageEditor;
   const hiddenMessage = doc.getElementById('message');
-  const toolbarAttach = doc.getElementById('toolbar-attach');
-  const fontFamily = doc.getElementById('font-family');
-  const fontSize = doc.getElementById('font-size');
 
   function exec(cmd, value = null) {
     if (doc.execCommand) doc.execCommand(cmd, false, value);
@@ -325,6 +358,9 @@ if (
     btn.addEventListener('click', () => exec(btn.dataset.cmd));
   });
 
+  const fontFamily = doc.getElementById('font-family');
+  const fontSize = doc.getElementById('font-size');
+
   if (fontFamily)
     fontFamily.addEventListener('change', (e) =>
       exec('fontName', e.target.value)
@@ -333,23 +369,17 @@ if (
     fontSize.addEventListener('change', (e) =>
       exec('fontSize', e.target.value)
     );
-  if (toolbarAttach) {
-    // no-op: attachments support removed
-  }
 
-  // ensure editor content is submitted
   function syncEditor() {
     if (hiddenMessage) hiddenMessage.value = editor ? editor.innerHTML : '';
   }
 
-  // Time-trap: measure time from page load to submit to detect bots
+  // Time tracking
   const startTime = Date.now();
-  // alias for clarity with older snippets/tests
-  const pageLoadTime = startTime;
   const timeInput = doc.getElementById('time_spent');
   const formTokenInput = doc.getElementById('form_token');
 
-  // Simple form token: generate per page load and store in-memory; if page hidden -> invalidate
+  // Form token generation
   let formToken = null;
   function generateToken() {
     try {
@@ -365,37 +395,114 @@ if (
   }
   generateToken();
 
-  // If captcha helper loaded, wire events; otherwise fall back to local no-op
+  // Función para forzar re-evaluación del captcha en móviles
+  function forceCheckCaptcha() {
+    console.log('Forcing captcha recheck...');
+    setTimeout(() => {
+      updateSubmitButtonState();
+    }, 100);
+
+    // Segundo chequeo más tarde por si hay delay
+    setTimeout(() => {
+      updateSubmitButtonState();
+    }, 500);
+  }
+
+  // Setup captcha event listeners - MEJORADO para móviles
   if (captcha) {
-    try {
-      // rebind internal cf response input reference inside captcha module if needed
-      if (typeof captcha.setCaptchaState === 'function') {
-        // nothing to call now; captcha module attaches its own global callbacks
-      }
-    } catch {
-      /* ignore */
-    }
+    console.log('Captcha module loaded successfully');
   } else {
-    // fallback: no-op global callbacks to avoid runtime errors
+    console.log('Captcha module not loaded, setting up fallback callbacks');
+    // Fallback callbacks mejorados para móviles
     globalThis.turnstileOnSuccess = function (token) {
+      console.log(
+        'Fallback turnstile success:',
+        !!token,
+        'Token length:',
+        token ? token.length : 0
+      );
       try {
         if (cfResponseInput) cfResponseInput.value = token || '';
-        if (submitBtn) submitBtn.disabled = !hasContent();
-      } catch {
-        /* ignore */
+
+        // En móviles, forzar múltiples actualizaciones
+        updateSubmitButtonState();
+        forceCheckCaptcha();
+      } catch (error) {
+        console.error('Error in turnstile success callback:', error);
       }
     };
+
     globalThis.turnstileOnExpired = function () {
+      console.log('Fallback turnstile expired');
       try {
         if (cfResponseInput) cfResponseInput.value = '';
         if (submitBtn) submitBtn.disabled = true;
-      } catch {
-        /* ignore */
+        updateSubmitButtonState();
+      } catch (error) {
+        console.error('Error in turnstile expired callback:', error);
+      }
+    };
+
+    globalThis.turnstileOnError = function (error) {
+      console.log('Fallback turnstile error:', error);
+      try {
+        if (cfResponseInput) cfResponseInput.value = '';
+        if (submitBtn) submitBtn.disabled = true;
+        updateSubmitButtonState();
+      } catch (err) {
+        console.error('Error in turnstile error callback:', err);
       }
     };
   }
 
-  // Invalidate token when switching tabs (discourages token reuse across tabs)
+  // Listen to captcha change events y agregar observador de DOM para móviles
+  try {
+    if (typeof globalThis.addEventListener === 'function') {
+      globalThis.addEventListener('captcha:change', (e) => {
+        console.log('Captcha change event received:', e.detail);
+        try {
+          const token = e.detail.token || '';
+          if (cfResponseInput) cfResponseInput.value = token;
+          updateSubmitButtonState();
+
+          // En móviles, forzar re-evaluación adicional
+          forceCheckCaptcha();
+        } catch (error) {
+          console.error('Error handling captcha change:', error);
+        }
+      });
+    }
+
+    // Observador para cambios en el contenedor del captcha (específico para móviles)
+    const captchaContainer = doc.querySelector('.cf-turnstile');
+    if (captchaContainer && typeof MutationObserver !== 'undefined') {
+      const observer = new MutationObserver((mutations) => {
+        let shouldRecheck = false;
+        mutations.forEach((mutation) => {
+          if (mutation.type === 'childList' || mutation.type === 'attributes') {
+            console.log('Captcha DOM changed:', mutation.type);
+            shouldRecheck = true;
+          }
+        });
+
+        if (shouldRecheck) {
+          setTimeout(() => {
+            forceCheckCaptcha();
+          }, 200);
+        }
+      });
+
+      observer.observe(captchaContainer, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+      });
+    }
+  } catch (error) {
+    console.error('Error setting up captcha event listener:', error);
+  }
+
+  // Token invalidation on tab switch
   if (doc && typeof doc.addEventListener === 'function') {
     doc.addEventListener('visibilitychange', () => {
       if (doc.hidden) {
@@ -407,391 +514,140 @@ if (
     });
   }
 
-  // If the captcha helper dispatches events on token/state changes, listen and update UI
-  try {
-    if (typeof globalThis.addEventListener === 'function') {
-      globalThis.addEventListener('captcha:change', () => {
-        try {
-          // sync hidden token input if module exposes getter
-          const token =
-            captcha && typeof captcha.getCaptchaToken === 'function'
-              ? captcha.getCaptchaToken()
-              : cfResponseInput && cfResponseInput.value
-                ? cfResponseInput.value
-                : '';
-          if (cfResponseInput) cfResponseInput.value = token || '';
-          // enable submit only when fields have content and captcha reports ok
-          const ok =
-            captcha && typeof captcha.isCaptchaOk === 'function'
-              ? captcha.isCaptchaOk()
-              : !!token;
-          if (submitBtn) submitBtn.disabled = !hasContent() || !ok;
-        } catch {
-          /* ignore */
-        }
-      });
-    }
-  } catch {
-    /* ignore */
-  }
-
-  // Local rate limit: allow 1 send per random(30..60) seconds per client
+  // Rate limiting - 5 minutes
   const RATE_KEY = 'contact:lastSend';
-  function allowedByRateLimit() {
+  const RATE_LIMIT_MS = 5 * 60 * 1000; // 5 minutos
+
+  function getRemainingCooldown() {
     try {
       const ls = globalThis.localStorage;
       const last = Number(ls ? ls.getItem(RATE_KEY) || 0 : 0);
       const now = Date.now();
-      const wait =
-        Number(ls ? ls.getItem('contact:wait') || 0 : 0) ||
-        (30 + Math.floor(Math.random() * 31)) * 1000;
-      if (ls && !ls.getItem('contact:wait'))
-        ls.setItem('contact:wait', String(wait));
-      if (now - last < wait) return false;
-      return true;
+      const elapsed = now - last;
+      const remaining = RATE_LIMIT_MS - elapsed;
+      return remaining > 0 ? remaining : 0;
     } catch {
-      return true;
+      return 0;
     }
   }
+
+  function formatCooldownTime(ms) {
+    const minutes = Math.floor(ms / 60000);
+    const seconds = Math.floor((ms % 60000) / 1000);
+    if (minutes > 0) {
+      return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+    return `${seconds}s`;
+  }
+
+  function allowedByRateLimit() {
+    return getRemainingCooldown() === 0;
+  }
+
   function markSend() {
     try {
       const ls = globalThis.localStorage;
       if (ls) ls.setItem(RATE_KEY, String(Date.now()));
-      // keep the same wait value for the session
+      startCooldownTimer();
     } catch {
       /* ignore */
     }
   }
 
-  if (form) {
-    // Workaround: some mobile browsers or styling can make the button area unresponsive.
-    // Add a capturing click listener on the form that forwards clicks on the
-    // visible submit button area to form.requestSubmit() so the submit handler runs.
-    try {
-      form.addEventListener(
-        'click',
-        (e) => {
-          try {
-            const path =
-              typeof e.composedPath === 'function'
-                ? e.composedPath()
-                : e.path || [];
-            for (let i = 0; i < path.length; i++) {
-              const n = path[i];
-              if (!n) continue;
-              if (
-                n.id === 'submit-btn' ||
-                (n.getAttribute && n.getAttribute('id') === 'submit-btn')
-              ) {
-                // forward to the form submit flow
-                try {
-                  if (typeof form.requestSubmit === 'function')
-                    form.requestSubmit();
-                  else form.submit();
-                } catch {
-                  try {
-                    let ev;
-                    if (
-                      typeof globalThis !== 'undefined' &&
-                      typeof globalThis.Event === 'function'
-                    ) {
-                      ev = new globalThis.Event('submit', { cancelable: true });
-                    } else if (
-                      typeof globalThis !== 'undefined' &&
-                      globalThis.document &&
-                      typeof globalThis.document.createEvent === 'function'
-                    ) {
-                      ev = globalThis.document.createEvent('Event');
-                      ev.initEvent('submit', true, true);
-                    }
-                    if (ev) form.dispatchEvent(ev);
-                  } catch {
-                    /* ignore */
-                  }
-                }
-                e.preventDefault();
-                return;
-              }
-            }
-          } catch {
-            /* ignore */
-          }
-        },
-        true
-      );
-    } catch {
-      /* ignore listener install errors */
-    }
-    // Extracted send logic so we can re-use it after captcha re-check
-    async function performSend() {
-      // final validation before sending
-      if (!validateForm()) {
-        if (status) {
-          status.textContent =
-            t('contact.fixErrors') ||
-            'Por favor corrige los errores antes de enviar.';
-          status.classList.add('text-red-600');
-        }
-        return;
-      }
-      if (status) status.textContent = '';
-      if (status) status.className = 'text-sm';
+  // Timer visual para mostrar el cooldown
+  let cooldownInterval = null;
+  const cooldownDisplay = doc.getElementById('cooldown-display');
+
+  function updateCooldownDisplay() {
+    const remaining = getRemainingCooldown();
+    if (remaining > 0 && cooldownDisplay) {
+      const timeStr = formatCooldownTime(remaining);
+      cooldownDisplay.textContent =
+        lang === 'EN'
+          ? `Please wait ${timeStr} before sending another message.`
+          : `Espera ${timeStr} antes de enviar otro mensaje.`;
+      cooldownDisplay.style.display = 'block';
+
+      // Deshabilitar el botón durante el cooldown
       if (submitBtn) submitBtn.disabled = true;
-      // Preserve original button children (may contain localized nodes); restore later
-      const originalBtnChildren = submitBtn
-        ? Array.from(submitBtn.childNodes).map((n) => n.cloneNode(true))
-        : null;
-      // prevent visual deformation: lock the current width as inline style
-      let _prevBtnInlineWidth = null;
-      try {
-        if (submitBtn) {
-          _prevBtnInlineWidth = submitBtn.style.width || '';
-          const rect = submitBtn.getBoundingClientRect();
-          if (rect && rect.width)
-            submitBtn.style.width = Math.ceil(rect.width) + 'px';
-        }
-      } catch {
-        /* ignore measurement errors */
+    } else {
+      if (cooldownDisplay) {
+        cooldownDisplay.style.display = 'none';
+        cooldownDisplay.textContent = '';
       }
-      if (submitBtn) submitBtn.textContent = 'Enviando...';
+      // Re-evaluar el estado del botón
+      updateSubmitButtonState();
+    }
+  }
 
-      try {
-        // sync rich editor to hidden input
-        syncEditor();
-
-        // Basic client-side sanitization: escape < and > in name and message
-        const sanitize = (s) =>
-          String(s).replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        try {
-          if (nameInput && nameInput.value)
-            nameInput.value = sanitize(nameInput.value);
-        } catch {
-          /* ignore */
-        }
-        try {
-          if (hiddenMessage && hiddenMessage.value)
-            hiddenMessage.value = sanitize(hiddenMessage.value);
-        } catch {
-          /* ignore */
-        }
-
-        const FD = globalThis.FormData;
-        const fd = FD ? new FD(form) : null;
-
-        // progressive enhancement: use fetch to send FormData (server expects form-type)
-        // If running in frontend-only mock mode, simulate network & success
-        let res = null;
-        let json = null;
-        if (FRONTEND_ONLY) {
-          // simulate a short network delay
-          await new Promise((r) => {
-            const st = globalThis.setTimeout;
-            if (typeof st === 'function')
-              return st(r, 700 + Math.random() * 800);
-            return r();
-          });
-          res = { ok: true };
-          json = { ok: true };
-        } else {
-          const fetchFn = globalThis.fetch;
-          if (!fetchFn) throw new Error('fetch not available');
-          // Request JSON responses when possible (Formspree supports Accept: application/json)
-          res = await fetchFn(form.action, {
-            method: 'POST',
-            body: fd,
-            headers: { Accept: 'application/json' },
-          });
-          try {
-            json = await res.json();
-          } catch {
-            const txt = await res.text().catch(() => '');
-            json = { ok: res.ok, text: txt };
-          }
-        }
-
-        const success = res && res.ok && json && json.ok !== false;
-        if (success) {
-          if (status) {
-            status.textContent =
-              t('contact.sentSuccess') || 'Mensaje enviado. Gracias!';
-            status.classList.add('text-green-600');
-            status.classList.remove('text-red-600');
-          }
-          form.reset();
-          // clear captcha state when form resets
-          try {
-            if (captcha && typeof captcha.resetCaptcha === 'function')
-              captcha.resetCaptcha();
-            else if (
-              globalThis.turnstile &&
-              typeof globalThis.turnstile.reset === 'function'
-            ) {
-              try {
-                globalThis.turnstile.reset();
-              } catch {
-                /* ignore */
-              }
-            }
-          } catch {
-            /* ignore */
-          }
-          markSend();
-          try {
-            if (globalThis.__contactCaptchaInterval) {
-              try {
-                globalThis.clearInterval(globalThis.__contactCaptchaInterval);
-              } catch {
-                /* ignore */
-              }
-              globalThis.__contactCaptchaInterval = null;
-            }
-          } catch {
-            /* ignore */
-          }
-        } else {
-          // Attempt an iframe fallback submit for CORS/network cases
-          let attemptedFallback = false;
-          try {
-            if (!FRONTEND_ONLY && typeof doc.createElement === 'function') {
-              const frameName = 'contact-iframe-' + String(Date.now());
-              const iframe = doc.createElement('iframe');
-              iframe.name = frameName;
-              iframe.style.display = 'none';
-              doc.body.appendChild(iframe);
-              const prevTarget = form.getAttribute('target');
-              form.setAttribute('target', frameName);
-              try {
-                form.submit();
-                attemptedFallback = true;
-                if (status) {
-                  status.textContent =
-                    t('contact.sentSuccess') || 'Mensaje enviado. Gracias!';
-                  status.classList.add('text-green-600');
-                  status.classList.remove('text-red-600');
-                }
-                try {
-                  form.reset();
-                  if (captcha && typeof captcha.resetCaptcha === 'function')
-                    captcha.resetCaptcha();
-                } catch {
-                  /* ignore */
-                }
-                markSend();
-                try {
-                  if (globalThis.__contactCaptchaInterval) {
-                    try {
-                      globalThis.clearInterval(
-                        globalThis.__contactCaptchaInterval
-                      );
-                    } catch {
-                      /* ignore */
-                    }
-                    globalThis.__contactCaptchaInterval = null;
-                  }
-                } catch {
-                  /* ignore */
-                }
-              } finally {
-                if (prevTarget) form.setAttribute('target', prevTarget);
-                else form.removeAttribute('target');
-                try {
-                  const st = globalThis.setTimeout;
-                  if (typeof st === 'function') {
-                    st(() => {
-                      try {
-                        if (iframe.parentNode)
-                          iframe.parentNode.removeChild(iframe);
-                      } catch {
-                        /* ignore */
-                      }
-                    }, 5000);
-                  }
-                } catch {
-                  /* ignore */
-                }
-              }
-            }
-          } catch {
-            /* ignore fallback errors */
-          }
-
-          if (!attemptedFallback) {
-            if (status) {
-              if (json && typeof json.error === 'string' && json.error.trim()) {
-                status.textContent = json.error;
-              } else if (
-                json &&
-                typeof json.text === 'string' &&
-                json.text.trim()
-              ) {
-                const excerpt = json.text
-                  .replace(/<[^>]+>/g, ' ')
-                  .replace(/\s+/g, ' ')
-                  .trim()
-                  .slice(0, 800);
-                status.textContent = 'Respuesta del servidor: ' + excerpt;
-              } else {
-                status.textContent =
-                  t('contact.sendError') ||
-                  'Ocurrió un error al enviar. Intenta de nuevo.';
-              }
-              status.classList.add('text-red-600');
-              status.classList.remove('text-green-600');
-            }
-            try {
-              if (
-                typeof globalThis.console === 'object' &&
-                typeof globalThis.console.warn === 'function'
-              )
-                globalThis.console.warn('Contact form send failed', {
-                  res,
-                  json,
-                });
-            } catch {
-              /* ignore */
-            }
-          }
-        }
-      } catch {
-        if (status) {
-          status.textContent =
-            t('contact.networkError') ||
-            'Ocurrió un error de conexión. Intenta más tarde.';
-          status.classList.add('text-red-600');
-          status.classList.remove('text-green-600');
-        }
-      } finally {
-        if (submitBtn) submitBtn.disabled = false;
-        try {
-          if (
-            submitBtn &&
-            originalBtnChildren &&
-            Array.isArray(originalBtnChildren)
-          ) {
-            submitBtn.replaceChildren(
-              ...originalBtnChildren.map((n) => n.cloneNode(true))
-            );
-          } else if (submitBtn) {
-            submitBtn.textContent = 'Enviar';
-          }
-        } catch {
-          if (submitBtn) submitBtn.textContent = 'Enviar';
-        }
-        try {
-          if (submitBtn && _prevBtnInlineWidth !== null) {
-            submitBtn.style.width = _prevBtnInlineWidth || '';
-          }
-        } catch {
-          /* ignore */
-        }
-      }
+  function startCooldownTimer() {
+    if (cooldownInterval) {
+      clearInterval(cooldownInterval);
     }
 
+    updateCooldownDisplay();
+
+    cooldownInterval = setInterval(() => {
+      updateCooldownDisplay();
+
+      // Si ya no hay cooldown, limpiar el interval
+      if (getRemainingCooldown() === 0) {
+        clearInterval(cooldownInterval);
+        cooldownInterval = null;
+      }
+    }, 1000);
+  }
+
+  // Verificar cooldown al cargar la página
+  if (getRemainingCooldown() > 0) {
+    startCooldownTimer();
+  }
+
+  // Event listener para botón de verificación manual (móviles)
+  const forceCheckButton = doc.getElementById('force-captcha-check');
+  if (forceCheckButton) {
+    forceCheckButton.addEventListener('click', () => {
+      console.log('Manual captcha verification requested');
+      forceCheckCaptcha();
+
+      // Feedback visual
+      const originalText = forceCheckButton.textContent;
+      forceCheckButton.textContent = '🔄 Verificando...';
+      forceCheckButton.disabled = true;
+
+      setTimeout(() => {
+        forceCheckButton.textContent = originalText;
+        forceCheckButton.disabled = false;
+
+        // Si aún hay problemas, mostrar mensaje
+        if (!isCaptchaValid()) {
+          const token = cfResponseInput ? cfResponseInput.value : '';
+          if (token && token.length > 5) {
+            if (status) {
+              status.textContent =
+                'Captcha completado pero no detectado. Intenta refrescar la página.';
+              status.classList.add('text-yellow-600');
+            }
+          }
+        }
+      }, 1000);
+    });
+  }
+
+  // Main form submission handler
+  if (form) {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      // honeypot check: if filled, treat as bot and abort
+      console.log('Form submission started');
+
+      // Clear any previous status messages
+      if (status) {
+        status.textContent = '';
+        status.className = 'text-sm';
+      }
+
+      // Honeypot check
       if (honeypot && (honeypot.value || '').trim()) {
-        // keep UX consistent: show status (no alert)
         if (status) {
           status.textContent =
             t('contact.spamDetected') || 'Envío detectado como spam.';
@@ -800,11 +656,10 @@ if (
         return;
       }
 
-      // record time spent and reject if too fast (< 2500ms)
-      const elapsed = Date.now() - pageLoadTime;
+      // Time check
+      const elapsed = Date.now() - startTime;
       if (timeInput) timeInput.value = String(elapsed);
       if (elapsed < 2500) {
-        // no alert popup; show inline status instead
         if (status) {
           status.textContent =
             t('contact.tooFastStatus') ||
@@ -814,18 +669,21 @@ if (
         return;
       }
 
-      // rate limit (client-side)
-      if (!allowedByRateLimit()) {
+      // Rate limit check - 5 minutos
+      const remainingCooldown = getRemainingCooldown();
+      if (remainingCooldown > 0) {
+        const timeStr = formatCooldownTime(remainingCooldown);
         if (status) {
           status.textContent =
-            t('contact.rateLimit') ||
-            'Espera un momento antes de volver a enviar.';
+            lang === 'EN'
+              ? `Please wait ${timeStr} before sending another message.`
+              : `Espera ${timeStr} antes de enviar otro mensaje.`;
           status.classList.add('text-red-600');
         }
         return;
       }
 
-      // form token check
+      // Form token check
       if (!formToken) {
         if (status) {
           status.textContent =
@@ -836,171 +694,144 @@ if (
         return;
       }
 
-      // captcha must be completed (Turnstile) unless running in frontend-only mock
+      // Form validation
+      if (!validateForm()) {
+        if (status) {
+          status.textContent = 'Por favor corrige los errores antes de enviar.';
+          status.classList.add('text-red-600');
+        }
+        return;
+      }
+
+      // Captcha validation - MEJORADO
       if (!FRONTEND_ONLY) {
-        // prefer captcha module token, fallback to hidden input
-        const token =
-          captcha && typeof captcha.getCaptchaToken === 'function'
-            ? captcha.getCaptchaToken()
-            : cfResponseInput && cfResponseInput.value
-              ? cfResponseInput.value
-              : '';
-        const captchaOkNow =
-          captcha && typeof captcha.isCaptchaOk === 'function'
-            ? captcha.isCaptchaOk()
-            : !!token;
-        if (!captchaOkNow || !token) {
-          // Show inline status and keep button disabled while we retry
+        const captchaValid = isCaptchaValid();
+        console.log('Final captcha validation:', captchaValid);
+
+        if (!captchaValid) {
           if (status) {
-            status.textContent =
-              t('contact.captchaRequired') ||
-              'Por favor completa el captcha antes de enviar.';
+            status.textContent = t('contact.captchaRequired');
             status.classList.add('text-red-600');
           }
-          if (submitBtn) submitBtn.disabled = true;
 
-          const captchaCheckingEl =
-            doc && typeof doc.getElementById === 'function'
-              ? doc.getElementById('captcha-checking')
-              : null;
-          try {
-            if (captchaCheckingEl) captchaCheckingEl.style.display = '';
-          } catch {
-            /* ignore */
-          }
-
-          // configurable retries (default 3 attempts)
-          const MAX_RETRIES =
-            typeof globalThis.__contactCaptchaMaxRetries === 'number'
-              ? globalThis.__contactCaptchaMaxRetries
-              : 3;
-          if (typeof globalThis.__contactCaptchaRetriesRemaining !== 'number')
-            globalThis.__contactCaptchaRetriesRemaining = MAX_RETRIES;
-
-          // avoid starting duplicate countdown loops
-          if (globalThis.__contactCaptchaCountdownActive) return;
-          globalThis.__contactCaptchaCountdownActive = true;
-
-          // count down from 5 seconds for the user to (re)complete the captcha
-          let remaining = 5;
-          const updateIndicator = () => {
-            try {
-              if (!captchaCheckingEl) return;
-              const base =
-                t('contact.captchaChecking') ||
-                'Waiting for captcha verification...';
-              const recheck = t('contact.recheckingIn') || 'Rechecking in';
-              const attempts = t('contact.attemptsLeft') || 'attempts left';
-              captchaCheckingEl.textContent = `${base} ${recheck} ${remaining}s (${globalThis.__contactCaptchaRetriesRemaining} ${attempts})`;
-            } catch {
-              /* ignore */
-            }
-          };
-
-          // At the start of the recheck loop, attempt to reload/regenerate the captcha
+          // Intentar recargar el captcha una vez
           try {
             if (captcha && typeof captcha.reloadCaptcha === 'function') {
-              try {
-                captcha.reloadCaptcha();
-              } catch {
-                /* ignore reload errors */
-              }
+              console.log('Attempting to reload captcha');
+              captcha.reloadCaptcha();
             }
-          } catch {
-            /* ignore */
+          } catch (error) {
+            console.error('Error reloading captcha:', error);
           }
 
-          updateIndicator();
-
-          const countdownId = globalThis.setInterval(async () => {
-            try {
-              remaining -= 1;
-              updateIndicator();
-              if (remaining <= 0) {
-                // perform a single check now
-                const tokenNow =
-                  captcha && typeof captcha.getCaptchaToken === 'function'
-                    ? captcha.getCaptchaToken()
-                    : cfResponseInput && cfResponseInput.value
-                      ? cfResponseInput.value
-                      : '';
-                const okNow =
-                  captcha && typeof captcha.isCaptchaOk === 'function'
-                    ? captcha.isCaptchaOk()
-                    : !!tokenNow;
-                if (okNow && tokenNow) {
-                  try {
-                    if (captchaCheckingEl)
-                      captchaCheckingEl.style.display = 'none';
-                  } catch {
-                    /* ignore */
-                  }
-                  try {
-                    globalThis.clearInterval(countdownId);
-                  } catch {
-                    /* ignore */
-                  }
-                  globalThis.__contactCaptchaCountdownActive = false;
-                  globalThis.__contactCaptchaRetriesRemaining = MAX_RETRIES;
-                  // captcha now valid: proceed
-                  await performSend();
-                  return;
-                }
-
-                // not ok: consume one retry and STOP the countdown (do not auto-restart)
-                globalThis.__contactCaptchaRetriesRemaining = Math.max(
-                  0,
-                  globalThis.__contactCaptchaRetriesRemaining - 1
-                );
-                try {
-                  if (captchaCheckingEl) captchaCheckingEl.style.display = 'none';
-                } catch {
-                  /* ignore */
-                }
-                try {
-                  globalThis.clearInterval(countdownId);
-                } catch {
-                  /* ignore */
-                }
-                globalThis.__contactCaptchaCountdownActive = false;
-                if (globalThis.__contactCaptchaRetriesRemaining > 0) {
-                  // inform user they have retries left and must press submit again to recheck
-                  if (status) {
-                    status.textContent =
-                      (t('contact.captchaTryAgain') ||
-                        'Captcha no verificado. Intenta enviar de nuevo para reintentar.') +
-                      ` (${globalThis.__contactCaptchaRetriesRemaining} ${
-                        t('contact.attemptsLeft') || 'attempts left'
-                      })`;
-                    status.classList.add('text-red-600');
-                  }
-                  if (submitBtn) submitBtn.disabled = true;
-                  return;
-                }
-
-                // no retries left: final stop and inform user inline
-                try {
-                  globalThis.clearInterval(countdownId);
-                } catch {
-                  /* ignore */
-                }
-                globalThis.__contactCaptchaRetriesRemaining = MAX_RETRIES;
-                if (status) {
-                  status.textContent =
-                    t('contact.captchaRequired') ||
-                    'Por favor completa el captcha antes de enviar.';
-                  status.classList.add('text-red-600');
-                }
-                if (submitBtn) submitBtn.disabled = true;
-                return;
-              }
-            } catch {
-              /* ignore */
-            }
-          }, 1000);
           return;
         }
       }
+
+      // Proceed with form submission
+      console.log('All validations passed, submitting form');
+      await submitForm();
     });
+  }
+
+  async function submitForm() {
+    if (submitBtn) submitBtn.disabled = true;
+
+    // Store original button content
+    const originalBtnChildren = submitBtn
+      ? Array.from(submitBtn.childNodes).map((n) => n.cloneNode(true))
+      : null;
+
+    if (submitBtn) submitBtn.textContent = 'Enviando...';
+
+    try {
+      syncEditor();
+
+      const sanitize = (s) =>
+        String(s).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+      if (nameInput && nameInput.value) {
+        nameInput.value = sanitize(nameInput.value);
+      }
+      if (hiddenMessage && hiddenMessage.value) {
+        hiddenMessage.value = sanitize(hiddenMessage.value);
+      }
+
+      let res = null;
+      let json = null;
+
+      if (FRONTEND_ONLY) {
+        // Mock submission
+        await new Promise((r) => setTimeout(r, 700 + Math.random() * 800));
+        res = { ok: true };
+        json = { ok: true };
+      } else {
+        const fd = new FormData(form);
+        res = await fetch(form.action, {
+          method: 'POST',
+          body: fd,
+          headers: { Accept: 'application/json' },
+        });
+
+        try {
+          json = await res.json();
+        } catch {
+          const txt = await res.text().catch(() => '');
+          json = { ok: res.ok, text: txt };
+        }
+      }
+
+      const success = res && res.ok && json && json.ok !== false;
+
+      if (success) {
+        if (status) {
+          status.textContent = 'Mensaje enviado. ¡Gracias!';
+          status.classList.add('text-green-600');
+          status.classList.remove('text-red-600');
+        }
+
+        form.reset();
+
+        // Reset captcha
+        try {
+          if (captcha && typeof captcha.resetCaptcha === 'function') {
+            captcha.resetCaptcha();
+          }
+        } catch (error) {
+          console.error('Error resetting captcha:', error);
+        }
+
+        markSend();
+      } else {
+        throw new Error('Form submission failed');
+      }
+    } catch (error) {
+      console.error('Form submission error:', error);
+
+      if (status) {
+        status.textContent = 'Ocurrió un error al enviar. Intenta de nuevo.';
+        status.classList.add('text-red-600');
+        status.classList.remove('text-green-600');
+      }
+    } finally {
+      // Restore button
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        try {
+          if (originalBtnChildren && Array.isArray(originalBtnChildren)) {
+            submitBtn.replaceChildren(
+              ...originalBtnChildren.map((n) => n.cloneNode(true))
+            );
+          } else {
+            submitBtn.textContent = 'Enviar';
+          }
+        } catch {
+          submitBtn.textContent = 'Enviar';
+        }
+      }
+
+      // Update button state based on current form state
+      updateSubmitButtonState();
+    }
   }
 }

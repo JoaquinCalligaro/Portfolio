@@ -1,39 +1,69 @@
-// Captcha helper for Turnstile
-// Exposes: isCaptchaOk(), getCaptchaToken(), resetCaptcha(), (turnstile callbacks attached globally)
-
 let _captchaOk = false;
 let _cfResponseInput = null;
 let _lastToken = '';
+let _widgetId = null;
+let _siteKey = null;
 
 function setCaptchaState(ok, token) {
   _captchaOk = !!ok;
-  // keep the last token in memory so callers can retrieve it even if the
-  // hidden input was not present at module init time.
-  try {
-    _lastToken = token || '';
-  } catch {
-    _lastToken = '';
-  }
+  _lastToken = token || '';
   try {
     if (_cfResponseInput) _cfResponseInput.value = token || '';
-  } catch {
-    /* ignore */
-  }
+    const byName = globalThis.document?.querySelector(
+      'input[name="cf-turnstile-response"]'
+    );
+    if (byName) byName.value = token || '';
+  } catch {}
+
   try {
-    if (
-      typeof globalThis !== 'undefined' &&
-      typeof globalThis.dispatchEvent === 'function' &&
-      typeof globalThis.CustomEvent === 'function'
-    ) {
-      globalThis.dispatchEvent(
-        new globalThis.CustomEvent('captcha:change', {
-          detail: { ok: _captchaOk, token },
-        })
-      );
+    globalThis.__captcha_token = _lastToken;
+    globalThis.__captcha_ok = _captchaOk;
+  } catch {}
+
+  try {
+    const evt = new CustomEvent('captcha:change', {
+      detail: { ok: _captchaOk, token: _lastToken },
+    });
+    globalThis.dispatchEvent(evt);
+  } catch {}
+
+  console.log('Captcha state updated:', {
+    ok: _captchaOk,
+    hasToken: !!_lastToken,
+  });
+}
+
+function renderCaptchaManually() {
+  const container = globalThis.document?.querySelector('.cf-turnstile');
+  if (!container) return;
+
+  _siteKey = container.getAttribute('data-sitekey') || _siteKey;
+  if (!_siteKey) return;
+
+  const tryRender = () => {
+    if (!globalThis.turnstile?.render) {
+      globalThis.setTimeout(tryRender, 100);
+      return;
     }
-  } catch {
-    /* ignore */
-  }
+
+    try {
+      while (container.firstChild) container.removeChild(container.firstChild);
+      container.style.display = container.style.display || 'block';
+
+      const minimalOptions = {
+        sitekey: _siteKey,
+        callback: (token) => setCaptchaState(true, token),
+        'expired-callback': () => setCaptchaState(false, ''),
+        'error-callback': () => setCaptchaState(false, ''),
+      };
+
+      _widgetId = globalThis.turnstile.render(container, minimalOptions);
+    } catch (err) {
+      console.error('Error in renderCaptchaManually:', err);
+    }
+  };
+
+  tryRender();
 }
 
 if (
@@ -44,17 +74,19 @@ if (
     _cfResponseInput = globalThis.document.getElementById(
       'cf-turnstile-response'
     );
+    const container = globalThis.document.querySelector('.cf-turnstile');
+    if (container) _siteKey = container.getAttribute('data-sitekey');
   } catch {
     _cfResponseInput = null;
   }
 
-  // Attach the callbacks Turnstile will call
-  globalThis.turnstileOnSuccess = function (token) {
-    setCaptchaState(true, token);
-  };
-  globalThis.turnstileOnExpired = function () {
-    setCaptchaState(false, '');
-  };
+  if (globalThis.document.readyState === 'loading') {
+    globalThis.document.addEventListener('DOMContentLoaded', () => {
+      globalThis.setTimeout(renderCaptchaManually, 500);
+    });
+  } else {
+    globalThis.setTimeout(renderCaptchaManually, 500);
+  }
 }
 
 export function isCaptchaOk() {
@@ -63,93 +95,25 @@ export function isCaptchaOk() {
 
 export function getCaptchaToken() {
   try {
-    // Prefer the hidden input value if present, otherwise return the last
-    // token the module received from the Turnstile callback.
-    return _cfResponseInput ? _cfResponseInput.value : _lastToken || '';
+    return _cfResponseInput?.value || _lastToken || '';
   } catch {
-    return '';
+    return _lastToken || '';
   }
 }
 
 export function resetCaptcha() {
+  console.log('Resetting captcha');
   setCaptchaState(false, '');
   try {
-    if (
-      typeof globalThis !== 'undefined' &&
-      globalThis.turnstile &&
-      typeof globalThis.turnstile.reset === 'function'
-    ) {
-      try {
-        globalThis.turnstile.reset();
-      } catch {
-        /* ignore */
-      }
+    if (globalThis.turnstile?.reset) {
+      if (_widgetId !== null) globalThis.turnstile.reset(_widgetId);
+      else globalThis.turnstile.reset();
     }
-  } catch {
-    /* ignore */
-  }
+  } catch {}
 }
 
-// Attempt to reload/regenerate the Turnstile widget.
-// This tries several strategies in order:
-// 1. Call turnstile.reset() if available (soft reset).
-// 2. Call turnstile.render() to re-render the widget into the existing container.
-// 3. As a last resort, replace the container DOM and call render on the new node.
 export function reloadCaptcha() {
-  try {
-    if (typeof globalThis === 'undefined') return;
-    // prefer soft reset
-    if (
-      globalThis.turnstile &&
-      typeof globalThis.turnstile.reset === 'function'
-    ) {
-      try {
-        globalThis.turnstile.reset();
-        return;
-      } catch {
-        /* ignore and try render */
-      }
-    }
-
-    // try a full render into the existing container
-    if (
-      globalThis.turnstile &&
-      typeof globalThis.turnstile.render === 'function' &&
-      globalThis.document &&
-      typeof globalThis.document.querySelector === 'function'
-    ) {
-      try {
-        const container = globalThis.document.querySelector('.cf-turnstile');
-        if (!container) return;
-        const sitekey = container.getAttribute('data-sitekey') || '';
-        // remove previous children to ensure a clean render
-        try {
-          while (container.firstChild)
-            container.removeChild(container.firstChild);
-        } catch {
-          /* ignore */
-        }
-        // prefer passing callback functions if available
-        const opts = { sitekey };
-        if (typeof globalThis.turnstileOnSuccess === 'function')
-          opts.callback = globalThis.turnstileOnSuccess;
-        if (typeof globalThis.turnstileOnExpired === 'function')
-          opts['expired-callback'] = globalThis.turnstileOnExpired;
-        try {
-          globalThis.turnstile.render(container, opts);
-        } catch {
-          // some versions accept (container, sitekey) signature
-          try {
-            globalThis.turnstile.render(container, sitekey);
-          } catch {
-            /* ignore */
-          }
-        }
-      } catch {
-        /* ignore */
-      }
-    }
-  } catch {
-    /* ignore */
-  }
+  console.log('Reloading captcha');
+  setCaptchaState(false, '');
+  globalThis.setTimeout(renderCaptchaManually, 150);
 }

@@ -149,16 +149,27 @@ const FORMSPREE_ACTION = import.meta.env.PUBLIC_FORMSPREE_ACTION;
     <h3 class="p-5 text-center text-xl font-bold text-red-500">
       <LocalizedText key="contact.captchaPrompt" />
     </h3>
+
+    <!-- Captcha con callbacks mejorados -->
     <div
       class="cf-turnstile mt-2 flex w-full items-center justify-center text-center"
       data-sitekey={SITE_KEY}
       data-callback="turnstileOnSuccess"
       data-expired-callback="turnstileOnExpired"
+      data-error-callback="turnstileOnError"
     >
     </div>
 
     <!-- Status message shown below the captcha and above the submit button -->
     <div class="w-full text-center">
+      <!-- Cooldown display mejorado -->
+      <div
+        id="cooldown-display"
+        class="mb-3 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-center text-yellow-800 dark:border-yellow-700 dark:bg-yellow-900 dark:text-yellow-200"
+        style="display:none"
+      >
+      </div>
+
       <div
         id="form-status"
         role="status"
