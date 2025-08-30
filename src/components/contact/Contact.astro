@@ -22,7 +22,7 @@ import ContactBtn from '../ui/ContactBtn.astro';
         name="name"
         type="text"
         required
-        class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-neutral-700 dark:bg-gray-800 dark:text-gray-100"
+        class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm transition-colors duration-150 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-neutral-700 dark:bg-gray-800 dark:text-gray-100"
       />
     </div>
 
@@ -37,7 +37,7 @@ import ContactBtn from '../ui/ContactBtn.astro';
         name="email"
         type="email"
         required
-        class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-neutral-700 dark:bg-gray-800 dark:text-gray-100"
+        class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm transition-colors duration-150 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-neutral-700 dark:bg-gray-800 dark:text-gray-100"
       />
     </div>
 
@@ -53,25 +53,25 @@ import ContactBtn from '../ui/ContactBtn.astro';
         <button
           type="button"
           data-cmd="bold"
-          class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 hover:bg-gray-100 dark:text-white dark:ring-gray-700 dark:hover:bg-gray-700"
+          class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 transition-colors duration-150 hover:bg-gray-100 dark:text-white dark:ring-gray-700 dark:hover:bg-gray-700"
           >B</button
         >
         <button
           type="button"
           data-cmd="italic"
-          class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 hover:bg-gray-100 dark:text-white dark:ring-gray-700 dark:hover:bg-gray-700"
+          class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 transition-colors duration-150 hover:bg-gray-100 dark:text-white dark:ring-gray-700 dark:hover:bg-gray-700"
           >I</button
         >
         <button
           type="button"
           data-cmd="underline"
-          class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 hover:bg-gray-100 dark:text-white dark:ring-gray-700 dark:hover:bg-gray-700"
+          class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 transition-colors duration-150 hover:bg-gray-100 dark:text-white dark:ring-gray-700 dark:hover:bg-gray-700"
           >U</button
         >
 
         <select
           id="font-family"
-          class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-700"
+          class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 transition-colors duration-150 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-700"
         >
           <option value="inherit">Fuente</option>
           <option value="Arial">Arial</option>
@@ -82,7 +82,7 @@ import ContactBtn from '../ui/ContactBtn.astro';
 
         <select
           id="font-size"
-          class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-700"
+          class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 transition-colors duration-150 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-700"
         >
           <option value="3">Tamaño</option>
           <option value="1">XS</option>
@@ -100,7 +100,7 @@ import ContactBtn from '../ui/ContactBtn.astro';
         contenteditable="true"
         aria-label="Mensaje"
         role="textbox"
-        class="mt-1 min-h-[120px] w-full rounded-md border border-gray-300 bg-white p-3 text-sm shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-neutral-700 dark:bg-gray-800 dark:text-gray-100"
+        class="mt-1 min-h-[120px] w-full rounded-md border border-gray-300 bg-white p-3 text-sm shadow-sm transition-colors duration-150 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-neutral-700 dark:bg-gray-800 dark:text-gray-100"
       >
       </div>
 
@@ -116,7 +116,7 @@ import ContactBtn from '../ui/ContactBtn.astro';
 
       <div
         id="drop-area"
-        class="mt-1 flex max-w-full flex-col gap-2 rounded-md border-2 border-dashed border-gray-300 p-4 text-sm text-gray-600 dark:border-neutral-700 dark:bg-gray-900 dark:text-gray-300"
+        class="mt-1 flex max-w-full flex-col gap-2 rounded-md border-2 border-dashed border-gray-300 p-4 text-sm text-gray-600 transition-colors duration-150 dark:border-neutral-700 dark:bg-gray-900 dark:text-gray-300"
       >
         <p class="mb-2">
           Arrastra y suelta archivos aquí o haz clic en "Adjuntar". (Imágenes,
@@ -125,7 +125,7 @@ import ContactBtn from '../ui/ContactBtn.astro';
         <div class="flex items-center gap-3">
           <label
             for="file-input"
-            class="inline-flex cursor-pointer items-center rounded-md bg-white px-3 py-1 text-sm font-medium text-gray-800 ring-1 ring-gray-200 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-700 dark:hover:bg-gray-700"
+            class="inline-flex cursor-pointer items-center rounded-md bg-white px-3 py-1 text-sm font-medium text-gray-800 ring-1 ring-gray-200 transition-colors duration-150 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-700 dark:hover:bg-gray-700"
             >Adjuntar</label
           >
           <input
@@ -254,13 +254,26 @@ import ContactBtn from '../ui/ContactBtn.astro';
       ['dragenter', 'dragover'].forEach((evt) => {
         dropArea.addEventListener(evt, (e) => {
           e.preventDefault();
-          dropArea.classList.add('bg-gray-100');
+          // highlight for light and dark
+          dropArea.classList.add(
+            'bg-gray-100',
+            'ring-2',
+            'ring-indigo-400',
+            'dark:ring-indigo-500',
+            'dark:bg-gray-800'
+          );
         });
       });
       ['dragleave', 'drop'].forEach((evt) => {
         dropArea.addEventListener(evt, (e) => {
           e.preventDefault();
-          dropArea.classList.remove('bg-gray-100');
+          dropArea.classList.remove(
+            'bg-gray-100',
+            'ring-2',
+            'ring-indigo-400',
+            'dark:ring-indigo-500',
+            'dark:bg-gray-800'
+          );
         });
       });
       dropArea.addEventListener('drop', (e) => {
