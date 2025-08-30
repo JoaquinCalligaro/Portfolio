@@ -110,9 +110,12 @@ export const post: APIRoute = async ({ request }) => {
       { status: 200 }
     );
   } catch (err) {
-    return new Response(JSON.stringify({ ok: false, error: String(err) }), {
-      status: 500,
-    });
+    // Log the real error server-side, but do not expose details to the client
+    console.error(err);
+    return new Response(
+      JSON.stringify({ ok: false, error: 'Internal server error' }),
+      { status: 500 }
+    );
   }
 };
 
