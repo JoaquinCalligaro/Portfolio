@@ -562,10 +562,10 @@ if (
     const remaining = getRemainingCooldown();
     if (remaining > 0 && cooldownDisplay) {
       const timeStr = formatCooldownTime(remaining);
-      cooldownDisplay.textContent =
-        lang === 'EN'
-          ? `Please wait ${timeStr} before sending another message.`
-          : `Espera ${timeStr} antes de enviar otro mensaje.`;
+      cooldownDisplay.textContent = t('contact.cooldownWait').replace(
+        '${timeStr}',
+        timeStr
+      );
       cooldownDisplay.style.display = 'block';
 
       // Deshabilitar el botón durante el cooldown
@@ -624,8 +624,7 @@ if (
           const token = cfResponseInput ? cfResponseInput.value : '';
           if (token && token.length > 5) {
             if (status) {
-              status.textContent =
-                'Captcha completado pero no detectado. Intenta refrescar la página.';
+              status.textContent = t('contact.captchaNotDetected');
               status.classList.add('text-yellow-600');
             }
           }
@@ -742,7 +741,8 @@ if (
       ? Array.from(submitBtn.childNodes).map((n) => n.cloneNode(true))
       : null;
 
-    if (submitBtn) submitBtn.textContent = 'Enviando...';
+    if (submitBtn)
+      submitBtn.textContent = t('contact.sending') || 'Enviando...';
 
     try {
       syncEditor();
@@ -785,7 +785,7 @@ if (
 
       if (success) {
         if (status) {
-          status.textContent = 'Mensaje enviado. ¡Gracias!';
+          status.textContent = t('contact.sentSuccess');
           status.classList.add('text-green-600');
           status.classList.remove('text-red-600');
         }
