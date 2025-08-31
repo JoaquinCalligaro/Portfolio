@@ -37,8 +37,35 @@
 /* Propiedades extra (easing, will-change) */
 .card-root {
   will-change: transform;
-  /* easing personalizado */
+
   transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  -webkit-backdrop-filter: blur(6px) saturate(1.03);
+  backdrop-filter: blur(6px) saturate(1.03);
+  /* Static border-glow and accent color (applied without hover/animation) */
+  box-shadow:
+    0 0 36px 6px rgba(0, 0, 0, 0),
+    0 0 36px 6px rgba(0, 145, 255, 0.12);
+  border-color: rgba(0, 145, 255, 0.22);
+}
+
+.card-root::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+
+  background-image:
+    radial-gradient(
+      1200px 600px at 10% 20%,
+      rgba(255, 255, 255, 0.04) 0%,
+      rgba(255, 255, 255, 0) 18%
+    ),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.02));
+  mix-blend-mode: screen;
+  opacity: 0.28; /* intensidad baja por defecto */
+  /* No hay transition/animation aquí: efecto estático por petición */
 }
 
 /* ============================================================
