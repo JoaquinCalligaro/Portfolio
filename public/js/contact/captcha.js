@@ -1,9 +1,17 @@
+/* eslint-env browser, es2021 */
+/* eslint no-console: 0 */
+/* eslint no-empty: 0 */
+/* global CustomEvent, console */
+/* Archivo cliente: se ejecuta en el navegador. Usamos globalThis para seguridad SSR.
+  Las directivas ESLint permiten reconocer los globals del navegador. */
+
 let _captchaOk = false;
 let _cfResponseInput = null;
 let _lastToken = '';
 let _widgetId = null;
 let _siteKey = null;
 
+// Actualiza el estado del captcha y notifica con el evento 'captcha:change'
 function setCaptchaState(ok, token) {
   _captchaOk = !!ok;
   _lastToken = token || '';
@@ -33,6 +41,7 @@ function setCaptchaState(ok, token) {
   });
 }
 
+// Renderiza Turnstile programáticamente (mejor compatibilidad móvil)
 function renderCaptchaManually() {
   const container = globalThis.document?.querySelector('.cf-turnstile');
   if (!container) return;
@@ -89,6 +98,7 @@ if (
   }
 }
 
+// API pública del helper
 export function isCaptchaOk() {
   return _captchaOk;
 }

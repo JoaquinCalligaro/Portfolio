@@ -1,9 +1,16 @@
-// Guard so this module can be parsed server-side without referencing browser globals
+/* eslint-env browser, es2021 */
+/* eslint no-console: 0 */
+/* eslint no-empty: 0 */
+/* Archivo cliente: se ejecuta en el navegador. Usamos globalThis para seguridad SSR
+  y las directivas ESLint habilitan los globals del navegador para evitar advertencias. */
+/* global console, navigator, setTimeout, setInterval, clearInterval, MutationObserver, FormData, fetch */
+/* eslint no-unused-vars: 0 */
+// Evita romper en SSR comprobando si document existe
 if (
   typeof globalThis !== 'undefined' &&
   typeof globalThis.document !== 'undefined'
 ) {
-  // import captcha helpers (dynamic import to keep SSR safe)
+  // import dinámico del helper de captcha (seguro para SSR)
   let captcha = null;
   try {
     captcha = await import('/js/contact/captcha.js');
@@ -13,20 +20,20 @@ if (
 
   const doc = globalThis.document;
 
-  // Read translations injected by LanguageToggle into window.TRANSLATIONS
+  // Leer traducciones inyectadas en window.TRANSLATIONS
   const translations =
     globalThis.TRANSLATIONS && typeof globalThis.TRANSLATIONS === 'object'
       ? globalThis.TRANSLATIONS
       : {};
 
-  // Get current language
+  // Obtener idioma actual
   const htmlLang =
     doc && doc.documentElement && doc.documentElement.lang
       ? String(doc.documentElement.lang)
       : 'ES';
   const lang = String(htmlLang).toUpperCase() === 'EN' ? 'EN' : 'ES';
 
-  // Default translations
+  // Traducciones por defecto (fallback)
   const DEFAULT_TRANSLATIONS = {
     ES: {
       contact: {
@@ -86,7 +93,7 @@ if (
     }
   }
 
-  // Frontend-only demo mode
+  // Modo demo frontend (omitir captcha en pruebas)
   const FRONTEND_ONLY = (() => {
     try {
       if (!doc) return false;
@@ -112,7 +119,7 @@ if (
   const submitBtn = doc.getElementById('submit-btn');
   const cfResponseInput = doc.getElementById('cf-turnstile-response');
 
-  // Form fields & validation nodes
+  // Campos del formulario y nodos de validación
   const nameInput = doc.getElementById('name');
   const emailInput = doc.getElementById('email');
   const nameError = doc.getElementById('name-error');
@@ -328,7 +335,7 @@ if (
     return n.length > 0 && e.length > 0 && m.length > 0;
   }
 
-  // Wire up event listeners
+  // Registrar listeners de eventos
   if (nameInput) nameInput.addEventListener('input', validateForm);
   if (emailInput) emailInput.addEventListener('input', validateForm);
   if (messageEditor) {
@@ -336,13 +343,13 @@ if (
     messageEditor.addEventListener('blur', validateForm);
   }
 
-  // Initial state - asegurar que el botón esté deshabilitado hasta completar captcha
+  // Estado inicial: botón deshabilitado hasta completar captcha
   if (submitBtn) {
     submitBtn.disabled = true; // Inicialmente deshabilitado
   }
   updateSubmitButtonState();
 
-  // Rich text editor setup (simplificado)
+  // Inicializar editor enriquecido (simplificado)
   const editor = messageEditor;
   const hiddenMessage = doc.getElementById('message');
 
@@ -374,12 +381,12 @@ if (
     if (hiddenMessage) hiddenMessage.value = editor ? editor.innerHTML : '';
   }
 
-  // Time tracking
+  // Registro de tiempo (para detección de envíos muy rápidos)
   const startTime = Date.now();
   const timeInput = doc.getElementById('time_spent');
   const formTokenInput = doc.getElementById('form_token');
 
-  // Form token generation
+  // Generación de token del formulario
   let formToken = null;
   function generateToken() {
     try {
@@ -395,7 +402,7 @@ if (
   }
   generateToken();
 
-  // Función para forzar re-evaluación del captcha en móviles
+  // Forzar re-evaluación del captcha en móviles
   function forceCheckCaptcha() {
     console.log('Forcing captcha recheck...');
     setTimeout(() => {
@@ -408,7 +415,7 @@ if (
     }, 500);
   }
 
-  // Setup captcha event listeners - MEJORADO para móviles
+  // Configurar manejo de eventos del captcha (mejoras móviles)
   if (captcha) {
     console.log('Captcha module loaded successfully');
   } else {
@@ -502,7 +509,7 @@ if (
     console.error('Error setting up captcha event listener:', error);
   }
 
-  // Token invalidation on tab switch
+  // Invalidar token al cambiar de pestaña
   if (doc && typeof doc.addEventListener === 'function') {
     doc.addEventListener('visibilitychange', () => {
       if (doc.hidden) {
@@ -514,7 +521,7 @@ if (
     });
   }
 
-  // Rate limiting - 5 minutes
+  // Límite de envío: 5 minutos
   const RATE_KEY = 'contact:lastSend';
   const RATE_LIMIT_MS = 5 * 60 * 1000; // 5 minutos
 
@@ -540,9 +547,7 @@ if (
     return `${seconds}s`;
   }
 
-  function allowedByRateLimit() {
-    return getRemainingCooldown() === 0;
-  }
+  // rate-limit helper inlined where needed; removed unused wrapper to satisfy linter
 
   function markSend() {
     try {
@@ -554,7 +559,7 @@ if (
     }
   }
 
-  // Timer visual para mostrar el cooldown
+  // Temporizador visual del cooldown
   let cooldownInterval = null;
   const cooldownDisplay = doc.getElementById('cooldown-display');
 
@@ -603,7 +608,7 @@ if (
     startCooldownTimer();
   }
 
-  // Event listener para botón de verificación manual (móviles)
+  // Listener del botón de verificación manual (móviles)
   const forceCheckButton = doc.getElementById('force-captcha-check');
   if (forceCheckButton) {
     forceCheckButton.addEventListener('click', () => {
@@ -633,7 +638,7 @@ if (
     });
   }
 
-  // Main form submission handler
+  // Manejador principal de envío de formulario
   if (form) {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -736,7 +741,7 @@ if (
   async function submitForm() {
     if (submitBtn) submitBtn.disabled = true;
 
-    // Store original button content
+    // Guardar contenido original del botón
     const originalBtnChildren = submitBtn
       ? Array.from(submitBtn.childNodes).map((n) => n.cloneNode(true))
       : null;
@@ -761,7 +766,7 @@ if (
       let json = null;
 
       if (FRONTEND_ONLY) {
-        // Mock submission
+        // Envío simulado en modo demo
         await new Promise((r) => setTimeout(r, 700 + Math.random() * 800));
         res = { ok: true };
         json = { ok: true };
@@ -792,7 +797,7 @@ if (
 
         form.reset();
 
-        // Reset captcha
+        // Reiniciar captcha
         try {
           if (captcha && typeof captcha.resetCaptcha === 'function') {
             captcha.resetCaptcha();
@@ -814,7 +819,7 @@ if (
         status.classList.remove('text-green-600');
       }
     } finally {
-      // Restore button
+      // Restaurar botón
       if (submitBtn) {
         submitBtn.disabled = false;
         try {
