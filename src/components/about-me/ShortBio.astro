@@ -1,18 +1,18 @@
 ---
-import Card from '../cards/Card.astro';
 import GitHubBtn from '../ui/GitHubBtn.astro';
 import LinkedInBtn from '../ui/LinkedInBtn.astro';
 import { getAboutMe } from '../../data/translations';
 import CvDownloadBtn from '../ui/CvDownloadBtn.astro';
+import '../../styles/about.css';
 const t = getAboutMe('ES');
 ---
 
 <article class="flex flex-col gap-6 md:flex-row">
   <!-- Bio y CV -->
-  <Card
-    className="flex-1 rounded-xl p-10 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+  <div
+    class="about-card-root flex-1 rounded-xl bg-gray-100/30 p-10 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:bg-gray-900/30"
   >
-    <div class="flex flex-col gap-6">
+    <div class="about-card-inner flex flex-col gap-6">
       <div class="flex flex-col gap-4">
         <h3
           class="flex items-center gap-2 text-lg font-semibold text-gray-950 sm:text-xl dark:text-white"
@@ -22,9 +22,7 @@ const t = getAboutMe('ES');
           >
           <span class="text-2xl">🧬</span>
         </h3>
-        <div
-          class="space-y-4 text-sm text-gray-600 sm:text-base dark:text-gray-400"
-        >
+        <div class="space-y-4 text-sm text-black sm:text-base dark:text-white">
           {
             t.shortBio.paragraphs.map((p, i) => (
               <p
@@ -45,5 +43,5 @@ const t = getAboutMe('ES');
         <LinkedInBtn />
       </div>
     </div>
-  </Card>
+  </div>
 </article>

@@ -1,5 +1,5 @@
 ---
-import Card from '../cards/Card.astro';
+import '../../styles/contact.css';
 import LocalizedText from '../language/LocalizedText.astro';
 
 import SubmitBtn from '../ui/SubmitBtn.astro';
@@ -9,190 +9,198 @@ const SITE_KEY =
 const FORMSPREE_ACTION = import.meta.env.PUBLIC_FORMSPREE_ACTION;
 ---
 
-<Card className="rounded-xl">
-  <form
-    id="contact-form"
-    action={FORMSPREE_ACTION}
-    method="post"
-    class="contact-form w-full space-y-4 rounded-xl"
-    novalidate
-  >
-    <div>
-      <label
-        for="name"
-        class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-        ><LocalizedText key="contact.name" /></label
-      >
-      <input
-        id="name"
-        name="name"
-        type="text"
-        required
-        class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm transition-colors duration-150 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-neutral-700 dark:bg-gray-800 dark:text-gray-100"
-      />
-      <p id="name-error" class="mt-1 text-sm text-red-600" aria-live="polite">
-      </p>
-    </div>
-
-    <div>
-      <label
-        for="email"
-        class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-        ><LocalizedText key="contact.email" /></label
-      >
-      <input
-        id="email"
-        name="email"
-        type="email"
-        required
-        class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm transition-colors duration-150 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-neutral-700 dark:bg-gray-800 dark:text-gray-100"
-      />
-      <p id="email-error" class="mt-1 text-sm text-red-600" aria-live="polite">
-      </p>
-    </div>
-
-    <div>
-      <label
-        for="message-editor"
-        class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-        ><LocalizedText key="contact.message" /></label
-      >
-
-      <!-- Toolbar -->
-      <div class="mt-2 mb-1 flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          data-cmd="bold"
-          class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 transition-colors duration-150 hover:bg-gray-100 dark:text-white dark:ring-gray-700 dark:hover:bg-gray-700"
-          >B</button
-        >
-        <button
-          type="button"
-          data-cmd="italic"
-          class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 transition-colors duration-150 hover:bg-gray-100 dark:text-white dark:ring-gray-700 dark:hover:bg-gray-700"
-          >I</button
-        >
-        <button
-          type="button"
-          data-cmd="underline"
-          class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 transition-colors duration-150 hover:bg-gray-100 dark:text-white dark:ring-gray-700 dark:hover:bg-gray-700"
-          >U</button
-        >
-
-        <select
-          id="font-family"
-          class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 transition-colors duration-150 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-700"
-        >
-          <option value="inherit"><LocalizedText key="contact.font" /></option>
-          <option value="Arial">Arial</option>
-          <option value="Georgia">Georgia</option>
-          <option value="Times New Roman">Times New Roman</option>
-          <option value="Courier New">Courier New</option>
-        </select>
-
-        <select
-          id="font-size"
-          class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 transition-colors duration-150 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-700"
-        >
-          <option value="3"><LocalizedText key="contact.size" /></option>
-          <option value="1">XS</option>
-          <option value="2">S</option>
-          <option value="3">M</option>
-          <option value="4">L</option>
-          <option value="5">XL</option>
-          <option value="6">XXL</option>
-        </select>
-      </div>
-
-      <!-- Editor -->
-      <div
-        id="message-editor"
-        contenteditable="true"
-        aria-label="Mensaje"
-        role="textbox"
-        class="mt-1 min-h-[120px] w-full rounded-md border border-gray-300 bg-white p-3 text-sm shadow-sm transition-colors duration-150 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-neutral-700 dark:bg-gray-800 dark:text-gray-100"
-      >
-      </div>
-
-      <p
-        id="message-error"
-        class="mt-1 text-sm text-red-600"
-        aria-live="polite"
-      >
-      </p>
-
-      <!-- Hidden input to submit HTML content -->
-      <input type="hidden" id="message" name="message" />
-      <!-- Time-trap hidden field (ms spent before submit) -->
-      <input type="hidden" id="time_spent" name="time_spent" />
-      <!-- Simple form token to make automated submissions harder -->
-      <input type="hidden" id="form_token" name="form_token" />
-      <!-- Turnstile token (populated by widget callback) -->
-      <input
-        type="hidden"
-        id="cf-turnstile-response"
-        name="cf-turnstile-response"
-      />
-    </div>
-
-    <!-- Honeypot: bots will fill this; real users won't. Use sr-only for accessibility -->
-    <label for="website" class="sr-only">Website</label>
-    <input
-      id="website"
-      name="website"
-      type="text"
-      autocomplete="off"
-      tabindex="-1"
-      class="sr-only"
-    />
-
-    <h3 class="p-5 text-center text-xl font-bold text-red-500">
-      <LocalizedText key="contact.captchaPrompt" />
-    </h3>
-
-    <!-- Captcha con callbacks mejorados -->
-    <div
-      class="cf-turnstile mt-2 flex w-full items-center justify-center text-center"
-      data-sitekey={SITE_KEY}
-      data-callback="turnstileOnSuccess"
-      data-expired-callback="turnstileOnExpired"
-      data-error-callback="turnstileOnError"
+<div class="contact-card-root rounded-xl">
+  <div class="contact-card-inner p-6">
+    <form
+      id="contact-form"
+      action={FORMSPREE_ACTION}
+      method="post"
+      class="contact-form w-full space-y-4 rounded-xl"
+      novalidate
     >
-    </div>
+      <div>
+        <label
+          for="name"
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          ><LocalizedText key="contact.name" /></label
+        >
+        <input
+          id="name"
+          name="name"
+          type="text"
+          required
+          class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm transition-colors duration-150 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-neutral-700 dark:bg-gray-800 dark:text-gray-100"
+        />
+        <p id="name-error" class="mt-1 text-sm text-red-600" aria-live="polite">
+        </p>
+      </div>
 
-    <!-- Status message shown below the captcha and above the submit button -->
-    <div class="w-full text-center">
-      <!-- Cooldown display mejorado -->
+      <div>
+        <label
+          for="email"
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          ><LocalizedText key="contact.email" /></label
+        >
+        <input
+          id="email"
+          name="email"
+          type="email"
+          required
+          class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm transition-colors duration-150 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-neutral-700 dark:bg-gray-800 dark:text-gray-100"
+        />
+        <p
+          id="email-error"
+          class="mt-1 text-sm text-red-600"
+          aria-live="polite"
+        >
+        </p>
+      </div>
+
+      <div>
+        <label
+          for="message-editor"
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          ><LocalizedText key="contact.message" /></label
+        >
+
+        <!-- Toolbar -->
+        <div class="mt-2 mb-1 flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            data-cmd="bold"
+            class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 transition-colors duration-150 hover:bg-gray-100 dark:text-white dark:ring-gray-700 dark:hover:bg-gray-700"
+            >B</button
+          >
+          <button
+            type="button"
+            data-cmd="italic"
+            class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 transition-colors duration-150 hover:bg-gray-100 dark:text-white dark:ring-gray-700 dark:hover:bg-gray-700"
+            >I</button
+          >
+          <button
+            type="button"
+            data-cmd="underline"
+            class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 transition-colors duration-150 hover:bg-gray-100 dark:text-white dark:ring-gray-700 dark:hover:bg-gray-700"
+            >U</button
+          >
+
+          <select
+            id="font-family"
+            class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 transition-colors duration-150 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-700"
+          >
+            <option value="inherit"><LocalizedText key="contact.font" /></option
+            >
+            <option value="Arial">Arial</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Courier New">Courier New</option>
+          </select>
+
+          <select
+            id="font-size"
+            class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 transition-colors duration-150 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-700"
+          >
+            <option value="3"><LocalizedText key="contact.size" /></option>
+            <option value="1">XS</option>
+            <option value="2">S</option>
+            <option value="3">M</option>
+            <option value="4">L</option>
+            <option value="5">XL</option>
+            <option value="6">XXL</option>
+          </select>
+        </div>
+
+        <!-- Editor -->
+        <div
+          id="message-editor"
+          contenteditable="true"
+          aria-label="Mensaje"
+          role="textbox"
+          class="mt-1 min-h-[120px] w-full rounded-md border border-gray-300 bg-white p-3 text-sm shadow-sm transition-colors duration-150 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-neutral-700 dark:bg-gray-800 dark:text-gray-100"
+        >
+        </div>
+
+        <p
+          id="message-error"
+          class="mt-1 text-sm text-red-600"
+          aria-live="polite"
+        >
+        </p>
+
+        <!-- Hidden input to submit HTML content -->
+        <input type="hidden" id="message" name="message" />
+        <!-- Time-trap hidden field (ms spent before submit) -->
+        <input type="hidden" id="time_spent" name="time_spent" />
+        <!-- Simple form token to make automated submissions harder -->
+        <input type="hidden" id="form_token" name="form_token" />
+        <!-- Turnstile token (populated by widget callback) -->
+        <input
+          type="hidden"
+          id="cf-turnstile-response"
+          name="cf-turnstile-response"
+        />
+      </div>
+
+      <!-- Honeypot: bots will fill this; real users won't. Use sr-only for accessibility -->
+      <label for="website" class="sr-only">Website</label>
+      <input
+        id="website"
+        name="website"
+        type="text"
+        autocomplete="off"
+        tabindex="-1"
+        class="sr-only"
+      />
+
+      <h3 class="p-5 text-center text-xl font-bold text-red-500">
+        <LocalizedText key="contact.captchaPrompt" />
+      </h3>
+
+      <!-- Captcha con callbacks mejorados -->
       <div
-        id="cooldown-display"
-        class="mb-3 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-center text-yellow-800 dark:border-yellow-700 dark:bg-yellow-900 dark:text-yellow-200"
-        style="display:none"
+        class="cf-turnstile mt-2 flex w-full items-center justify-center text-center"
+        data-sitekey={SITE_KEY}
+        data-callback="turnstileOnSuccess"
+        data-expired-callback="turnstileOnExpired"
+        data-error-callback="turnstileOnError"
       >
       </div>
 
-      <div
-        id="form-status"
-        role="status"
-        aria-live="polite"
-        class="mb-3 text-sm"
-        style="min-height:1rem"
-      >
-      </div>
-      <!-- Indicator shown while periodic captcha checks are running -->
-      <div
-        id="captcha-checking"
-        class="mb-2 text-xs text-yellow-400"
-        style="display:none"
-      >
-        <LocalizedText key="contact.captchaChecking" />
-      </div>
-    </div>
+      <!-- Status message shown below the captcha and above the submit button -->
+      <div class="w-full text-center">
+        <!-- Cooldown display mejorado -->
+        <div
+          id="cooldown-display"
+          class="mb-3 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-center text-yellow-800 dark:border-yellow-700 dark:bg-yellow-900 dark:text-yellow-200"
+          style="display:none"
+        >
+        </div>
 
-    <div class="flex items-center justify-start gap-3">
-      <SubmitBtn id="submit-btn"><LocalizedText key="contact.send" /></SubmitBtn
-      >
-    </div>
-  </form>
+        <div
+          id="form-status"
+          role="status"
+          aria-live="polite"
+          class="mb-3 text-sm"
+          style="min-height:1rem"
+        >
+        </div>
+        <!-- Indicator shown while periodic captcha checks are running -->
+        <div
+          id="captcha-checking"
+          class="mb-2 text-xs text-yellow-400"
+          style="display:none"
+        >
+          <LocalizedText key="contact.captchaChecking" />
+        </div>
+      </div>
 
-  <script type="module" src="/js/contact/contact.js"></script>
-</Card>
+      <div class="flex items-center justify-start gap-3">
+        <SubmitBtn id="submit-btn"
+          ><LocalizedText key="contact.send" /></SubmitBtn
+        >
+      </div>
+    </form>
+
+    <script type="module" src="/js/contact/contact.js"></script>
+  </div>
+</div>

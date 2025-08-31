@@ -9,7 +9,8 @@
 @import './projects.css';
 @import './aboutme.css';
 @import './go-to-top.css';
-
+@import './contact.css';
+@import './about.css';
 /*! Temas personalizados */
 @theme {
   --breakpoint-xs: 32rem;

@@ -1,0 +1,77 @@
+/* Visual styles for Contact card areas — copied from about styles */
+.contact-card-root {
+  transform-origin: center center;
+  will-change: transform;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: 1rem;
+  box-shadow: 0 2px 10px rgba(2, 6, 23, 0.04);
+  backdrop-filter: blur(8px) saturate(1.03);
+  -webkit-backdrop-filter: blur(8px) saturate(1.03);
+  transition:
+    transform 520ms cubic-bezier(0.2, 0.85, 0.25, 1),
+    filter 520ms ease,
+    box-shadow 680ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.contact-card-root:hover {
+  transform: scale(1.02);
+}
+.dark .contact-card-root,
+.contact-card-root.dark {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+.contact-card-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+.contact-border-anim-only {
+  position: relative;
+}
+.contact-border-anim-only::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 6px 20px -6px rgba(0, 0, 0, 0.02),
+    0 0 20px 5px rgba(0, 0, 0, 0.02);
+  transition:
+    box-shadow 90ms ease,
+    border-color 80ms ease;
+}
+.contact-border-anim-only:hover::after {
+  box-shadow:
+    0 0 36px 6px rgba(0, 0, 0, 0),
+    0 0 36px 6px rgba(0, 145, 255, 0.12);
+  border-color: rgba(0, 145, 255, 0.22);
+}
+@media (min-width: 768px) {
+  .contact-card-root::before {
+    content: '';
+    position: absolute;
+    inset: -40%;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.02),
+      rgba(255, 255, 255, 0.01)
+    );
+    transform: rotate(-20deg);
+    opacity: 0.25;
+    filter: blur(2px);
+  }
+}
+.contact-card-root .slider-track {
+  z-index: 10;
+}
+.contact-card-root .slide img,
+.contact-card-root .slide picture {
+  max-width: 100%;
+  height: auto;
+}
