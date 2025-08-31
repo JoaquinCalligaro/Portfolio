@@ -1,11 +1,11 @@
 ---
 // Sección: Layout
 // Propósito: envoltorio de la página (Navbar, Footer, main)
-import background from '../assets/svg/background.svg';
 import Footer from '../components/Footer.astro';
 import GoToTopBtn from '../components/ui/GoToTopBtn.astro';
 import Navbar from '../components/Navbar.astro';
 import '../styles/global.css';
+import Background from '../components/background/Background.tsx';
 ---
 
 <!doctype html>
@@ -28,12 +28,8 @@ import '../styles/global.css';
       defer></script>
   </head>
   <body class="dark:bg-gray-950">
-    <img
-      class="fixed top-0 left-0 -z-10 size-full blur-2xl"
-      src={background.src}
-      alt=""
-      fetchpriority="high"
-    />
+    <Background client:only="react" />
+
     <Navbar />
     <main class="mx-auto flex max-w-screen-lg flex-col gap-12 p-6">
       <slot />
