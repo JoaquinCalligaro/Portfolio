@@ -54,6 +54,29 @@
   border-color: rgba(0, 145, 255, 0.22);
 }
 
+/* Also apply a subtle border/glow on hover to the main about-card-root container */
+.about-card-root::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 6px 20px -6px rgba(0, 0, 0, 0.02),
+    0 0 20px 5px rgba(0, 0, 0, 0.02);
+  transition:
+    box-shadow 90ms ease,
+    border-color 80ms ease;
+}
+
+.about-card-root:hover::after {
+  box-shadow:
+    0 0 36px 6px rgba(0, 0, 0, 0),
+    0 0 36px 6px rgba(0, 145, 255, 0.12);
+  border-color: rgba(0, 145, 255, 0.22);
+}
+
 @media (min-width: 768px) {
   .about-card-root::before {
     content: '';

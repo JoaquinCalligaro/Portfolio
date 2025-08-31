@@ -4,6 +4,8 @@
 import TechStackSection from './TechStackSection.astro';
 import LocalizedText from '../language/LocalizedText.astro';
 import { stacks } from '../../data/techs';
+import '../../styles/techstack.css';
+
 interface Props {
   className?: string;
 }
@@ -14,7 +16,7 @@ const splitClasses = className.split(' ');
 ---
 
 <div
-  class="tech-stack-card mt-20 w-full rounded-4xl border border-gray-300 bg-white/65 p-6 shadow-sm dark:border-neutral-800 dark:bg-gray-950/30"
+  class="tech-stack-card mt-20 w-full rounded-4xl border border-gray-300 bg-white/65 p-6 shadow-sm dark:border-neutral-900/10 dark:bg-gray-950/30"
   class:list={splitClasses}
 >
   <div class="flex flex-col gap-4 pb-10">
