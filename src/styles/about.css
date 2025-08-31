@@ -50,8 +50,9 @@
 .about-border-anim-only:hover::after {
   box-shadow:
     0 0 36px 6px rgba(0, 0, 0, 0),
-    0 0 36px 6px rgba(0, 145, 255, 0.12);
-  border-color: rgba(0, 145, 255, 0.22);
+    0 0 36px 6px rgba(0, 145, 255, 0.14),
+    0 0 48px 8px rgba(0, 145, 255, 0.04);
+  border-color: rgba(0, 145, 255, 0.24);
 }
 
 /* Also apply a subtle border/glow on hover to the main about-card-root container */
@@ -73,8 +74,9 @@
 .about-card-root:hover::after {
   box-shadow:
     0 0 36px 6px rgba(0, 0, 0, 0),
-    0 0 36px 6px rgba(0, 145, 255, 0.12);
-  border-color: rgba(0, 145, 255, 0.22);
+    0 0 36px 6px rgba(0, 145, 255, 0.18),
+    0 0 48px 8px rgba(0, 145, 255, 0.06);
+  border-color: rgba(0, 145, 255, 0.28);
 }
 
 @media (min-width: 768px) {

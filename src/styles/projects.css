@@ -45,8 +45,9 @@
   /* Static border-glow and accent color (applied without hover/animation) */
   box-shadow:
     0 0 36px 6px rgba(0, 0, 0, 0),
-    0 0 36px 6px rgba(0, 145, 255, 0.12);
-  border-color: rgba(0, 145, 255, 0.22);
+    0 0 36px 6px rgba(0, 145, 255, 0.14),
+    0 0 48px 8px rgba(0, 145, 255, 0.04);
+  border-color: rgba(0, 145, 255, 0.24);
 }
 
 .card-root::before {
@@ -469,7 +470,7 @@ animation: pulse-shadow 2s infinite;
 /* Variables específicas para el botón VER TODOS/SHOW ALL  */
 :root {
   /* linea de borde animada */
-  --showmore-primary: #0091ff;
+  --showmore-primary: #0091ff8a;
   /* grosor de la linea */
   --showmore-border-width: 1.5px;
 }
@@ -557,7 +558,8 @@ Modifica: keyframes contract-vertically, animate-* classes
   ========================================================  Variables específicas para el botón VER TODOS/SHOW ALL  */
 :root {
   /* linea de borde animada */
-  --showmore-primary: #36acda9d;
+  /* use same blue as the card glow (with alpha) so the button matches */
+  --showmore-primary: #0091ff8a;
   /* grosor de la linea */
   --showmore-border-width: 1.8px;
 }
