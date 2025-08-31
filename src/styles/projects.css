@@ -42,12 +42,8 @@
 
   -webkit-backdrop-filter: blur(6px) saturate(1.03);
   backdrop-filter: blur(6px) saturate(1.03);
-  /* Static border-glow and accent color (applied without hover/animation) */
-  box-shadow:
-    0 0 36px 6px rgba(0, 0, 0, 0),
-    0 0 36px 6px rgba(0, 145, 255, 0.14),
-    0 0 48px 8px rgba(0, 145, 255, 0.04);
-  border-color: rgba(0, 145, 255, 0.24);
+  /* base subtle shadow (non-colored) - color glow applied on hover via ::after */
+  box-shadow: 0 2px 10px rgba(2, 6, 23, 0.04);
 }
 
 .card-root::before {
@@ -67,6 +63,32 @@
   mix-blend-mode: screen;
   opacity: 0.28; /* intensidad baja por defecto */
   /* No hay transition/animation aquí: efecto estático por petición */
+}
+
+/* Border/glow pseudo-element: base neutral state, color glow only on hover/focus */
+.card-root::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 6px 20px -6px rgba(0, 0, 0, 0.02),
+    0 0 20px 5px rgba(0, 0, 0, 0.02);
+  transition:
+    box-shadow 90ms ease,
+    border-color 80ms ease;
+}
+
+.card-root:hover::after,
+.card-root:focus-within::after,
+.card-root:focus-visible::after {
+  box-shadow:
+    0 0 36px 6px rgba(0, 0, 0, 0),
+    0 0 36px 6px rgba(0, 145, 255, 0.14),
+    0 0 48px 8px rgba(0, 145, 255, 0.04);
+  border-color: rgba(0, 145, 255, 0.24);
 }
 
 /* ============================================================
@@ -470,7 +492,7 @@ animation: pulse-shadow 2s infinite;
 /* Variables específicas para el botón VER TODOS/SHOW ALL  */
 :root {
   /* linea de borde animada */
-  --showmore-primary: #0091ff8a;
+  --showmore-primary: #0091ff;
   /* grosor de la linea */
   --showmore-border-width: 1.5px;
 }
@@ -558,8 +580,7 @@ Modifica: keyframes contract-vertically, animate-* classes
   ========================================================  Variables específicas para el botón VER TODOS/SHOW ALL  */
 :root {
   /* linea de borde animada */
-  /* use same blue as the card glow (with alpha) so the button matches */
-  --showmore-primary: #0091ff8a;
+  --showmore-primary: #36acda9d;
   /* grosor de la linea */
   --showmore-border-width: 1.8px;
 }
