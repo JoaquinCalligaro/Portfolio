@@ -131,7 +131,6 @@ const StarsLayer: React.FC<LayerProps> = ({
         position: 'absolute',
         inset: 0,
         mixBlendMode: 'screen',
-        zIndex: 10,
         pointerEvents: 'none',
       }}
     />
@@ -225,7 +224,6 @@ const ConnectionsLayer: React.FC<LayerProps> = ({
       style={{
         position: 'absolute',
         inset: 0,
-        zIndex: 3,
         pointerEvents: 'none',
       }}
     />
@@ -1032,7 +1030,6 @@ const NebulaLayer: React.FC<LayerProps> = ({
       style={{
         position: 'absolute',
         inset: 0,
-        zIndex: 1,
         pointerEvents: 'none',
       }}
     />
@@ -1112,6 +1109,46 @@ export default function BackgroundExport(props: BackgroundExportProps) {
     typeof speedMultiplier === 'number' ? speedMultiplier : 0.8;
   // key que fuerza remount de las capas cuando cambia (evita bug que requiere F5)
   const [refreshKey, setRefreshKey] = useState(0);
+  // Wait for theme readiness to avoid race with initializer; fallback timeout
+  const [themeReady, setThemeReady] = useState(false);
+
+  useEffect(() => {
+    let done = false;
+    const onReady = () => {
+      if (!done) {
+        done = true;
+        setThemeReady(true);
+      }
+    };
+
+    // If theme already applied on documentElement, consider ready
+    try {
+      if (
+        document.documentElement.classList.contains('dark') ||
+        document.documentElement.classList.contains('light')
+      ) {
+        onReady();
+      }
+    } catch (e) {
+      // ignore
+    }
+
+    // Listen for theme:ready event from ThemeHelper
+    try {
+      window.addEventListener('theme:ready', onReady, { once: true });
+    } catch (e) {
+      // ignore
+    }
+
+    // Fallback timeout to avoid blocking forever
+    const t = setTimeout(onReady, 600);
+    return () => {
+      clearTimeout(t);
+      try {
+        window.removeEventListener('theme:ready', onReady as EventListener);
+      } catch (e) {}
+    };
+  }, []);
 
   useEffect(() => {
     // inicializa util que observa cambios y despacha 'background-refresh'
@@ -1130,7 +1167,7 @@ export default function BackgroundExport(props: BackgroundExportProps) {
   }, []);
   return (
     <div
-      style={{ position: 'fixed', inset: 0, overflow: 'hidden', zIndex: -9999 }}
+      style={{ position: 'fixed', inset: 0, overflow: 'hidden', zIndex: -20 }}
       className="export-background-root"
     >
       {/* Two background layers cross-fading for smooth transition */}
@@ -1141,6 +1178,7 @@ export default function BackgroundExport(props: BackgroundExportProps) {
           inset: 0,
           transition: 'opacity 500ms ease',
           opacity: themeState === 'light' ? 1 : 0,
+          zIndex: -30, // fallback below canvases
           background:
             'radial-gradient(ellipse at top left, #ffdca420, transparent 60%), radial-gradient(ellipse at bottom right, #ffe6b515, transparent 60%), linear-gradient(135deg,#f7fafc 0%,#f0f4f8 50%,#e6eef8 100%)',
         }}
@@ -1152,35 +1190,43 @@ export default function BackgroundExport(props: BackgroundExportProps) {
           inset: 0,
           transition: 'opacity 500ms ease',
           opacity: themeState === 'light' ? 0 : 1,
+          zIndex: -30, // fallback below canvases
           background:
             'radial-gradient(ellipse at top left, #00e1ff20, transparent 60%), radial-gradient(ellipse at bottom right, #00e1ff15, transparent 60%), linear-gradient(135deg,#0F0F23 0%,#1a1a2e 50%,#16213e 100%)',
         }}
       />
-      <div key={refreshKey} style={{ position: 'absolute', inset: 0 }}>
-        <StarsLayer
-          color={color}
-          speed={speedSafe}
-          intensity={intensityNorm}
-          theme={themeState}
-          particleCount={particleCountSafe}
-          speedMultiplier={speedMultiplierSafe}
-        />
-        <ConnectionsLayer
-          color={color}
-          speed={speedSafe}
-          intensity={intensityNorm}
-          theme={themeState}
-          particleCount={particleCountSafe}
-          speedMultiplier={speedMultiplierSafe}
-        />
-        <NebulaLayer
-          color={color}
-          speed={speedSafe}
-          intensity={intensityNorm}
-          theme={themeState}
-          particleCount={particleCountSafe}
-          speedMultiplier={speedMultiplierSafe}
-        />
+      <div
+        key={refreshKey}
+        style={{ position: 'absolute', inset: 0, zIndex: -10 }}
+      >
+        {themeReady ? (
+          <>
+            <StarsLayer
+              color={color}
+              speed={speedSafe}
+              intensity={intensityNorm}
+              theme={themeState}
+              particleCount={particleCountSafe}
+              speedMultiplier={speedMultiplierSafe}
+            />
+            <ConnectionsLayer
+              color={color}
+              speed={speedSafe}
+              intensity={intensityNorm}
+              theme={themeState}
+              particleCount={particleCountSafe}
+              speedMultiplier={speedMultiplierSafe}
+            />
+            <NebulaLayer
+              color={color}
+              speed={speedSafe}
+              intensity={intensityNorm}
+              theme={themeState}
+              particleCount={particleCountSafe}
+              speedMultiplier={speedMultiplierSafe}
+            />
+          </>
+        ) : null}
       </div>
     </div>
   );

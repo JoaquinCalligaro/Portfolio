@@ -22,6 +22,36 @@ import Background from '../components/background/Background.tsx';
       name="description"
       content="A small minimalist web developer portfolio built with Astro and TailwindCSS"
     />
+    <!-- Inline theme initializer: runs as early as possible to avoid white flash -->
+    <script>
+      (function () {
+        try {
+          let stored = null;
+          try {
+            stored = localStorage.getItem('color-theme');
+          } catch (err) {
+            console.debug('Unable to read theme from localStorage', err);
+            stored = null;
+          }
+          const prefersDark =
+            typeof window !== 'undefined' &&
+            window.matchMedia &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const theme = stored || (prefersDark ? 'dark' : 'light');
+
+          if (theme === 'dark') {
+            try {
+              document.documentElement.classList.add('dark');
+            } catch (err) {
+              console.debug('Failed to add dark class', err);
+            }
+            // temporary background avoided: rely on CSS fallback in global.css
+          }
+        } catch (err) {
+          console.debug('Theme initializer error', err);
+        }
+      })();
+    </script>
     <!-- Turnstile script is injected only on pages that need it (Contact.astro) -->
   </head>
   <body class="page-root">
@@ -33,6 +63,7 @@ import Background from '../components/background/Background.tsx';
     </main>
     <GoToTopBtn />
     <Footer />
+    <script src="/js/theme.js" defer></script>
   </body>
   <style is:global>
     * {

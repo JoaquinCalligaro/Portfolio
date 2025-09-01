@@ -31,3 +31,14 @@
   max-width: 100vw;
   position: relative;
 }
+
+.page-root {
+  z-index: 10;
+}
+
+/* Fallback solid background for dark mode to avoid white flashes while the background component initializes */
+html.dark,
+html.dark body,
+.dark .page-root {
+  background-color: #071029 !important;
+}
