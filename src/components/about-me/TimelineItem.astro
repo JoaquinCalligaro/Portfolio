@@ -21,43 +21,24 @@ interface Props {
 
 const { title, date, description, badgeText, iconClass, iconLabel } =
   Astro.props as Props;
-
-// Nota: use el slot `icon` para reemplazar el icono por item. Ejemplo:
-// <TimelineItem title="Foo" date="..">
-//   <MyIcon slot="icon" class="h-5 w-5" />
-// </TimelineItem>
 ---
 
-<li class="ms-8 mb-10">
-  <span
-    class="absolute -start-3 flex size-6 items-center justify-center rounded-full bg-blue-300 ring-8 ring-blue-100 dark:bg-blue-800 dark:ring-blue-950/60"
-  >
+<li>
+  <span>
     <Education
-      class={`${iconClass || 'size-4 text-gray-600 dark:text-gray-400'}`}
+      class={`${iconClass}`}
       {...iconLabel
         ? { role: 'img', 'aria-label': iconLabel }
         : { 'aria-hidden': 'true' }}
     />
     <slot name="icon" />
   </span>
-  <h3
-    class="mb-1 flex items-center text-lg font-semibold text-gray-950 dark:text-white"
-  >
+  <h3>
     {title}
-    {
-      badgeText && (
-        <span class="ms-3 me-2 rounded-xs bg-blue-100 px-2.5 py-0.5 text-sm font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-          {badgeText}
-        </span>
-      )
-    }
+    {badgeText && <span>{badgeText}</span>}
   </h3>
-  <time class="mb-2 block text-sm leading-none font-normal text-gray-500"
-    >{date}</time
-  >
-  <p
-    class="mb-4 text-sm font-normal text-gray-600 sm:text-base dark:text-gray-400"
-  >
+  <time>{date}</time>
+  <p>
     {description}
   </p>
   <slot name="extra-content" />
