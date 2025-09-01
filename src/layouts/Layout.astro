@@ -22,10 +22,7 @@ import Background from '../components/background/Background.tsx';
       name="description"
       content="A small minimalist web developer portfolio built with Astro and TailwindCSS"
     />
-    <script
-      src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-      async
-      defer></script>
+    <!-- Turnstile script is injected only on pages that need it (Contact.astro) -->
   </head>
   <body class="page-root">
     <Background client:only="react" />

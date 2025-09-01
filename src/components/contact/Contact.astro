@@ -3,6 +3,7 @@ import '../../styles/contact.css';
 import LocalizedText from '../language/LocalizedText.astro';
 
 import SubmitBtn from '../ui/SubmitBtn.astro';
+import ReloadCaptchaBtn from '../ui/ReloadCaptchaBtn.astro';
 const SITE_KEY =
   import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '0x4AAAAAABwHlflWrLMpjcOh';
 // Formspree action must be provided via env
@@ -36,6 +37,9 @@ const FORMSPREE_ACTION = import.meta.env.PUBLIC_FORMSPREE_ACTION;
       </div>
 
       <div>
+        <!-- Actions related to captcha (separate from form-status so contact.js won't overwrite) -->
+        <!-- moved outside the <form> later to prevent removal on form.reset() -->
+
         <label
           for="email"
           class="block text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -157,6 +161,26 @@ const FORMSPREE_ACTION = import.meta.env.PUBLIC_FORMSPREE_ACTION;
       </h3>
 
       <!-- Captcha con callbacks mejorados -->
+      <!-- Load Turnstile script only if not already present to avoid double-load warnings -->
+      <script is:inline>
+        (function () {
+          try {
+            if (
+              typeof window !== 'undefined' &&
+              !window._turnstile_loader_injected
+            ) {
+              window._turnstile_loader_injected = true;
+              const s = document.createElement('script');
+              s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+              s.async = true;
+              s.defer = true;
+              document.head.appendChild(s);
+            }
+          } catch {
+            // fail silently
+          }
+        })();
+      </script>
       <div
         class="cf-turnstile mt-2 flex w-full items-center justify-center text-center"
         data-sitekey={SITE_KEY}
@@ -180,17 +204,16 @@ const FORMSPREE_ACTION = import.meta.env.PUBLIC_FORMSPREE_ACTION;
           id="form-status"
           role="status"
           aria-live="polite"
-          class="mb-3 text-sm"
+          class="mb-3 flex flex-col items-center gap-2 text-sm"
           style="min-height:1rem"
         >
         </div>
-        <!-- Indicator shown while periodic captcha checks are running -->
-        <div
-          id="captcha-checking"
-          class="mb-2 text-xs text-yellow-400"
-          style="display:none"
-        >
-          <LocalizedText key="contact.captchaChecking" />
+
+        <!-- Actions related to captcha (inside the form, but outside form-status so it's not removed) -->
+        <div id="captcha-actions" class="mb-3 w-full text-center">
+          <ReloadCaptchaBtn id="reload-captcha-btn" class="mt-2">
+            Reintentar captcha
+          </ReloadCaptchaBtn>
         </div>
       </div>
 
@@ -200,6 +223,76 @@ const FORMSPREE_ACTION = import.meta.env.PUBLIC_FORMSPREE_ACTION;
         >
       </div>
     </form>
+
+    <!-- Small inline helper to wire the retry button to the captcha helper. It
+         will attempt to import the captcha module and call reloadCaptcha(),
+         or fall back to global handlers. Kept minimal and resilient. -->
+    <script is:inline>
+      (function () {
+        try {
+          const btn = document.getElementById('reload-captcha-btn');
+          if (!btn) return;
+
+          // Show the button by default so user can manually attempt if captcha not detected
+          try {
+            btn.style.display = 'inline-flex';
+          } catch (e) {
+            console.debug('Could not set reload button display', e);
+          }
+
+          btn.addEventListener('click', async function () {
+            try {
+              btn.disabled = true;
+              btn.classList.add('loading-state');
+
+              let mod = null;
+              try {
+                mod = await import('/js/contact/captcha.js');
+              } catch (e) {
+                console.debug('Failed dynamic import captcha helper', e);
+                mod = null;
+              }
+
+              if (mod && typeof mod.reloadCaptcha === 'function') {
+                try {
+                  mod.reloadCaptcha();
+                } catch (e) {
+                  console.debug('mod.reloadCaptcha failed', e);
+                }
+              } else if (globalThis.reloadCaptcha) {
+                try {
+                  globalThis.reloadCaptcha();
+                } catch (e) {
+                  console.debug('global reloadCaptcha failed', e);
+                }
+              } else {
+                try {
+                  globalThis.dispatchEvent(new CustomEvent('captcha:reload'));
+                } catch (e) {
+                  console.debug('dispatch captcha:reload failed', e);
+                }
+              }
+
+              // optional quick feedback could be added here, but avoid
+              // touching `form-status` to prevent accidental removals.
+            } catch (err) {
+              console.debug('Error in reload-captcha handler', err);
+            } finally {
+              globalThis.setTimeout(() => {
+                try {
+                  btn.disabled = false;
+                  btn.classList.remove('loading-state');
+                } catch (e) {
+                  console.debug('Failed restoring reload button state', e);
+                }
+              }, 1400);
+            }
+          });
+        } catch (e) {
+          console.debug('Failed to init reload-captcha btn', e);
+        }
+      })();
+    </script>
 
     <script type="module" src="/js/contact/contact.js"></script>
   </div>

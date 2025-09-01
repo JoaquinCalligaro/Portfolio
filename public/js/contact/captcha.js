@@ -10,6 +10,11 @@ let _cfResponseInput = null;
 let _lastToken = '';
 let _widgetId = null;
 let _siteKey = null;
+// Render retry state
+let _renderAttempts = 0;
+const _maxRenderAttempts = 4; // safe limit
+let _checkTokenTimer = null;
+const _renderBackoffBase = 300; // ms
 
 // Actualiza el estado del captcha y notifica con el evento 'captcha:change'
 function setCaptchaState(ok, token) {
@@ -35,6 +40,17 @@ function setCaptchaState(ok, token) {
     globalThis.dispatchEvent(evt);
   } catch {}
 
+  // If we received a valid token, clear retry state
+  try {
+    if (_lastToken) {
+      _renderAttempts = 0;
+      if (_checkTokenTimer) {
+        globalThis.clearTimeout(_checkTokenTimer);
+        _checkTokenTimer = null;
+      }
+    }
+  } catch {}
+
   console.log('Captcha state updated:', {
     ok: _captchaOk,
     hasToken: !!_lastToken,
@@ -49,9 +65,10 @@ function renderCaptchaManually() {
   _siteKey = container.getAttribute('data-sitekey') || _siteKey;
   if (!_siteKey) return;
 
-  const tryRender = () => {
+  // Attempt render with retries and backoff if token doesn't arrive
+  const attemptRender = () => {
     if (!globalThis.turnstile?.render) {
-      globalThis.setTimeout(tryRender, 100);
+      globalThis.setTimeout(attemptRender, 100);
       return;
     }
 
@@ -67,12 +84,40 @@ function renderCaptchaManually() {
       };
 
       _widgetId = globalThis.turnstile.render(container, minimalOptions);
+
+      // increment attempts and schedule a token check
+      _renderAttempts = (_renderAttempts || 0) + 1;
+      if (_checkTokenTimer) {
+        clearTimeout(_checkTokenTimer);
+        _checkTokenTimer = null;
+      }
+
+      _checkTokenTimer = globalThis.setTimeout(() => {
+        try {
+          const token =
+            _cfResponseInput?.value || globalThis.__captcha_token || '';
+          if (!token) {
+            if (_renderAttempts < _maxRenderAttempts) {
+              const delay = _renderBackoffBase * Math.pow(2, _renderAttempts);
+              // intermediate retry (silenced in console)
+              globalThis.setTimeout(attemptRender, delay);
+            } else {
+              console.error('Captcha render retries exhausted');
+              setCaptchaState(false, '');
+            }
+          }
+        } catch (err) {
+          console.debug('Error during captcha token check:', err);
+        }
+      }, 900);
     } catch (err) {
-      console.error('Error in renderCaptchaManually:', err);
+      console.debug('Error in renderCaptchaManually:', err);
     }
   };
 
-  tryRender();
+  // reset counter on fresh call
+  _renderAttempts = 0;
+  attemptRender();
 }
 
 if (
@@ -125,5 +170,13 @@ export function resetCaptcha() {
 export function reloadCaptcha() {
   console.log('Reloading captcha');
   setCaptchaState(false, '');
+  // reset attempts and timers then try render
+  try {
+    _renderAttempts = 0;
+    if (_checkTokenTimer) {
+      globalThis.clearTimeout(_checkTokenTimer);
+      _checkTokenTimer = null;
+    }
+  } catch {}
   globalThis.setTimeout(renderCaptchaManually, 150);
 }
