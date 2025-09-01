@@ -4,7 +4,32 @@
 // IMPORTANTE: El fondo tiene z-index: -9999 para estar siempre debajo del contenido
 /* eslint-disable */
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import initBackgroundRefresh from './refreshBackground';
+
+// Light-mode intensity configuration (ajusta efectos cuando el tema es claro)
+const LIGHT_MODE_CONFIG = {
+  starsCountMultiplier: 1.6, // este ajuste aumenta la cantidad de estrellas
+  starsOpacityMultiplier: 1.8, // este ajuste sube la opacidad de las estrellas
+  starsTwinkleBoost: 2, // este ajuste intensifica el parpadeo
+  connectionsCountMultiplier: 2, // este ajuste aumenta nodos/conexiones
+  connectionsOpacityMultiplier: 2, // este ajuste sube la opacidad de las conexiones
+  nebulaIntensityMultiplier: 2.0, // este ajuste hace la nebulosa más densa
+  nebulaSaturationBoost: 1.3, // este ajuste aumenta la saturación de la nebulosa
+  nebulaLightnessBoost: 1.5, // este ajuste aumenta la luminosidad de la nebulosa
+};
+
+// Dark-mode configuration (valores por defecto; ajústalos si quieres cambiar dark mode)
+const DARK_MODE_CONFIG = {
+  starsCountMultiplier: 1.0, // mantener cantidad de estrellas en dark
+  starsOpacityMultiplier: 1.0, // mantener opacidad de estrellas en dark
+  starsTwinkleBoost: 1.0, // mantener parpadeo en dark
+  connectionsCountMultiplier: 1.0, // mantener nodos/conexiones en dark
+  connectionsOpacityMultiplier: 1.0, // mantener opacidad de conexiones en dark
+  nebulaIntensityMultiplier: 1.0, // mantener intensidad de nebulosa en dark
+  nebulaSaturationBoost: 1.0, // mantener saturación de nebulosa en dark
+  nebulaLightnessBoost: 1.0, // mantener luminosidad de nebulosa en dark
+};
 
 interface LayerProps {
   color: string;
@@ -19,7 +44,12 @@ function speedMul(s: 'slow' | 'normal' | 'fast') {
   if (s === 'fast') return 2;
   return 1;
 }
-const StarsLayer: React.FC<LayerProps> = ({ color, speed, intensity }) => {
+const StarsLayer: React.FC<LayerProps> = ({
+  color,
+  speed,
+  intensity,
+  theme,
+}) => {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const c = ref.current;
@@ -32,8 +62,16 @@ const StarsLayer: React.FC<LayerProps> = ({ color, speed, intensity }) => {
     };
     resize();
     addEventListener('resize', resize);
-    const mul = speedMul(speed);
-    const count = Math.floor(200 * intensity);
+    const themeIsLight = theme === 'light';
+    const chosenStarsConfig = themeIsLight
+      ? LIGHT_MODE_CONFIG
+      : DARK_MODE_CONFIG; // configura estrellas según tema
+    const count = Math.floor(
+      200 * intensity * chosenStarsConfig.starsCountMultiplier
+    ); // usa config por tema
+    const starOpacityMultiplier = chosenStarsConfig.starsOpacityMultiplier; // usa config por tema
+    const twinkleBoost = chosenStarsConfig.starsTwinkleBoost; // usa config por tema
+    const mul = speedMul(speed); // multiplicador de velocidad según el ajuste
     const stars = Array.from({ length: count }, () => ({
       x: Math.random() * c.width,
       y: Math.random() * c.height,
@@ -57,10 +95,15 @@ const StarsLayer: React.FC<LayerProps> = ({ color, speed, intensity }) => {
       g.addColorStop(1, color + '02');
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, c.width, c.height);
+      // subtle warm overlay in light mode to make the effect more colorful
+      if (themeIsLight) {
+        ctx.fillStyle = 'rgba(255,230,180,0.06)';
+        ctx.fillRect(0, 0, c.width, c.height);
+      }
       stars.forEach((s) => {
         s.phase += s.tw * mul;
-        const twinkle = (Math.sin(s.phase) + 1) * 0.5;
-        const op = s.o * (0.3 + twinkle * 0.7);
+        const twinkle = (Math.sin(s.phase) + 1) * 0.5 * twinkleBoost;
+        const op = s.o * (0.3 + twinkle * 0.7) * starOpacityMultiplier;
         ctx.save();
         ctx.globalAlpha = op;
         ctx.translate(s.x, s.y);
@@ -122,6 +165,7 @@ const ConnectionsLayer: React.FC<LayerProps> = ({
   color,
   speed,
   intensity,
+  theme,
 }) => {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
@@ -136,13 +180,24 @@ const ConnectionsLayer: React.FC<LayerProps> = ({
     resize();
     addEventListener('resize', resize);
     const speedMultiplier = speedMul(speed);
-    const nodes = Array.from({ length: Math.floor(15 * intensity) }, () => ({
-      x: Math.random() * c.width,
-      y: Math.random() * c.height,
-      vx: (Math.random() - 0.5) * speedMultiplier * 40,
-      vy: (Math.random() - 0.5) * speedMultiplier * 40,
-      r: Math.random() * 4 + 2,
-    }));
+    const themeIsLight = theme === 'light';
+    const chosenConnectionsConfig = themeIsLight
+      ? LIGHT_MODE_CONFIG
+      : DARK_MODE_CONFIG; // configura conexiones por tema
+    const nodes = Array.from(
+      {
+        length: Math.floor(
+          15 * intensity * chosenConnectionsConfig.connectionsCountMultiplier
+        ),
+      },
+      () => ({
+        x: Math.random() * c.width,
+        y: Math.random() * c.height,
+        vx: (Math.random() - 0.5) * speedMultiplier * 40,
+        vy: (Math.random() - 0.5) * speedMultiplier * 40,
+        r: Math.random() * 4 + 2,
+      })
+    );
     let f: number;
     const loop = () => {
       ctx.clearRect(0, 0, c.width, c.height);
@@ -153,8 +208,11 @@ const ConnectionsLayer: React.FC<LayerProps> = ({
         if (n.y <= 0 || n.y >= c.height) n.vy *= -1;
       });
       ctx.strokeStyle = color;
-      ctx.lineWidth = 1;
-      ctx.globalAlpha = 0.3 * intensity;
+      ctx.lineWidth = themeIsLight ? 1.6 : 1; // grosor adaptativo
+      ctx.globalAlpha =
+        (themeIsLight
+          ? 0.45 * chosenConnectionsConfig.connectionsOpacityMultiplier
+          : 0.3) * intensity; // opacidad adaptativa
       nodes.forEach((n1, i) => {
         nodes.slice(i + 1).forEach((n2) => {
           const dx = n1.x - n2.x;
@@ -579,7 +637,12 @@ const NebulaLayer: React.FC<LayerProps> = ({
       ctx.scale(zoomBase, zoomBase);
       ctx.translate(-w / 2, -h / 2);
       timeRef.current += 0.006 * speedValue * sMult;
-      const baseOpacity = effectiveTheme === 'light' ? 0.15 : intensity * 0.8;
+      // Make nebula more visible in light theme by increasing base opacity and intensity
+      const baseOpacity =
+        effectiveTheme === 'light'
+          ? Math.max(0.22, intensity * 0.8) // higher base for light mode
+          : intensity * 0.8;
+      const nebulaIntensityMultiplier = effectiveTheme === 'light' ? 2.2 : 1; // stronger multiplier in light
       ctx.globalCompositeOperation = 'source-over';
       const grad = ctx.createRadialGradient(
         w / 2,
@@ -590,10 +653,11 @@ const NebulaLayer: React.FC<LayerProps> = ({
         Math.max(w, h) * 0.7
       );
       if (effectiveTheme === 'light') {
-        grad.addColorStop(0, 'hsla(' + mainHSL.h + ',80%,95%,0.55)');
-        grad.addColorStop(0.3, 'hsla(' + mainHSL.h + ',90%,85%,0.22)');
-        grad.addColorStop(0.7, 'hsla(' + mainHSL.h + ',80%,80%,0.10)');
-        grad.addColorStop(1, 'rgba(255,255,255,0.01)');
+        // stronger, more saturated stops for light mode so clouds remain visible
+        grad.addColorStop(0, 'hsla(' + mainHSL.h + ',90%,80%,0.9)');
+        grad.addColorStop(0.3, 'hsla(' + mainHSL.h + ',92%,75%,0.5)');
+        grad.addColorStop(0.7, 'hsla(' + mainHSL.h + ',86%,70%,0.25)');
+        grad.addColorStop(1, 'rgba(255,255,255,0.03)');
       } else {
         grad.addColorStop(0, 'hsla(' + mainHSL.h + ',80%,38%,0.38)');
         grad.addColorStop(0.3, 'hsla(' + mainHSL.h + ',90%,22%,0.18)');
@@ -604,8 +668,9 @@ const NebulaLayer: React.FC<LayerProps> = ({
       ctx.fillRect(0, 0, w, h);
       if (!starsInit || staticStars.length === 0) initStars(w, h);
       ctx.save();
+      // Use 'screen' on light theme so nebula remains visible over bright backgrounds
       ctx.globalCompositeOperation =
-        effectiveTheme === 'light' ? 'multiply' : 'screen';
+        effectiveTheme === 'light' ? 'screen' : 'multiply';
       for (let i = 0; i < staticStars.length; i++) {
         const s = staticStars[i];
         const tw =
@@ -656,8 +721,9 @@ const NebulaLayer: React.FC<LayerProps> = ({
             shootingStars.splice(i, 1);
         }
       }
+      // Draw clouds: use 'screen' in light mode for vivid result, 'multiply' in dark
       ctx.globalCompositeOperation =
-        effectiveTheme === 'light' ? 'multiply' : 'screen';
+        effectiveTheme === 'light' ? 'screen' : 'multiply';
       cloudsRef.current.forEach((cloud, idx) => {
         if (!mobileSimple) {
           cloud.rotation += cloud.rotationSpeed;
@@ -681,7 +747,8 @@ const NebulaLayer: React.FC<LayerProps> = ({
           const layerOpacity =
             baseOpacity *
             cloud.density *
-            (mobileSimple ? 0.12 : (1 - L * 0.2) * 0.18);
+            (mobileSimple ? 0.12 : (1 - L * 0.2) * 0.18) *
+            nebulaIntensityMultiplier; // already accounts for light/dark
           const layerOffset = mobileSimple ? 0 : L * 8;
           const rotX =
             finalX + Math.cos(cloud.rotation + L * 0.2) * layerOffset;
@@ -696,9 +763,26 @@ const NebulaLayer: React.FC<LayerProps> = ({
             layerSize
           );
           if (effectiveTheme === 'light') {
+            // boost saturation and lightness slightly for more vivid nebula in light mode
+            const sBoost = Math.min(
+              100,
+              55 * LIGHT_MODE_CONFIG.nebulaSaturationBoost
+            );
+            const lBoost = Math.min(
+              60,
+              26 * LIGHT_MODE_CONFIG.nebulaLightnessBoost
+            );
             g2.addColorStop(
               0,
-              'hsla(' + cloud.hue + ',55%,26%,' + layerOpacity + ')'
+              'hsla(' +
+                cloud.hue +
+                ',' +
+                sBoost +
+                '%,' +
+                lBoost +
+                '%,' +
+                layerOpacity +
+                ')'
             );
             g2.addColorStop(
               0.6,
@@ -744,7 +828,7 @@ const NebulaLayer: React.FC<LayerProps> = ({
         }
       });
       ctx.globalCompositeOperation =
-        effectiveTheme === 'light' ? 'multiply' : 'screen';
+        effectiveTheme === 'light' ? 'screen' : 'multiply';
       particlesRef.current.forEach((p, idx) => {
         const noiseX = Math.floor(p.x / noiseCellRef.current);
         const noiseY = Math.floor(p.y / noiseCellRef.current);
@@ -1003,54 +1087,124 @@ export default function BackgroundExport(props: BackgroundExportProps) {
   const color = animationColor || '#00e1ff';
   const speedSafe: 'slow' | 'normal' | 'fast' =
     speed === 'slow' || speed === 'fast' || speed === 'normal' ? speed : 'slow';
-  const themeSafe: 'light' | 'dark' =
-    theme === 'light' || theme === 'dark'
-      ? theme
-      : window.matchMedia &&
-          window.matchMedia('(prefers-color-scheme: light)').matches
-        ? 'light'
-        : 'dark';
+  const [themeState, setThemeState] = useState<'light' | 'dark'>(() => {
+    if (theme === 'light' || theme === 'dark') return theme;
+    try {
+      const ls = localStorage.getItem('color-theme');
+      if (ls === 'light' || ls === 'dark') return ls;
+      if (document.documentElement.classList.contains('dark')) return 'dark';
+      if (
+        window.matchMedia &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches
+      )
+        return 'dark';
+    } catch (e) {
+      /* ignore */
+    }
+    return 'light';
+  });
+
+  useEffect(() => {
+    // Observe changes to <html class="..."> to detect theme toggles applied by Navbar
+    const mo = new MutationObserver(() => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setThemeState(isDark ? 'dark' : 'light');
+    });
+    mo.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+
+    // Listen for localStorage changes from other tabs
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'color-theme') {
+        const v = e.newValue;
+        if (v === 'light' || v === 'dark') setThemeState(v);
+      }
+    };
+    window.addEventListener('storage', onStorage);
+
+    return () => {
+      mo.disconnect();
+      window.removeEventListener('storage', onStorage);
+    };
+  }, []);
   const particleCountSafe =
     typeof particleCount === 'number' ? particleCount : 180;
   const speedMultiplierSafe =
     typeof speedMultiplier === 'number' ? speedMultiplier : 0.8;
+  // key que fuerza remount de las capas cuando cambia (evita bug que requiere F5)
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useEffect(() => {
+    // inicializa util que observa cambios y despacha 'background-refresh'
+    const cleanupInit = initBackgroundRefresh();
+
+    const onRefresh = () => setRefreshKey((k) => k + 1);
+    window.addEventListener('background-refresh', onRefresh as EventListener);
+
+    return () => {
+      cleanupInit();
+      window.removeEventListener(
+        'background-refresh',
+        onRefresh as EventListener
+      );
+    };
+  }, []);
   return (
     <div
       style={{ position: 'fixed', inset: 0, overflow: 'hidden', zIndex: -9999 }}
       className="export-background-root"
     >
+      {/* Two background layers cross-fading for smooth transition */}
       <div
+        aria-hidden
         style={{
           position: 'absolute',
           inset: 0,
+          transition: 'opacity 500ms ease',
+          opacity: themeState === 'light' ? 1 : 0,
+          background:
+            'radial-gradient(ellipse at top left, #ffdca420, transparent 60%), radial-gradient(ellipse at bottom right, #ffe6b515, transparent 60%), linear-gradient(135deg,#f7fafc 0%,#f0f4f8 50%,#e6eef8 100%)',
+        }}
+      />
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          inset: 0,
+          transition: 'opacity 500ms ease',
+          opacity: themeState === 'light' ? 0 : 1,
           background:
             'radial-gradient(ellipse at top left, #00e1ff20, transparent 60%), radial-gradient(ellipse at bottom right, #00e1ff15, transparent 60%), linear-gradient(135deg,#0F0F23 0%,#1a1a2e 50%,#16213e 100%)',
         }}
       />
-      <StarsLayer
-        color={color}
-        speed={speedSafe}
-        intensity={intensityNorm}
-        theme={themeSafe}
-        particleCount={particleCountSafe}
-        speedMultiplier={speedMultiplierSafe}
-      />
-      <ConnectionsLayer
-        color={color}
-        speed={speedSafe}
-        intensity={intensityNorm}
-        theme={themeSafe}
-        particleCount={particleCountSafe}
-        speedMultiplier={speedMultiplierSafe}
-      />
-      <NebulaLayer
-        color={color}
-        speed={speedSafe}
-        intensity={intensityNorm}
-        theme={themeSafe}
-        particleCount={particleCountSafe}
-        speedMultiplier={speedMultiplierSafe}
-      />
+      <div key={refreshKey} style={{ position: 'absolute', inset: 0 }}>
+        <StarsLayer
+          color={color}
+          speed={speedSafe}
+          intensity={intensityNorm}
+          theme={themeState}
+          particleCount={particleCountSafe}
+          speedMultiplier={speedMultiplierSafe}
+        />
+        <ConnectionsLayer
+          color={color}
+          speed={speedSafe}
+          intensity={intensityNorm}
+          theme={themeState}
+          particleCount={particleCountSafe}
+          speedMultiplier={speedMultiplierSafe}
+        />
+        <NebulaLayer
+          color={color}
+          speed={speedSafe}
+          intensity={intensityNorm}
+          theme={themeState}
+          particleCount={particleCountSafe}
+          speedMultiplier={speedMultiplierSafe}
+        />
+      </div>
     </div>
   );
 }
