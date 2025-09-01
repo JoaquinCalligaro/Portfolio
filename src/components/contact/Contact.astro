@@ -211,9 +211,12 @@ const FORMSPREE_ACTION = import.meta.env.PUBLIC_FORMSPREE_ACTION;
 
         <!-- Actions related to captcha (inside the form, but outside form-status so it's not removed) -->
         <div id="captcha-actions" class="mb-3 w-full text-center">
-          <ReloadCaptchaBtn id="reload-captcha-btn" class="mt-2">
-            Reintentar captcha
-          </ReloadCaptchaBtn>
+          <ReloadCaptchaBtn
+            id="reload-captcha-btn"
+            class="mt-2"
+            localizedText="contact.retryCaptcha"
+            localizedTextLoading="contact.retryingCaptcha"
+          />
         </div>
       </div>
 
