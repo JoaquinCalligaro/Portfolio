@@ -77,23 +77,7 @@
     0 0 48px 8px rgba(0, 145, 255, 0.04);
   border-color: rgba(0, 145, 255, 0.24);
 }
-@media (min-width: 768px) {
-  .contact-card-root::before {
-    content: '';
-    position: absolute;
-    inset: -40%;
-    z-index: 0;
-    pointer-events: none;
-    background: linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.02),
-      rgba(255, 255, 255, 0.01)
-    );
-    transform: rotate(-20deg);
-    opacity: 0.25;
-    filter: blur(2px);
-  }
-}
+
 .contact-card-root .slider-track {
   z-index: 10;
 }

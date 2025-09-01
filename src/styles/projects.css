@@ -158,60 +158,6 @@
   animation: none;
 }
 
-/* Re-activate the sheen and performance hints on medium+ screens */
-@media (min-width: 768px) {
-  .glassmorph-effect {
-    /* performance hints for complex visual effects */
-    will-change: transform, filter;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-    transform-style: preserve-3d;
-  }
-
-  /* Make the sheen element wider and centered so the animated sweep
-     reliably crosses the visible area even after rotation. */
-  .glassmorph-effect::before {
-    opacity: 0.35;
-    transition:
-      opacity 520ms ease,
-      transform 520ms ease;
-    left: -50%;
-    width: 200%;
-    height: 220%;
-    transform-origin: center center;
-    transform: rotate(-20deg) translateZ(0);
-    will-change: transform, opacity;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    animation: sheen-move-md 10s ease-in-out infinite;
-  }
-
-  .glassmorph-effect:hover::before {
-    opacity: 0.65;
-    transform: rotate(-20deg) translateY(-2px) scale(1.005);
-  }
-
-  /* MD+ sheen keyframes: translate the (wider) pseudo-element fully left->right */
-  @keyframes sheen-move-md {
-    0% {
-      transform: rotate(-20deg) translate3d(-100%, 0, 0);
-      opacity: 0;
-    }
-    25% {
-      opacity: 0.9;
-    }
-    75% {
-      opacity: 0.9;
-    }
-    100% {
-      transform: rotate(-20deg) translate3d(100%, 0, 0);
-      opacity: 0;
-    }
-  }
-}
-
 /* ============================================================
   ! Glow (iconos)
   Modifica: .glow-effect, [class*='icon-'], animaciones 'glowing' y 'pulse-shadow'

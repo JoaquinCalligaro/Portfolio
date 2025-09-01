@@ -79,24 +79,6 @@
   border-color: rgba(0, 145, 255, 0.28);
 }
 
-@media (min-width: 768px) {
-  .about-card-root::before {
-    content: '';
-    position: absolute;
-    inset: -40%;
-    z-index: 0;
-    pointer-events: none;
-    background: linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.02),
-      rgba(255, 255, 255, 0.01)
-    );
-    transform: rotate(-20deg);
-    opacity: 0.25;
-    filter: blur(2px);
-  }
-}
-
 /* small utilities reused by about */
 .about-card-root .slider-track {
   z-index: 10;
