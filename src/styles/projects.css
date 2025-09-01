@@ -42,7 +42,7 @@
 
   -webkit-backdrop-filter: blur(6px) saturate(1.03);
   backdrop-filter: blur(6px) saturate(1.03);
-  /* base subtle shadow (non-colored) - color glow applied on hover via ::after */
+
   box-shadow: 0 2px 10px rgba(2, 6, 23, 0.04);
 }
 

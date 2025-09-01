@@ -51,6 +51,32 @@
     0 0 48px 8px rgba(0, 145, 255, 0.04);
   border-color: rgba(0, 145, 255, 0.24);
 }
+
+/* Border/glow pseudo-element for the contact card: neutral base and blue glow on hover/focus */
+.contact-card-root::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 6px 20px -6px rgba(0, 0, 0, 0.02),
+    0 0 20px 5px rgba(0, 0, 0, 0.02);
+  transition:
+    box-shadow 90ms ease,
+    border-color 80ms ease;
+}
+
+.contact-card-root:hover::after,
+.contact-card-root:focus-within::after,
+.contact-card-root:focus-visible::after {
+  box-shadow:
+    0 0 36px 6px rgba(0, 0, 0, 0),
+    0 0 36px 6px rgba(0, 145, 255, 0.14),
+    0 0 48px 8px rgba(0, 145, 255, 0.04);
+  border-color: rgba(0, 145, 255, 0.24);
+}
 @media (min-width: 768px) {
   .contact-card-root::before {
     content: '';
