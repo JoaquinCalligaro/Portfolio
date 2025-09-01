@@ -6,30 +6,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import initBackgroundRefresh from './refreshBackground';
-
-// Light-mode intensity configuration (ajusta efectos cuando el tema es claro)
-const LIGHT_MODE_CONFIG = {
-  starsCountMultiplier: 1.6, // este ajuste aumenta la cantidad de estrellas
-  starsOpacityMultiplier: 1.8, // este ajuste sube la opacidad de las estrellas
-  starsTwinkleBoost: 2, // este ajuste intensifica el parpadeo
-  connectionsCountMultiplier: 2, // este ajuste aumenta nodos/conexiones
-  connectionsOpacityMultiplier: 2, // este ajuste sube la opacidad de las conexiones
-  nebulaIntensityMultiplier: 2.0, // este ajuste hace la nebulosa más densa
-  nebulaSaturationBoost: 1.3, // este ajuste aumenta la saturación de la nebulosa
-  nebulaLightnessBoost: 1.5, // este ajuste aumenta la luminosidad de la nebulosa
-};
-
-// Dark-mode configuration (valores por defecto; ajústalos si quieres cambiar dark mode)
-const DARK_MODE_CONFIG = {
-  starsCountMultiplier: 1.0, // mantener cantidad de estrellas en dark
-  starsOpacityMultiplier: 1.0, // mantener opacidad de estrellas en dark
-  starsTwinkleBoost: 1.0, // mantener parpadeo en dark
-  connectionsCountMultiplier: 1.0, // mantener nodos/conexiones en dark
-  connectionsOpacityMultiplier: 1.0, // mantener opacidad de conexiones en dark
-  nebulaIntensityMultiplier: 1.0, // mantener intensidad de nebulosa en dark
-  nebulaSaturationBoost: 1.0, // mantener saturación de nebulosa en dark
-  nebulaLightnessBoost: 1.0, // mantener luminosidad de nebulosa en dark
-};
+import { LIGHT_MODE_CONFIG, DARK_MODE_CONFIG } from './config';
 
 interface LayerProps {
   color: string;
