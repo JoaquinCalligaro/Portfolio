@@ -1,3 +1,5 @@
+/* eslint-env browser */
+/* global window, document, CustomEvent, console */
 // Client-side theme helper
 // Responsibilities:
 // - provide get/set for theme in localStorage
@@ -10,16 +12,16 @@
   function safeGet(key) {
     try {
       return global.localStorage.getItem(key);
-    } catch (e) {
-      console.debug('localStorage.get failed', e);
+    } catch (err) {
+      console.debug('localStorage.get failed', err);
       return null;
     }
   }
   function safeSet(key, value) {
     try {
       global.localStorage.setItem(key, value);
-    } catch (e) {
-      console.debug('localStorage.set failed', e);
+    } catch (err) {
+      console.debug('localStorage.set failed', err);
     }
   }
 
@@ -34,15 +36,17 @@
       try {
         document.documentElement.style.backgroundColor = '';
         if (document.body) document.body.style.backgroundColor = '';
-      } catch (e) {}
+      } catch (err) {
+        console.debug('clear temporary background failed', err);
+      }
       try {
         const evt = new CustomEvent('theme:change', { detail: { theme } });
         global.dispatchEvent(evt);
-      } catch (e) {
-        console.debug('Failed to dispatch theme:change', e);
+      } catch (err) {
+        console.debug('Failed to dispatch theme:change', err);
       }
-    } catch (e) {
-      console.debug('applyTheme error', e);
+    } catch (err) {
+      console.debug('applyTheme error', err);
     }
   }
 
@@ -55,7 +59,9 @@
         global.matchMedia('(prefers-color-scheme: dark)').matches
       )
         return 'dark';
-    } catch (e) {}
+    } catch (err) {
+      console.debug('matchMedia check failed', err);
+    }
     return 'light';
   }
 
@@ -83,8 +89,8 @@
   try {
     const current = getPreferred();
     applyTheme(current);
-  } catch (e) {
-    console.debug('Failed to auto-apply theme', e);
+  } catch (err) {
+    console.debug('Failed to auto-apply theme', err);
   }
   // Notify that initial theme application has completed. Consumers can wait for this
   // event to avoid race conditions when mounting theme-dependent UI (e.g. canvas background).
@@ -93,7 +99,7 @@
       detail: { theme: getPreferred() },
     });
     global.dispatchEvent(readyEvt);
-  } catch (e) {
-    console.debug('Failed to dispatch theme:ready', e);
+  } catch (err) {
+    console.debug('Failed to dispatch theme:ready', err);
   }
 })(window);
