@@ -3,6 +3,45 @@
 @custom-variant dark (&:where(.dark, .dark *));
 /* stylelint-disable-next-line */
 @plugin "@midudev/tailwind-animations";
+
+/*! Prevenir scroll horizontal */
+html {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  position: relative;
+}
+
+/* Prevenir que elementos con transform: scale() causen overflow */
+* {
+  box-sizing: border-box;
+}
+
+/* Asegurar que pseudo-elementos con posiciones negativas no causen overflow */
+*::before,
+*::after {
+  max-width: 100vw;
+}
+
+/* Asegurar que los canvas del background no causen overflow */
+.export-background-root canvas,
+.layer {
+  max-width: 100vw;
+  max-height: 100vh;
+}
+
+/* Contener elementos con efectos de escala dentro de sus contenedores */
+.card-root,
+.contact-card-root,
+.glassmorph-effect,
+.tech-stack-card {
+  contain: layout style;
+}
+
 /*! Importaciones */
 @import './navbar.css';
 @import './techstack.css';
