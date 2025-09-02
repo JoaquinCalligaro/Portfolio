@@ -76,7 +76,6 @@ export const translations = {
       size: 'Tamaño',
       send: 'Enviar',
       sending: 'Enviando...',
-      captchaPrompt: 'Completa el Captcha para continuar',
       nameRequired: 'El nombre es requerido.',
       invalidEmail: 'Formato de email inválido.',
       spamDetected: 'Envío detectado como spam.',
@@ -85,19 +84,13 @@ export const translations = {
       rateLimit: 'Espera un momento antes de volver a enviar.',
       invalidForm:
         'Formulario inválido. Refresca la página e intenta de nuevo.',
-      captchaRequired: 'Por favor completa el captcha antes de enviar.',
       fixErrors: 'Por favor corrige los errores antes de enviar.',
       sentSuccess: 'Mensaje enviado.',
       sendError: 'Ocurrió un error al enviar. Intenta de nuevo.',
       networkError: 'Ocurrió un error de conexión. Intenta más tarde.',
-      captchaChecking: 'Esperando verificación del captcha...',
-      retryCaptcha: 'Reintentar captcha',
-      retryingCaptcha: '🔄 Reintentando...',
       recheckingIn: 'Reintentando en',
       attemptsLeft: 'intentos restantes',
       cooldownWait: 'Espera ${timeStr} antes de enviar otro mensaje.',
-      captchaNotDetected:
-        'Captcha completado pero no detectado. Intenta refrescar la página.',
       messageMinLength: 'El mensaje debe tener al menos 10 caracteres.',
     },
     showMore: {
@@ -202,7 +195,6 @@ export const translations = {
       size: 'Size',
       send: 'Send',
       sending: 'Sending...',
-      captchaPrompt: 'Complete the Captcha to continue',
       nameRequired: 'Name is required.',
       invalidEmail: 'Invalid email format.',
       spamDetected: 'Submission detected as spam.',
@@ -210,19 +202,15 @@ export const translations = {
       tooFastStatus: 'Submission too fast (possible bot).',
       rateLimit: 'Please wait a moment before sending again.',
       invalidForm: 'Invalid form. Refresh the page and try again.',
-      captchaRequired: 'Please complete the captcha before sending.',
       fixErrors: 'Please fix the errors before submitting.',
       sentSuccess: 'Message sent!.',
       sendError: 'An error occurred while sending. Try again.',
       networkError: 'Connection error. Try again later.',
-      captchaChecking: 'Waiting for captcha verification...',
-      retryCaptcha: 'Retry captcha',
-      retryingCaptcha: '🔄 Retrying...',
+
       recheckingIn: 'Rechecking in',
       attemptsLeft: 'attempts left',
       cooldownWait: 'Please wait ${timeStr} before sending another message.',
-      captchaNotDetected:
-        'Captcha completed but not detected. Try refreshing the page.',
+
       messageMinLength: 'The message must be at least 10 characters.',
     },
     showMore: {

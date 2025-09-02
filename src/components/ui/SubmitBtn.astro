@@ -1,4 +1,6 @@
 ---
+import { translations, type Lang } from '../../data/translations';
+
 // Reusable submit button used across the UI
 const {
   id = undefined,
@@ -7,7 +9,29 @@ const {
   className = '',
   disabled = false,
   name = undefined,
+  translationKey = undefined,
 } = Astro.props;
+
+// Function to resolve translation key
+function resolve(lang: Lang, k: string) {
+  return k.split('.').reduce(
+    (acc: unknown, part) => {
+      if (
+        acc &&
+        typeof acc === 'object' &&
+        Object.prototype.hasOwnProperty.call(acc, part)
+      ) {
+        return (acc as unknown as Record<string, unknown>)[part];
+      }
+      return null;
+    },
+    (translations as unknown as Record<string, unknown>)[lang]
+  );
+}
+
+// Get initial text based on translation key or fallback to provided text
+const serverLang: Lang = 'ES';
+const buttonText = translationKey ? (resolve(serverLang, translationKey) ?? text) : text;
 ---
 
 <button
@@ -16,6 +40,79 @@ const {
   name={name}
   class={`mx-auto my-4 cursor-pointer inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-indigo-400 to-purple-400 dark:from-indigo-600 dark:to-purple-600 px-15 py-3 text-sm font-bold text-white shadow-lg hover:from-indigo-500 hover:to-purple-500 dark:hover:from-indigo-700 dark:hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-indigo-200/40 dark:focus:ring-indigo-300/30 disabled:opacity-50 min-w-[200px] ${className}`}
   disabled={disabled}
+  data-translation-key={translationKey}
 >
-  {Astro.slots.default ? <slot /> : text}
+  {Astro.slots.default ? <slot /> : buttonText}
 </button>
+
+{translationKey && (
+  <script is:inline define:vars={{ translationKey, buttonId: id }}>
+    (function () {
+      const button = buttonId ? document.getElementById(buttonId) : document.currentScript.previousElementSibling;
+      if (!button) {
+        console.warn('Button not found for translation');
+        return;
+      }
+
+      const updateButtonText = (lang) => {
+        try {
+          if (!window.TRANSLATIONS || !window.TRANSLATIONS[lang]) {
+            console.warn('Translations not available for lang:', lang);
+            return;
+          }
+
+          // Navigate through the translation object using the key
+          const parts = translationKey.split('.');
+          let value = window.TRANSLATIONS[lang];
+
+          for (const part of parts) {
+            if (value && typeof value === 'object' && value[part] !== undefined) {
+              value = value[part];
+            } else {
+              value = null;
+              break;
+            }
+          }
+
+          if (typeof value === 'string') {
+            button.textContent = value;
+            console.log('Button text updated to:', value, 'for lang:', lang);
+          } else {
+            console.warn('Translation not found for key:', translationKey, 'lang:', lang);
+          }
+        } catch (e) {
+          console.warn('Error updating button translation:', e);
+        }
+      };
+
+      // Listen for language changes
+      window.addEventListener('langChange', (e) => {
+        const lang = (e && e.detail) || document.documentElement.lang || 'ES';
+        console.log('langChange event received, lang:', lang);
+        // Add small delay to ensure DOM and translations are synchronized
+        setTimeout(() => updateButtonText(lang), 10);
+      });
+
+      // Function to wait for translations and apply them
+      const applyTranslationsWhenReady = () => {
+        const currentLang = document.documentElement.lang || 'ES';
+        console.log('Applying translations for lang:', currentLang);
+        
+        if (window.TRANSLATIONS && window.TRANSLATIONS[currentLang]) {
+          updateButtonText(currentLang);
+        } else {
+          // If translations aren't ready, wait a bit and try again
+          setTimeout(applyTranslationsWhenReady, 100);
+        }
+      };
+
+      // Apply initial translation
+      applyTranslationsWhenReady();
+
+      // Also listen for DOMContentLoaded in case we're too early
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', applyTranslationsWhenReady);
+      }
+    })();
+  </script>
+)}
