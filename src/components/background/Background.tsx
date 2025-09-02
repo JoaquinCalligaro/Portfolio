@@ -5,7 +5,7 @@
 /* eslint-disable */
 
 import React, { useEffect, useRef, useState } from 'react';
-import initBackgroundRefresh from './refreshBackground';
+// refreshBackground helper removed for debugging — import intentionally omitted
 import { LIGHT_MODE_CONFIG, DARK_MODE_CONFIG } from './config';
 
 interface LayerProps {
@@ -34,8 +34,8 @@ const StarsLayer: React.FC<LayerProps> = ({
     const ctx = c.getContext('2d');
     if (!ctx) return;
     const resize = () => {
-      c.width = innerWidth;
-      c.height = innerHeight;
+      c.width = window.innerWidth;
+      c.height = window.innerHeight;
     };
     resize();
     addEventListener('resize', resize);
@@ -150,8 +150,8 @@ const ConnectionsLayer: React.FC<LayerProps> = ({
     const ctx = c.getContext('2d');
     if (!ctx) return;
     const resize = () => {
-      c.width = innerWidth;
-      c.height = innerHeight;
+      c.width = window.innerWidth;
+      c.height = window.innerHeight;
     };
     resize();
     addEventListener('resize', resize);
@@ -362,11 +362,11 @@ const NebulaLayer: React.FC<LayerProps> = ({
     })();
     const touch =
       (navigator as any).maxTouchPoints > 0 || 'ontouchstart' in window;
-    const isMobile = uaMobile || coarse || touch || innerWidth <= 768;
+    const isMobile = uaMobile || coarse || touch || window.innerWidth <= 768;
     const deviceMemory = (navigator as any).deviceMemory || 4;
     const cores = (navigator as any).hardwareConcurrency || 4;
     const isLowEndMobile =
-      isMobile && (deviceMemory <= 3 || cores <= 4 || innerWidth <= 480);
+      isMobile && (deviceMemory <= 3 || cores <= 4 || window.innerWidth <= 480);
     const targetFPS = isLowEndMobile ? 40 : 60;
     const noiseCellRef = { current: isLowEndMobile ? 38 : 25 };
     const enableConnections = false;
@@ -382,8 +382,8 @@ const NebulaLayer: React.FC<LayerProps> = ({
     const resize = () => {
       const parent = canvas.parentElement;
       if (!parent) return;
-      const w = parent.offsetWidth || innerWidth;
-      const h = parent.offsetHeight || innerHeight;
+      const w = parent.offsetWidth || window.innerWidth;
+      const h = parent.offsetHeight || window.innerHeight;
       const dpr = Math.min(devicePixelRatio || 1, isMobile ? 1 : 1.5);
       canvas.width = w * dpr;
       canvas.height = h * dpr;
@@ -404,8 +404,8 @@ const NebulaLayer: React.FC<LayerProps> = ({
       particlesRef.current = [];
       const parent = canvas.parentElement;
       if (!parent) return;
-      const w = parent.offsetWidth || innerWidth;
-      const h = parent.offsetHeight || innerHeight;
+      const w = parent.offsetWidth || window.innerWidth;
+      const h = parent.offsetHeight || window.innerHeight;
       const baseCount = typeof particleCount === 'number' ? particleCount : 180;
       const effCount = isLowEndMobile
         ? Math.max(70, Math.floor(baseCount * 0.5))
@@ -441,8 +441,8 @@ const NebulaLayer: React.FC<LayerProps> = ({
       cloudsRef.current = [];
       const parent = canvas.parentElement;
       if (!parent) return;
-      const w = parent.offsetWidth || innerWidth;
-      const h = parent.offsetHeight || innerHeight;
+      const w = parent.offsetWidth || window.innerWidth;
+      const h = parent.offsetHeight || window.innerHeight;
       const baseHue = mainHSL.h;
       const cfg = [
         {
@@ -586,8 +586,8 @@ const NebulaLayer: React.FC<LayerProps> = ({
       lastFrame.current = now;
       const parent = canvas.parentElement;
       if (!parent) return;
-      const w = parent.offsetWidth || innerWidth;
-      const h = parent.offsetHeight || innerHeight;
+      const w = parent.offsetWidth || window.innerWidth;
+      const h = parent.offsetHeight || window.innerHeight;
       if (!isMobile) {
         zoomPhase += 0.008 * speedValue * sMult;
         zoomBase = 1 + zoomPhase * 0.07;
@@ -1151,8 +1151,8 @@ export default function BackgroundExport(props: BackgroundExportProps) {
   }, []);
 
   useEffect(() => {
-    // inicializa util que observa cambios y despacha 'background-refresh'
-    const cleanupInit = initBackgroundRefresh();
+    // refreshBackground helper removed for debugging; use noop cleanup
+    const cleanupInit = () => {};
 
     const onRefresh = () => setRefreshKey((k) => k + 1);
     window.addEventListener('background-refresh', onRefresh as EventListener);
@@ -1167,7 +1167,14 @@ export default function BackgroundExport(props: BackgroundExportProps) {
   }, []);
   return (
     <div
-      style={{ position: 'fixed', inset: 0, overflow: 'hidden', zIndex: -20 }}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        width: '100vw',
+        height: '100vh',
+        overflow: 'hidden',
+        zIndex: -20,
+      }}
       className="export-background-root"
     >
       {/* Two background layers cross-fading for smooth transition */}
@@ -1176,6 +1183,8 @@ export default function BackgroundExport(props: BackgroundExportProps) {
         style={{
           position: 'absolute',
           inset: 0,
+          width: '100%',
+          height: '100%',
           transition: 'opacity 500ms ease',
           opacity: themeState === 'light' ? 1 : 0,
           zIndex: -30, // fallback below canvases
@@ -1188,6 +1197,8 @@ export default function BackgroundExport(props: BackgroundExportProps) {
         style={{
           position: 'absolute',
           inset: 0,
+          width: '100%',
+          height: '100%',
           transition: 'opacity 500ms ease',
           opacity: themeState === 'light' ? 0 : 1,
           zIndex: -30, // fallback below canvases
@@ -1197,7 +1208,13 @@ export default function BackgroundExport(props: BackgroundExportProps) {
       />
       <div
         key={refreshKey}
-        style={{ position: 'absolute', inset: 0, zIndex: -10 }}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          zIndex: -10,
+        }}
       >
         {themeReady ? (
           <>
