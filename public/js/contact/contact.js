@@ -250,6 +250,12 @@ if (
         token = cfResponseInput.value || '';
       }
 
+      // Fallback: verificar estados globales
+      if (!token && globalThis.__captcha_token) {
+        token = globalThis.__captcha_token;
+        isOk = globalThis.__captcha_ok;
+      }
+
       // En móviles, solo verificar que el token existe y no esté vacío
       // Los tokens de Turnstile pueden variar en longitud
       const hasValidToken = !!token && token.length > 5; // Más flexible para móviles
@@ -405,14 +411,32 @@ if (
   // Forzar re-evaluación del captcha en móviles
   function forceCheckCaptcha() {
     console.log('Forcing captcha recheck...');
-    setTimeout(() => {
-      updateSubmitButtonState();
-    }, 100);
 
-    // Segundo chequeo más tarde por si hay delay
-    setTimeout(() => {
-      updateSubmitButtonState();
-    }, 500);
+    // Intentos múltiples con delays incrementales
+    const delays = [100, 300, 500, 800, 1200];
+
+    delays.forEach((delay, index) => {
+      setTimeout(() => {
+        console.log(`Captcha recheck attempt ${index + 1}`);
+        updateSubmitButtonState();
+
+        // En el último intento, verificar explícitamente
+        if (index === delays.length - 1) {
+          const isValid = isCaptchaValid();
+          console.log(`Final captcha validation result: ${isValid}`);
+
+          if (
+            isValid &&
+            submitBtn &&
+            hasContentInFields() &&
+            getRemainingCooldown() === 0
+          ) {
+            submitBtn.disabled = false;
+            console.log('Submit button enabled after forced recheck');
+          }
+        }
+      }, delay);
+    });
   }
 
   // Configurar manejo de eventos del captcha (mejoras móviles)
@@ -431,8 +455,15 @@ if (
       try {
         if (cfResponseInput) cfResponseInput.value = token || '';
 
-        // En móviles, forzar múltiples actualizaciones
+        // Actualizar estados globales
+        globalThis.__captcha_token = token || '';
+        globalThis.__captcha_ok = !!token;
+
+        // En móviles, forzar múltiples actualizaciones con delays
         updateSubmitButtonState();
+        setTimeout(() => updateSubmitButtonState(), 100);
+        setTimeout(() => updateSubmitButtonState(), 300);
+        setTimeout(() => updateSubmitButtonState(), 500);
         forceCheckCaptcha();
       } catch (error) {
         console.error('Error in turnstile success callback:', error);
@@ -443,6 +474,11 @@ if (
       console.log('Fallback turnstile expired');
       try {
         if (cfResponseInput) cfResponseInput.value = '';
+
+        // Limpiar estados globales
+        globalThis.__captcha_token = '';
+        globalThis.__captcha_ok = false;
+
         if (submitBtn) submitBtn.disabled = true;
         updateSubmitButtonState();
       } catch (error) {
@@ -454,6 +490,11 @@ if (
       console.log('Fallback turnstile error:', error);
       try {
         if (cfResponseInput) cfResponseInput.value = '';
+
+        // Limpiar estados globales
+        globalThis.__captcha_token = '';
+        globalThis.__captcha_ok = false;
+
         if (submitBtn) submitBtn.disabled = true;
         updateSubmitButtonState();
       } catch (err) {
@@ -469,8 +510,18 @@ if (
         console.log('Captcha change event received:', e.detail);
         try {
           const token = e.detail.token || '';
+          const isOk = e.detail.ok || false;
+
           if (cfResponseInput) cfResponseInput.value = token;
+
+          // Actualizar estados globales para compatibilidad
+          globalThis.__captcha_token = token;
+          globalThis.__captcha_ok = isOk;
+
+          // Forzar múltiples actualizaciones para asegurar que el botón se actualice
           updateSubmitButtonState();
+          setTimeout(() => updateSubmitButtonState(), 100);
+          setTimeout(() => updateSubmitButtonState(), 300);
 
           // En móviles, forzar re-evaluación adicional
           forceCheckCaptcha();
@@ -613,28 +664,59 @@ if (
   if (forceCheckButton) {
     forceCheckButton.addEventListener('click', () => {
       console.log('Manual captcha verification requested');
-      forceCheckCaptcha();
 
       // Feedback visual
       const originalText = forceCheckButton.textContent;
       forceCheckButton.textContent = '🔄 Verificando...';
       forceCheckButton.disabled = true;
 
+      // Ejecutar verificación forzada
+      forceCheckCaptcha();
+
       setTimeout(() => {
         forceCheckButton.textContent = originalText;
         forceCheckButton.disabled = false;
 
-        // Si aún hay problemas, mostrar mensaje
-        if (!isCaptchaValid()) {
+        // Verificar el resultado después de los intentos
+        const isValid = isCaptchaValid();
+        console.log('Manual verification result:', isValid);
+
+        if (isValid) {
+          // Si el captcha es válido, ocultar el botón de verificación manual
+          forceCheckButton.style.display = 'none';
+
+          // Actualizar el estado del botón submit
+          updateSubmitButtonState();
+
+          if (status) {
+            status.textContent = '✅ Captcha verificado correctamente';
+            status.classList.add('text-green-600');
+            status.classList.remove('text-yellow-600', 'text-red-600');
+
+            // Limpiar mensaje después de 3 segundos
+            setTimeout(() => {
+              if (status) status.textContent = '';
+            }, 3000);
+          }
+        } else {
+          // Si aún hay problemas, mostrar mensaje
           const token = cfResponseInput ? cfResponseInput.value : '';
           if (token && token.length > 5) {
             if (status) {
-              status.textContent = t('contact.captchaNotDetected');
+              status.textContent =
+                '⚠️ Captcha completado pero no detectado. Intenta enviar el formulario.';
               status.classList.add('text-yellow-600');
+              status.classList.remove('text-green-600', 'text-red-600');
+            }
+          } else {
+            if (status) {
+              status.textContent = '❌ Por favor completa el captcha primero';
+              status.classList.add('text-red-600');
+              status.classList.remove('text-green-600', 'text-yellow-600');
             }
           }
         }
-      }, 1000);
+      }, 1500); // Aumentado el tiempo para dar más oportunidad a los intentos
     });
   }
 
@@ -797,6 +879,11 @@ if (
 
         form.reset();
 
+        // Limpiar estados del captcha
+        if (cfResponseInput) cfResponseInput.value = '';
+        globalThis.__captcha_token = '';
+        globalThis.__captcha_ok = false;
+
         // Reiniciar captcha
         try {
           if (captcha && typeof captcha.resetCaptcha === 'function') {
@@ -805,6 +892,9 @@ if (
         } catch (error) {
           console.error('Error resetting captcha:', error);
         }
+
+        // Deshabilitar botón inmediatamente tras reset
+        if (submitBtn) submitBtn.disabled = true;
 
         markSend();
       } else {
