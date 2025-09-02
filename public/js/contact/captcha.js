@@ -88,7 +88,7 @@ function renderCaptchaManually() {
       // increment attempts and schedule a token check
       _renderAttempts = (_renderAttempts || 0) + 1;
       if (_checkTokenTimer) {
-        clearTimeout(_checkTokenTimer);
+        globalThis.clearTimeout(_checkTokenTimer);
         _checkTokenTimer = null;
       }
 
