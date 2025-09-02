@@ -3,7 +3,7 @@
 /* eslint no-empty: 0 */
 /* Archivo cliente: se ejecuta en el navegador. Usamos globalThis para seguridad SSR
   y las directivas ESLint habilitan los globals del navegador para evitar advertencias. */
-/* global console, navigator, setTimeout, setInterval, clearInterval, MutationObserver, FormData, fetch */
+/* global console, navigator, setTimeout, setInterval, clearInterval, MutationObserver, FormData, fetch, CustomEvent */
 /* eslint no-unused-vars: 0 */
 // Evita romper en SSR comprobando si document existe
 if (
@@ -231,53 +231,44 @@ if (
     return ok;
   }
 
-  // Función mejorada para verificar el estado del captcha - Compatible con móviles
+  // Estado controlado del captcha
+  let __captchaSolved = false;
+  // Nuevo flag: solo se pone true dentro del callback oficial de Turnstile (éxito)
+  let __captchaSolvedByCallback = false;
+
   function isCaptchaValid() {
-    if (FRONTEND_ONLY) return true; // Skip captcha in demo mode
-
-    try {
-      let token = '';
-      let isOk = false;
-
-      // Verificar usando el módulo captcha si está disponible
-      if (captcha && typeof captcha.isCaptchaOk === 'function') {
-        isOk = captcha.isCaptchaOk();
-        token = captcha.getCaptchaToken();
-      }
-
-      // Fallback: verificar directamente el input hidden
-      if (!token && cfResponseInput) {
-        token = cfResponseInput.value || '';
-      }
-
-      // Fallback: verificar estados globales
-      if (!token && globalThis.__captcha_token) {
-        token = globalThis.__captcha_token;
-        isOk = globalThis.__captcha_ok;
-      }
-
-      // En móviles, solo verificar que el token existe y no esté vacío
-      // Los tokens de Turnstile pueden variar en longitud
-      const hasValidToken = !!token && token.length > 5; // Más flexible para móviles
-
-      console.log('Captcha validation:', {
-        isOk,
-        hasToken: !!token,
-        tokenLength: token ? token.length : 0,
-        hasValidToken,
-        isMobile:
-          /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-            navigator.userAgent
-          ),
-      });
-
-      // Para mayor compatibilidad, considerar válido si hay token válido, incluso si isOk es false
-      return hasValidToken;
-    } catch (error) {
-      console.error('Error checking captcha:', error);
-      return false;
-    }
+    if (FRONTEND_ONLY) return true;
+    const token =
+      (cfResponseInput && cfResponseInput.value) ||
+      globalThis.__captcha_token ||
+      '';
+    // Solo consideramos válido si el callback oficial se disparó en esta carga
+    const valid = __captchaSolvedByCallback && token.length > 20;
+    return valid;
   }
+
+  // Registrar callbacks (sobrescriben anteriores si existían)
+  globalThis.turnstileOnSuccess = (token) => {
+    __captchaSolved = true; // legacy internal
+    __captchaSolvedByCallback = true; // flag estricto
+    if (cfResponseInput) cfResponseInput.value = token || '';
+    globalThis.__captcha_token = token || '';
+    updateSubmitButtonState();
+  };
+  globalThis.turnstileOnExpired = () => {
+    __captchaSolved = false;
+    __captchaSolvedByCallback = false;
+    if (cfResponseInput) cfResponseInput.value = '';
+    globalThis.__captcha_token = '';
+    updateSubmitButtonState();
+  };
+  globalThis.turnstileOnError = () => {
+    __captchaSolved = false;
+    __captchaSolvedByCallback = false;
+    if (cfResponseInput) cfResponseInput.value = '';
+    globalThis.__captcha_token = '';
+    updateSubmitButtonState();
+  };
 
   // Función mejorada para actualizar el estado del botón submit
   function updateSubmitButtonState() {
@@ -297,38 +288,47 @@ if (
       captchaValid,
       cooldownActive,
       shouldEnable,
+      captchaSolvedFlag:
+        typeof __captchaSolved !== 'undefined' ? __captchaSolved : 'n/a',
+      captchaSolvedByCallback: __captchaSolvedByCallback,
     });
 
-    // Siempre deshabilitar si no hay captcha válido
+    // CRÍTICO: El botón debe estar deshabilitado si NO hay captcha válido
     if (!captchaValid && !FRONTEND_ONLY) {
       submitBtn.disabled = true;
-
-      // En móviles, mostrar botón de verificación manual si hay contenido en campos
-      const isMobile =
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent
-        );
-      const forceButton = doc.getElementById('force-captcha-check');
-      if (isMobile && forceButton && hasContent) {
-        // Verificar si realmente hay token pero el estado no se actualiza
-        const token = cfResponseInput ? cfResponseInput.value : '';
-        if (token && token.length > 5) {
-          forceButton.style.display = 'inline-block';
-        } else {
-          forceButton.style.display = 'none';
-        }
-      }
-      return;
+      console.log('Button DISABLED - Captcha not valid');
+    } else if (shouldEnable) {
+      submitBtn.disabled = false;
+      console.log('Button ENABLED - All conditions met');
+    } else {
+      submitBtn.disabled = true;
+      console.log('Button DISABLED - Not all conditions met');
     }
 
-    // Ocultar botón de verificación manual si todo está bien
+    // En móviles, mostrar botón de verificación manual si hay contenido pero captcha no válido
+    const isMobile =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      );
     const forceButton = doc.getElementById('force-captcha-check');
-    if (forceButton) {
+
+    if (
+      isMobile &&
+      forceButton &&
+      hasContent &&
+      !captchaValid &&
+      !FRONTEND_ONLY
+    ) {
+      // Verificar si realmente hay token pero el estado no se actualiza
+      const token = cfResponseInput ? cfResponseInput.value : '';
+      if (token && token.length > 5) {
+        forceButton.style.display = 'inline-block';
+      } else {
+        forceButton.style.display = 'none';
+      }
+    } else if (forceButton) {
       forceButton.style.display = 'none';
     }
-
-    // Aplicar el estado calculado
-    submitBtn.disabled = !shouldEnable;
   }
 
   function hasContentInFields() {
@@ -349,10 +349,22 @@ if (
     messageEditor.addEventListener('blur', validateForm);
   }
 
-  // Estado inicial: botón deshabilitado hasta completar captcha
-  if (submitBtn) {
-    submitBtn.disabled = true; // Inicialmente deshabilitado
-  }
+  // Estado inicial: botón deshabilitado hasta completar captcha y limpiar tokens previos
+  if (submitBtn) submitBtn.disabled = true;
+  if (cfResponseInput) cfResponseInput.value = '';
+  try {
+    globalThis.__captcha_token = '';
+    globalThis.__captcha_ok = false;
+  } catch {}
+
+  // Debug inicial
+  console.log('Contact form initialized:', {
+    submitBtn: !!submitBtn,
+    cfResponseInput: !!cfResponseInput,
+    captchaModule: !!captcha,
+    hasContentFields: hasContentInFields(),
+  });
+
   updateSubmitButtonState();
 
   // Inicializar editor enriquecido (simplificado)
@@ -412,31 +424,69 @@ if (
   function forceCheckCaptcha() {
     console.log('Forcing captcha recheck...');
 
-    // Intentos múltiples con delays incrementales
-    const delays = [100, 300, 500, 800, 1200];
+    // Buscar token en todos los lugares posibles
+    let foundToken = '';
 
-    delays.forEach((delay, index) => {
-      setTimeout(() => {
-        console.log(`Captcha recheck attempt ${index + 1}`);
-        updateSubmitButtonState();
+    // 1. Input hidden principal
+    if (cfResponseInput && cfResponseInput.value) {
+      foundToken = cfResponseInput.value;
+      console.log('Found token in main input:', foundToken.length, 'chars');
+    }
 
-        // En el último intento, verificar explícitamente
-        if (index === delays.length - 1) {
-          const isValid = isCaptchaValid();
-          console.log(`Final captcha validation result: ${isValid}`);
+    // 2. Variables globales
+    if (!foundToken && globalThis.__captcha_token) {
+      foundToken = globalThis.__captcha_token;
+      console.log(
+        'Found token in global variable:',
+        foundToken.length,
+        'chars'
+      );
+    }
 
-          if (
-            isValid &&
-            submitBtn &&
-            hasContentInFields() &&
-            getRemainingCooldown() === 0
-          ) {
-            submitBtn.disabled = false;
-            console.log('Submit button enabled after forced recheck');
+    // 3. Todos los inputs relacionados con captcha/turnstile
+    if (!foundToken) {
+      const allInputs = doc.querySelectorAll(
+        'input[name*="turnstile"], input[name*="captcha"], input[id*="turnstile"], input[id*="captcha"], input[type="hidden"]'
+      );
+      for (const input of allInputs) {
+        const inputValue = input.value || '';
+        if (inputValue && inputValue.length > 20) {
+          // Tokens de Turnstile son típicamente >40 chars
+          foundToken = inputValue;
+          console.log(
+            'Found token in input:',
+            input.name || input.id,
+            'Length:',
+            foundToken.length
+          );
+          // Sincronizar con el input principal
+          if (cfResponseInput) {
+            cfResponseInput.value = foundToken;
           }
+          break;
         }
-      }, delay);
-    });
+      }
+    }
+
+    // 4. Si encontramos token, actualizar variables globales
+    if (foundToken && foundToken.length > 20) {
+      globalThis.__captcha_token = foundToken;
+      globalThis.__captcha_ok = true;
+      // Si encontramos un token válido manualmente, marcar como resuelto
+      __captchaSolvedByCallback = true;
+      console.log(
+        'Token found and synchronized:',
+        foundToken.substring(0, 10) + '...'
+      );
+    }
+    setTimeout(() => {
+      updateSubmitButtonState();
+    }, 100);
+
+    // Segundo chequeo más tarde por si hay delay
+    setTimeout(() => {
+      updateSubmitButtonState();
+    }, 500);
   }
 
   // Configurar manejo de eventos del captcha (mejoras móviles)
@@ -453,18 +503,32 @@ if (
         token ? token.length : 0
       );
       try {
-        if (cfResponseInput) cfResponseInput.value = token || '';
+        if (token && token.length > 10) {
+          // Sincronizar en todos los lugares
+          if (cfResponseInput) cfResponseInput.value = token;
+          globalThis.__captcha_token = token;
+          globalThis.__captcha_ok = true;
+          __captchaSolved = true; // mantener legacy
+          __captchaSolvedByCallback = true; // estricto
 
-        // Actualizar estados globales
-        globalThis.__captcha_token = token || '';
-        globalThis.__captcha_ok = !!token;
+          console.log('Token successfully stored in all locations');
 
-        // En móviles, forzar múltiples actualizaciones con delays
-        updateSubmitButtonState();
-        setTimeout(() => updateSubmitButtonState(), 100);
-        setTimeout(() => updateSubmitButtonState(), 300);
-        setTimeout(() => updateSubmitButtonState(), 500);
-        forceCheckCaptcha();
+          // Forzar múltiples actualizaciones
+          updateSubmitButtonState();
+          forceCheckCaptcha();
+
+          // Disparar evento personalizado para mayor compatibilidad
+          if (typeof globalThis.dispatchEvent === 'function') {
+            const evt = new CustomEvent('captcha:change', {
+              detail: { ok: true, token: token },
+            });
+            globalThis.dispatchEvent(evt);
+          }
+        } else {
+          console.warn(
+            'Turnstile success callback called but no valid token provided'
+          );
+        }
       } catch (error) {
         console.error('Error in turnstile success callback:', error);
       }
@@ -474,11 +538,10 @@ if (
       console.log('Fallback turnstile expired');
       try {
         if (cfResponseInput) cfResponseInput.value = '';
-
-        // Limpiar estados globales
         globalThis.__captcha_token = '';
         globalThis.__captcha_ok = false;
-
+        __captchaSolved = false;
+        __captchaSolvedByCallback = false;
         if (submitBtn) submitBtn.disabled = true;
         updateSubmitButtonState();
       } catch (error) {
@@ -490,11 +553,10 @@ if (
       console.log('Fallback turnstile error:', error);
       try {
         if (cfResponseInput) cfResponseInput.value = '';
-
-        // Limpiar estados globales
         globalThis.__captcha_token = '';
         globalThis.__captcha_ok = false;
-
+        __captchaSolved = false;
+        __captchaSolvedByCallback = false;
         if (submitBtn) submitBtn.disabled = true;
         updateSubmitButtonState();
       } catch (err) {
@@ -510,18 +572,9 @@ if (
         console.log('Captcha change event received:', e.detail);
         try {
           const token = e.detail.token || '';
-          const isOk = e.detail.ok || false;
-
           if (cfResponseInput) cfResponseInput.value = token;
-
-          // Actualizar estados globales para compatibilidad
-          globalThis.__captcha_token = token;
-          globalThis.__captcha_ok = isOk;
-
-          // Forzar múltiples actualizaciones para asegurar que el botón se actualice
+          // NO marcar solved aquí para evitar habilitar antes de interacción real
           updateSubmitButtonState();
-          setTimeout(() => updateSubmitButtonState(), 100);
-          setTimeout(() => updateSubmitButtonState(), 300);
 
           // En móviles, forzar re-evaluación adicional
           forceCheckCaptcha();
@@ -654,6 +707,61 @@ if (
     }, 1000);
   }
 
+  // Chequeo periódico para móviles - detectar captcha completado no detectado
+  let mobileCheckInterval = null;
+  const isMobileDevice =
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+
+  // Chequeo más agresivo para todos los dispositivos si hay problemas de sincronización
+  console.log('Starting enhanced captcha monitoring...');
+  mobileCheckInterval = setInterval(() => {
+    // Solo chequear si hay contenido en los campos pero el botón está deshabilitado
+    if (
+      hasContentInFields() &&
+      submitBtn &&
+      submitBtn.disabled &&
+      !getRemainingCooldown()
+    ) {
+      // Buscar indicadores visuales de éxito
+      const captchaWidget = doc.querySelector('.cf-turnstile');
+      let hasVisualSuccess = false;
+
+      if (captchaWidget) {
+        const textContent = captchaWidget.textContent || '';
+        const hasSuccessText = textContent.toLowerCase().includes('success');
+        const hasCheckmark = captchaWidget.querySelector(
+          'svg[data-icon="check"], .checkmark, [aria-label*="success" i]'
+        );
+        hasVisualSuccess = hasSuccessText || !!hasCheckmark;
+      }
+
+      // Si hay éxito visual o token, forzar recheck
+      const token = cfResponseInput ? cfResponseInput.value : '';
+      if ((token && token.length > 10) || hasVisualSuccess) {
+        console.log(
+          'Detected captcha completion - Token:',
+          !!token,
+          'Visual success:',
+          hasVisualSuccess
+        );
+        forceCheckCaptcha();
+      }
+    }
+  }, 1000); // Chequear cada segundo (más frecuente)
+
+  // Limpiar interval cuando se complete el captcha exitosamente
+  if (typeof globalThis.addEventListener === 'function') {
+    globalThis.addEventListener('captcha:change', (e) => {
+      if (e.detail.ok && mobileCheckInterval) {
+        clearInterval(mobileCheckInterval);
+        mobileCheckInterval = null;
+        console.log('Enhanced captcha monitoring stopped - captcha completed');
+      }
+    });
+  }
+
   // Verificar cooldown al cargar la página
   if (getRemainingCooldown() > 0) {
     startCooldownTimer();
@@ -664,59 +772,28 @@ if (
   if (forceCheckButton) {
     forceCheckButton.addEventListener('click', () => {
       console.log('Manual captcha verification requested');
+      forceCheckCaptcha();
 
       // Feedback visual
       const originalText = forceCheckButton.textContent;
       forceCheckButton.textContent = '🔄 Verificando...';
       forceCheckButton.disabled = true;
 
-      // Ejecutar verificación forzada
-      forceCheckCaptcha();
-
       setTimeout(() => {
         forceCheckButton.textContent = originalText;
         forceCheckButton.disabled = false;
 
-        // Verificar el resultado después de los intentos
-        const isValid = isCaptchaValid();
-        console.log('Manual verification result:', isValid);
-
-        if (isValid) {
-          // Si el captcha es válido, ocultar el botón de verificación manual
-          forceCheckButton.style.display = 'none';
-
-          // Actualizar el estado del botón submit
-          updateSubmitButtonState();
-
-          if (status) {
-            status.textContent = '✅ Captcha verificado correctamente';
-            status.classList.add('text-green-600');
-            status.classList.remove('text-yellow-600', 'text-red-600');
-
-            // Limpiar mensaje después de 3 segundos
-            setTimeout(() => {
-              if (status) status.textContent = '';
-            }, 3000);
-          }
-        } else {
-          // Si aún hay problemas, mostrar mensaje
+        // Si aún hay problemas, mostrar mensaje
+        if (!isCaptchaValid()) {
           const token = cfResponseInput ? cfResponseInput.value : '';
           if (token && token.length > 5) {
             if (status) {
-              status.textContent =
-                '⚠️ Captcha completado pero no detectado. Intenta enviar el formulario.';
+              status.textContent = t('contact.captchaNotDetected');
               status.classList.add('text-yellow-600');
-              status.classList.remove('text-green-600', 'text-red-600');
-            }
-          } else {
-            if (status) {
-              status.textContent = '❌ Por favor completa el captcha primero';
-              status.classList.add('text-red-600');
-              status.classList.remove('text-green-600', 'text-yellow-600');
             }
           }
         }
-      }, 1500); // Aumentado el tiempo para dar más oportunidad a los intentos
+      }, 1000);
     });
   }
 
@@ -879,24 +956,24 @@ if (
 
         form.reset();
 
-        // Limpiar estados del captcha
-        if (cfResponseInput) cfResponseInput.value = '';
-        globalThis.__captcha_token = '';
-        globalThis.__captcha_ok = false;
-
-        // Reiniciar captcha
+        // Reiniciar captcha y estados
         try {
           if (captcha && typeof captcha.resetCaptcha === 'function') {
             captcha.resetCaptcha();
           }
+          // Limpiar input de captcha
+          if (cfResponseInput) cfResponseInput.value = '';
+          // Limpiar variables globales
+          if (globalThis.__captcha_token) globalThis.__captcha_token = '';
+          if (globalThis.__captcha_ok) globalThis.__captcha_ok = false;
         } catch (error) {
           console.error('Error resetting captcha:', error);
         }
 
-        // Deshabilitar botón inmediatamente tras reset
-        if (submitBtn) submitBtn.disabled = true;
-
         markSend();
+
+        // Regenerar form token para próximo envío
+        generateToken();
       } else {
         throw new Error('Form submission failed');
       }
@@ -926,7 +1003,16 @@ if (
       }
 
       // Update button state based on current form state
-      updateSubmitButtonState();
+      setTimeout(() => {
+        updateSubmitButtonState();
+      }, 100);
+
+      // Additional check for mobile devices
+      if (isMobileDevice) {
+        setTimeout(() => {
+          updateSubmitButtonState();
+        }, 500);
+      }
     }
   }
 }
