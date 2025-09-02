@@ -25,21 +25,6 @@
   -webkit-backdrop-filter: blur(3px);
 }
 
-/* Base styles for full height layout */
-html,
-body {
-  min-height: 100vh;
-  overflow-x: hidden;
-  margin: 0;
-  padding: 0;
-}
-
-/* Ensure body fills viewport even when content is short */
-body {
-  display: flex;
-  flex-direction: column;
-}
-
 /* Contenedor raíz para estilos que no deben aplicarse directamente a html/body */
 .page-root {
   overflow-x: hidden;
