@@ -79,7 +79,7 @@ export const translations = {
       nameRequired: 'El nombre es requerido.',
       invalidEmail: 'Formato de email inválido.',
       spamDetected: 'Envío detectado como spam.',
-      tooFast: 'Demasiado rápido, parece bot',
+      tooFast: 'Demasiado rápido, posible bot',
       tooFastStatus: 'Envío demasiado rápido (posible bot).',
       rateLimit: 'Espera un momento antes de volver a enviar.',
       invalidForm:
@@ -203,7 +203,7 @@ export const translations = {
       rateLimit: 'Please wait a moment before sending again.',
       invalidForm: 'Invalid form. Refresh the page and try again.',
       fixErrors: 'Please fix the errors before submitting.',
-      sentSuccess: 'Message sent!.',
+      sentSuccess: 'Message sent!',
       sendError: 'An error occurred while sending. Try again.',
       networkError: 'Connection error. Try again later.',
 

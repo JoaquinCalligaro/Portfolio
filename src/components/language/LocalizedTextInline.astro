@@ -1,36 +1,7 @@
 ---
-import { translations, type Lang } from '../../data/translations';
-
-interface Props {
-  key: string;
-  fallback?: string;
-  class?: string;
-}
-
-const {
-  key: i18nKey,
-  fallback = '',
-  class: className = '',
-} = Astro.props as Props;
-
-function resolve(lang: Lang, k: string) {
-  return k.split('.').reduce(
-    (acc: unknown, part) => {
-      if (
-        acc &&
-        typeof acc === 'object' &&
-        Object.prototype.hasOwnProperty.call(acc, part)
-      ) {
-        return (acc as unknown as Record<string, unknown>)[part];
-      }
-      return null;
-    },
-    (translations as unknown as Record<string, unknown>)[lang]
-  );
-}
-
-const serverLang: Lang = 'ES';
-const resolved = resolve(serverLang, i18nKey) ?? fallback ?? '';
+// This file was removed by request. Do not use LocalizedTextInline; use LocalizedText instead.
 ---
 
-<span class={className} data-i18n-key={i18nKey}>{resolved}</span>
+<script>
+  throw new Error('LocalizedTextInline was removed. Use LocalizedText.');
+</script>

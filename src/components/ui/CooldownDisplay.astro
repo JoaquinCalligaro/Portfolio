@@ -1,0 +1,17 @@
+---
+// Simple cooldown display component
+// Props:
+// - id: optional id to attach (for client scripts)
+// - message: initial message text (can be updated by client JS)
+const { id = undefined, message = '' } = Astro.props;
+---
+
+<div
+  id={id}
+  role="status"
+  aria-live="polite"
+  class={`mb-3 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-center text-yellow-800 dark:border-yellow-700 dark:bg-yellow-900 dark:text-yellow-200 ${message ? '' : 'hidden'}`}
+  style={`display:${message ? '' : 'none'}`}
+>
+  {message}
+</div>

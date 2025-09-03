@@ -3,6 +3,8 @@ import '../../styles/contact.css';
 import LocalizedText from '../language/LocalizedText.astro';
 
 import SubmitBtn from '../ui/SubmitBtn.astro';
+import FormStatus from '../ui/FormStatus.astro';
+import CooldownDisplay from '../ui/CooldownDisplay.astro';
 // Formspree action must be provided via env
 const FORMSPREE_ACTION = import.meta.env.PUBLIC_FORMSPREE_ACTION;
 ---
@@ -34,9 +36,6 @@ const FORMSPREE_ACTION = import.meta.env.PUBLIC_FORMSPREE_ACTION;
       </div>
 
       <div>
-        <!-- Actions related to captcha (separate from form-status so contact.js won't overwrite) -->
-        <!-- moved outside the <form> later to prevent removal on form.reset() -->
-
         <label
           for="email"
           class="block text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -64,52 +63,7 @@ const FORMSPREE_ACTION = import.meta.env.PUBLIC_FORMSPREE_ACTION;
           ><LocalizedText key="contact.message" /></label
         >
 
-        <!-- Toolbar -->
-        <div class="mt-2 mb-1 flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            data-cmd="bold"
-            class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 transition-colors duration-150 hover:bg-gray-100 dark:text-white dark:ring-gray-700 dark:hover:bg-gray-700"
-            >B</button
-          >
-          <button
-            type="button"
-            data-cmd="italic"
-            class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 transition-colors duration-150 hover:bg-gray-100 dark:text-white dark:ring-gray-700 dark:hover:bg-gray-700"
-            >I</button
-          >
-          <button
-            type="button"
-            data-cmd="underline"
-            class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 transition-colors duration-150 hover:bg-gray-100 dark:text-white dark:ring-gray-700 dark:hover:bg-gray-700"
-            >U</button
-          >
-
-          <select
-            id="font-family"
-            class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 transition-colors duration-150 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-700"
-          >
-            <option value="inherit"><LocalizedText key="contact.font" /></option
-            >
-            <option value="Arial">Arial</option>
-            <option value="Georgia">Georgia</option>
-            <option value="Times New Roman">Times New Roman</option>
-            <option value="Courier New">Courier New</option>
-          </select>
-
-          <select
-            id="font-size"
-            class="rounded px-2 py-1 text-sm ring-1 ring-gray-200 transition-colors duration-150 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-700"
-          >
-            <option value="3"><LocalizedText key="contact.size" /></option>
-            <option value="1">XS</option>
-            <option value="2">S</option>
-            <option value="3">M</option>
-            <option value="4">L</option>
-            <option value="5">XL</option>
-            <option value="6">XXL</option>
-          </select>
-        </div>
+        <!-- Toolbar removed: simplified editor -->
 
         <!-- Editor -->
         <div
@@ -148,42 +102,17 @@ const FORMSPREE_ACTION = import.meta.env.PUBLIC_FORMSPREE_ACTION;
         class="sr-only"
       />
 
-      <!-- Captcha removed: simple cooldown + validation enforced client-side -->
-
-      <!-- Status message shown below the captcha and above the submit button -->
       <div class="w-full text-center">
         <!-- Cooldown display mejorado -->
-        <div
-          id="cooldown-display"
-          class="mb-3 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-center text-yellow-800 dark:border-yellow-700 dark:bg-yellow-900 dark:text-yellow-200"
-          style="display:none"
-        >
-        </div>
+        <CooldownDisplay id="cooldown-display" />
 
-        <div
-          id="form-status"
-          role="status"
-          aria-live="polite"
-          class="mb-3 flex flex-col items-center gap-2 text-sm"
-          style="min-height:1rem"
-        >
-        </div>
-
-        <!-- Actions container (no captcha) -->
-        <div
-          id="captcha-actions"
-          class="mb-3 w-full text-center"
-          style="display:none"
-        >
-        </div>
+        <FormStatus id="form-status" />
       </div>
 
       <div class="flex items-center justify-start gap-3">
         <SubmitBtn id="submit-btn" translationKey="contact.send" />
       </div>
     </form>
-
-    <!-- No captcha helper script required -->
 
     <script type="module" src="/js/contact/contact.js"></script>
   </div>

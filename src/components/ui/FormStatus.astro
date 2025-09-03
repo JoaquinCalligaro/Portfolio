@@ -1,0 +1,18 @@
+---
+// Simple form status component.
+// Props:
+// - id: optional id to attach (for client scripts)
+// - type: 'info' | 'success' | 'error' (default: info)
+// - message: initial message text
+const { id = undefined, type = 'info', message = '' } = Astro.props;
+---
+
+<div
+  id={id}
+  role="status"
+  aria-live="polite"
+  class={`form-status mb-3 px-4 py-3 text-center text-md bg-transparent font-bold  data-[status=success]:text-green-500 data-[status=error]:text-red-500  data-[status=info]:text-yellow-600  ${message ? '' : 'hidden'}`}
+  data-status={type}
+>
+  {message}
+</div>
