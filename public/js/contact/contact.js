@@ -51,13 +51,28 @@
       return diff > 0 ? diff : 0;
     }
 
+    // Validation settings
+    var NAME_MAX_LENGTH = 50; // configurable limit for name field
+
     function validateName(v) {
       var t = String(v || '').trim();
-      if (!t) return { ok: false };
-      if (t.length < 2) return { ok: false };
-      // Reject names that contain any digit
-      if (/\d/.test(t)) return { ok: false };
-      if (t.length > 200) return { ok: false };
+      if (!t) return { ok: false, reason: 'required' };
+      if (t.length < 2) return { ok: false, reason: 'tooShort' };
+      if (t.length > NAME_MAX_LENGTH) return { ok: false, reason: 'tooLong' };
+      // Allow only Unicode letters, spaces, hyphens and apostrophes commonly used in names
+      // 
+      // Uses Unicode property escape if supported; fallbacks to conservative ascii check.
+      var lettersOnly = true;
+      try {
+        // Regex: one or more of letters (\p{L}), spaces, hyphen, apostrophe
+        var re = /^(?:[\p{L}]+[ \-']?)+$/u;
+        lettersOnly = re.test(t);
+      } catch {
+        // Fallback: disallow digits and most punctuation
+        lettersOnly = !/[^A-Za-z \-']/.test(t);
+      }
+
+      if (!lettersOnly) return { ok: false, reason: 'invalidChars' };
       return { ok: true };
     }
     function validateEmail(v) {
@@ -198,13 +213,23 @@
         // name
         try {
           if (nameError) {
-            var invalidName = !validateName(nameInput.value).ok;
+            var nameValidation = validateName(nameInput.value);
+            var invalidName = !nameValidation.ok;
             if (invalidName && (hasAttemptedSubmit || touched.name)) {
-              // If it contains any digit, show the specific invalidName message
-              if (/\d/.test(String(nameInput.value || '').trim())) {
+              // Show specific messages based on reason codes
+              if (nameValidation.reason === 'invalidChars') {
                 nameError.textContent =
-                  resolveTranslation('contact.invalidName', lang) ||
-                  'Name cannot contain numbers';
+                  resolveTranslation('contact.invalidNameChars', lang) ||
+                  'Name can only contain letters, spaces and -\'';
+              } else if (nameValidation.reason === 'tooLong') {
+                nameError.textContent =
+                  (resolveTranslation('contact.nameTooLong', lang) ||
+                    'Name is too long') +
+                  ' (' + NAME_MAX_LENGTH + ')';
+              } else if (nameValidation.reason === 'tooShort') {
+                nameError.textContent =
+                  resolveTranslation('contact.nameRequired', lang) ||
+                  'Name required';
               } else {
                 nameError.textContent =
                   resolveTranslation('contact.nameRequired', lang) ||
