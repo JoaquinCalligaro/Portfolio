@@ -5,7 +5,7 @@
 /* eslint-disable */
 
 import React, { useEffect, useRef, useState } from 'react';
-// refreshBackground helper removed for debugging — import intentionally omitted
+import { initBackgroundRefresh } from './refreshBackground';
 import { LIGHT_MODE_CONFIG, DARK_MODE_CONFIG } from './config';
 
 interface LayerProps {
@@ -1151,8 +1151,8 @@ export default function BackgroundExport(props: BackgroundExportProps) {
   }, []);
 
   useEffect(() => {
-    // refreshBackground helper removed for debugging; use noop cleanup
-    const cleanupInit = () => {};
+    // Initialize background refresh observer
+    const cleanupInit = initBackgroundRefresh();
 
     const onRefresh = () => setRefreshKey((k) => k + 1);
     window.addEventListener('background-refresh', onRefresh as EventListener);
