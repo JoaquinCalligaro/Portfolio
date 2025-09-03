@@ -113,6 +113,14 @@
 
     var cooldownDisplay = qs('#cooldown-display');
     var formStatus = qs('#form-status');
+    var nameError = qs('#name-error');
+    var emailError = qs('#email-error');
+    var messageError = qs('#message-error');
+
+    // Bandera para saber si el usuario ya intentó enviar el formulario
+    var hasAttemptedSubmit = false;
+    // Campos que el usuario ya tocó / salió (blur) -> muestra solo ese error
+    var touched = { name: false, email: false, message: false };
 
     function formatTimeStr(ms) {
       var totalSec = Math.ceil(ms / 1000);
@@ -182,6 +190,90 @@
       }
     }
 
+    function showValidationErrors() {
+      try {
+        var lang = document.documentElement.lang || 'ES';
+        // name
+        try {
+          if (nameError) {
+            var invalidName = !validateName(nameInput.value).ok;
+            if (invalidName && (hasAttemptedSubmit || touched.name)) {
+              nameError.textContent =
+                resolveTranslation('contact.nameRequired', lang) ||
+                'Name required';
+              nameError.classList.remove('hidden');
+            } else {
+              nameError.textContent = '';
+              nameError.classList.add('hidden');
+            }
+          }
+        } catch {
+          // noop
+        }
+        // email
+        try {
+          if (emailError) {
+            var invalidEmail = !validateEmail(emailInput.value).ok;
+            if (invalidEmail && (hasAttemptedSubmit || touched.email)) {
+              emailError.textContent =
+                resolveTranslation('contact.invalidEmail', lang) ||
+                'Invalid email';
+              emailError.classList.remove('hidden');
+            } else {
+              emailError.textContent = '';
+              emailError.classList.add('hidden');
+            }
+          }
+        } catch {
+          // noop
+        }
+        // message
+        try {
+          var messageVal = '';
+          try {
+            if (messageEditor)
+              messageVal =
+                messageEditor.textContent || messageEditor.innerText || '';
+            else if (messageInput && typeof messageInput.value === 'string')
+              messageVal = messageInput.value;
+          } catch {
+            messageVal = '';
+          }
+          if (messageError) {
+            var invalidMsg = !validateMessage(messageVal).ok;
+            if (invalidMsg && (hasAttemptedSubmit || touched.message)) {
+              messageError.textContent =
+                resolveTranslation('contact.messageMinLength', lang) ||
+                'Message is too short';
+              messageError.classList.remove('hidden');
+            } else {
+              messageError.textContent = '';
+              messageError.classList.add('hidden');
+            }
+          }
+        } catch {
+          // noop
+        }
+      } catch {
+        // noop
+      }
+    }
+
+    function hideAllValidationErrors() {
+      try {
+        [nameError, emailError, messageError].forEach(function (errorElement) {
+          if (errorElement) {
+            errorElement.textContent = '';
+            errorElement.classList.add('hidden');
+          }
+        });
+        touched.name = touched.email = touched.message = false;
+        hasAttemptedSubmit = false;
+      } catch {
+        // noop
+      }
+    }
+
     function clearStatus() {
       try {
         if (!formStatus) return;
@@ -220,11 +312,19 @@
     }
 
     function updateSubmitButtonState() {
+      // Mostrar errores si el usuario intentó enviar o tocó campos
+      if (
+        hasAttemptedSubmit ||
+        touched.name ||
+        touched.email ||
+        touched.message
+      ) {
+        showValidationErrors();
+      }
+
       var disabled = !isFormValid() || isCooldownActive();
       submitBtn.disabled = !!disabled;
-      // keep button label stable; cooldown shown in the cooldown display area
       submitBtn.textContent = submitBtn.dataset.defaultLabel;
-      // update cooldown display as part of state update
       updateCooldownDisplay();
     }
 
@@ -258,6 +358,29 @@
       }
     });
 
+    // Marcar campos como "touched" al salir (blur) para mostrar solo ese error
+    try {
+      nameInput.addEventListener('blur', function () {
+        touched.name = true;
+        updateSubmitButtonState();
+      });
+      emailInput.addEventListener('blur', function () {
+        touched.email = true;
+        updateSubmitButtonState();
+      });
+      if (messageEditor) {
+        messageEditor.addEventListener('blur', function () {
+          touched.message = true;
+          updateSubmitButtonState();
+        });
+      } else if (messageInput) {
+        messageInput.addEventListener('blur', function () {
+          touched.message = true;
+          updateSubmitButtonState();
+        });
+      }
+    } catch {}
+
     updateSubmitButtonState();
 
     function markSend() {
@@ -267,7 +390,13 @@
 
     async function handleSubmit(e) {
       e.preventDefault();
+
+      // Marcar que el usuario intentó enviar
+      hasAttemptedSubmit = true;
+
       if (!isFormValid()) {
+        // Mostrar errores de validación cuando se intenta enviar
+        showValidationErrors();
         updateSubmitButtonState();
         return;
       }
@@ -275,6 +404,10 @@
         updateSubmitButtonState();
         return;
       }
+
+      // Si llegamos aquí, el formulario es válido - ocultar errores de validación
+      hideAllValidationErrors();
+
       submitBtn.disabled = true;
       var originalText = submitBtn.textContent;
       submitBtn.textContent = 'Sending...';
@@ -318,6 +451,10 @@
         }
         markSend();
         form.reset();
+        // Ocultar errores de validación cuando el formulario se resetea exitosamente
+        hideAllValidationErrors();
+        // Resetear la bandera para que no aparezcan errores en el próximo uso
+        hasAttemptedSubmit = false;
         // show translated success message with status code
         try {
           var okCode = (res && res.status) || '';
