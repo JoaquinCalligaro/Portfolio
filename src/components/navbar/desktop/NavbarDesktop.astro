@@ -1,9 +1,9 @@
 ---
 // icons are rendered inside LanguageToggle
-import MoonIcon from '../assets/svg/moon.svg';
-import SunIcon from '../assets/svg/sun.svg';
-import LanguageToggle from './language/LanguageToggle.astro';
-import LocalizedText from './language/LocalizedText.astro';
+import MoonIcon from '../../../assets/svg/moon.svg';
+import SunIcon from '../../../assets/svg/sun.svg';
+import LanguageToggle from '../../language/LanguageToggle.astro';
+import LocalizedText from '../../language/LocalizedText.astro';
 ---
 
 <header
@@ -69,9 +69,10 @@ import LocalizedText from './language/LocalizedText.astro';
     id="navbar"
     class="dark:navbar-glow hidden w-full -translate-y-[200%] rounded-sm p-4 text-sm transition-transform sm:static sm:mt-0 sm:block sm:w-auto sm:translate-y-0 sm:border-none sm:p-0 lg:text-base"
   >
+    <!-- Mobile Navigation (original) -->
     <ul
       id="navbar-links"
-      class="flex flex-col items-center gap-8 font-semibold sm:flex-row sm:gap-6 md:gap-7 lg:gap-8 xl:gap-8"
+      class="flex flex-col items-center gap-8 font-semibold sm:hidden"
     >
       <li>
         <a href="#tech-stack" class="nav-hover-light nav-hover-dark"
@@ -88,13 +89,37 @@ import LocalizedText from './language/LocalizedText.astro';
           ><LocalizedText key="navbar.projects" fallback="About" /></a
         >
       </li>
-      <!-- Home button removed as requested -->
       <li>
         <a href="#contact" class="nav-hover-light nav-hover-dark"
           ><LocalizedText key="navbar.contact" fallback="Contact" /></a
         >
       </li>
     </ul>
+
+    <!-- Desktop Glass Navigation -->
+    <div class="glass-nav-wrapper hidden sm:flex">
+      <input type="radio" name="nav-section" id="glass-tech" checked />
+      <label for="glass-tech" data-target="#tech-stack">
+        <LocalizedText key="navbar.home" fallback="Tech Stack" />
+      </label>
+
+      <input type="radio" name="nav-section" id="glass-projects" />
+      <label for="glass-projects" data-target="#projects">
+        <LocalizedText key="navbar.tech" fallback="Projects" />
+      </label>
+
+      <input type="radio" name="nav-section" id="glass-about" />
+      <label for="glass-about" data-target="#about">
+        <LocalizedText key="navbar.projects" fallback="About" />
+      </label>
+
+      <input type="radio" name="nav-section" id="glass-contact" />
+      <label for="glass-contact" data-target="#contact">
+        <LocalizedText key="navbar.contact" fallback="Contact" />
+      </label>
+
+      <div class="glass-nav-glider"></div>
+    </div>
   </nav>
 </header>
 
@@ -185,5 +210,92 @@ import LocalizedText from './language/LocalizedText.astro';
     }
 
     lastScrollTop = Math.max(currentScrollTop, 0);
+  });
+
+  // Glass Navigation functionality (Desktop only)
+  document.addEventListener('DOMContentLoaded', () => {
+    const glassNavLabels = document.querySelectorAll(
+      '.glass-nav-wrapper label'
+    );
+    const mobileNavLinks = document.querySelectorAll('#navbar-links a');
+
+    // Handle glass nav clicks with smooth scroll
+    glassNavLabels.forEach((label) => {
+      label.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = label.getAttribute('data-target');
+        if (target) {
+          const element = document.querySelector(target);
+          if (element) {
+            element.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+            });
+          }
+        }
+      });
+    });
+
+    // Handle mobile nav clicks with smooth scroll
+    mobileNavLinks.forEach((link) => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = link.getAttribute('href');
+        if (target && target.startsWith('#')) {
+          const element = document.querySelector(target);
+          if (element) {
+            element.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+            });
+          }
+
+          // Close mobile menu
+          if (navbarXIcon) navbarXIcon.classList.add('hidden');
+          if (navbarMenuIcon) navbarMenuIcon.classList.remove('hidden');
+          if (navbar) navbar.classList.add('hidden', '-translate-y-[200%]');
+          document.body.style.transition = 'padding-top 0.5s ease-in-out';
+          document.body.style.paddingTop = '80px';
+        }
+      });
+    });
+
+    // Update active section based on scroll position
+    const sections = ['#tech-stack', '#projects', '#about', '#contact'];
+    const radioInputs = [
+      document.getElementById('glass-tech'),
+      document.getElementById('glass-projects'),
+      document.getElementById('glass-about'),
+      document.getElementById('glass-contact'),
+    ];
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const sectionId = entry.target.id;
+            const sectionIndex = sections.findIndex(
+              (s) => s === `#${sectionId}`
+            );
+
+            if (sectionIndex !== -1 && radioInputs[sectionIndex]) {
+              radioInputs[sectionIndex].checked = true;
+            }
+          }
+        });
+      },
+      {
+        threshold: 0.6,
+        rootMargin: '-20% 0px -20% 0px',
+      }
+    );
+
+    // Observe all sections
+    sections.forEach((sectionId) => {
+      const element = document.querySelector(sectionId);
+      if (element) {
+        observer.observe(element);
+      }
+    });
   });
 </script>
