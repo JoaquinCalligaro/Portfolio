@@ -34,8 +34,16 @@
 
     if (!form || !nameInput || !emailInput || !messageInput || !submitBtn)
       return;
-    submitBtn.dataset.defaultLabel =
-      submitBtn.textContent || submitBtn.value || 'Send';
+    
+    // Store the original text or use translation key if available
+    var translationKey = submitBtn.dataset.translationKey;
+    if (translationKey) {
+      // Don't override if using translation system
+      submitBtn.dataset.defaultLabel = null;
+    } else {
+      submitBtn.dataset.defaultLabel =
+        submitBtn.textContent || submitBtn.value || 'Send';
+    }
 
     function getLastSend() {
       var v = localStorage.getItem(LAST_SEND_KEY);
@@ -358,7 +366,15 @@
 
       var disabled = !isFormValid() || isCooldownActive();
       submitBtn.disabled = !!disabled;
-      submitBtn.textContent = submitBtn.dataset.defaultLabel;
+      
+      // Use translation key if available, otherwise use stored default
+      var translationKey = submitBtn.dataset.translationKey;
+      if (translationKey) {
+        // Don't override text - let the translation system handle it
+      } else if (submitBtn.dataset.defaultLabel) {
+        submitBtn.textContent = submitBtn.dataset.defaultLabel;
+      }
+      
       updateCooldownDisplay();
     }
 
@@ -444,7 +460,11 @@
 
       submitBtn.disabled = true;
       var originalText = submitBtn.textContent;
-      submitBtn.textContent = 'Sending...';
+      
+      // Use translation for "Sending..." text
+      var lang = document.documentElement.lang || 'ES';
+      var sendingText = resolveTranslation('contact.sending', lang) || 'Sending...';
+      submitBtn.textContent = sendingText;
       try {
         var fd = new FormData(form);
         if (fd.has && fd.has('cf-turnstile-response'))
@@ -502,7 +522,10 @@
         } catch {
           // noop
         }
-        submitBtn.textContent = 'Sent';
+        
+        // Use translation for "Sent" text
+        var sentText = resolveTranslation('contact.sent', lang) || 'Sent';
+        submitBtn.textContent = sentText;
         setTimeout(function () {
           submitBtn.textContent = originalText;
           updateSubmitButtonState();

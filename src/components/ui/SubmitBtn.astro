@@ -87,7 +87,9 @@ const buttonText = translationKey ? (resolve(serverLang, translationKey) ?? text
 
       // Listen for language changes
       window.addEventListener('langChange', (e) => {
-        const lang = (e && e.detail) || document.documentElement.lang || 'ES';
+        // Normalize lang to match translation keys (ES/EN)
+        const raw = (e && e.detail) || document.documentElement.lang || 'ES';
+        const lang = String(raw).toUpperCase();
         console.log('langChange event received, lang:', lang);
         // Add small delay to ensure DOM and translations are synchronized
         setTimeout(() => updateButtonText(lang), 10);
@@ -95,9 +97,10 @@ const buttonText = translationKey ? (resolve(serverLang, translationKey) ?? text
 
       // Function to wait for translations and apply them
       const applyTranslationsWhenReady = () => {
-        const currentLang = document.documentElement.lang || 'ES';
+        const raw = document.documentElement.lang || 'ES';
+        const currentLang = String(raw).toUpperCase();
         console.log('Applying translations for lang:', currentLang);
-        
+
         if (window.TRANSLATIONS && window.TRANSLATIONS[currentLang]) {
           updateButtonText(currentLang);
         } else {
