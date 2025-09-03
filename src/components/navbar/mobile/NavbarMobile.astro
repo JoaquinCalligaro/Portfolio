@@ -1,0 +1,32 @@
+---
+import LocalizedText from '../../language/LocalizedText.astro';
+---
+
+<!-- Mobile navigation: simple vertical list, logic handled in inline script below -->
+<ul
+  id="navbar-links"
+  class="flex flex-col items-center gap-8 font-semibold sm:hidden"
+>
+  <li>
+    <a href="#tech-stack" class="nav-hover-light nav-hover-dark"
+      ><LocalizedText key="navbar.home" fallback="Tech Stack" /></a
+    >
+  </li>
+  <li>
+    <a href="#projects" class="nav-hover-light nav-hover-dark"
+      ><LocalizedText key="navbar.tech" fallback="Projects" /></a
+    >
+  </li>
+  <li>
+    <a href="#about" class="nav-hover-light nav-hover-dark"
+      ><LocalizedText key="navbar.projects" fallback="About" /></a
+    >
+  </li>
+  <li>
+    <a href="#contact" class="nav-hover-light nav-hover-dark"
+      ><LocalizedText key="navbar.contact" fallback="Contact" /></a
+    >
+  </li>
+</ul>
+
+<!-- Mobile behavior handled in the parent desktop component script to avoid duplication -->

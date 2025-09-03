@@ -4,6 +4,7 @@ import MoonIcon from '../../../assets/svg/moon.svg';
 import SunIcon from '../../../assets/svg/sun.svg';
 import LanguageToggle from '../../language/LanguageToggle.astro';
 import LocalizedText from '../../language/LocalizedText.astro';
+import NavbarMobile from '../mobile/NavbarMobile.astro';
 ---
 
 <header
@@ -69,32 +70,8 @@ import LocalizedText from '../../language/LocalizedText.astro';
     id="navbar"
     class="dark:navbar-glow hidden w-full -translate-y-[200%] rounded-sm p-4 text-sm transition-transform sm:static sm:mt-0 sm:block sm:w-auto sm:translate-y-0 sm:border-none sm:p-0 lg:text-base"
   >
-    <!-- Mobile Navigation (original) -->
-    <ul
-      id="navbar-links"
-      class="flex flex-col items-center gap-8 font-semibold sm:hidden"
-    >
-      <li>
-        <a href="#tech-stack" class="nav-hover-light nav-hover-dark"
-          ><LocalizedText key="navbar.home" fallback="Tech Stack" /></a
-        >
-      </li>
-      <li>
-        <a href="#projects" class="nav-hover-light nav-hover-dark"
-          ><LocalizedText key="navbar.tech" fallback="Projects" /></a
-        >
-      </li>
-      <li>
-        <a href="#about" class="nav-hover-light nav-hover-dark"
-          ><LocalizedText key="navbar.projects" fallback="About" /></a
-        >
-      </li>
-      <li>
-        <a href="#contact" class="nav-hover-light nav-hover-dark"
-          ><LocalizedText key="navbar.contact" fallback="Contact" /></a
-        >
-      </li>
-    </ul>
+    <!-- Mobile Navigation (moved to component) -->
+    <NavbarMobile />
 
     <!-- Desktop Glass Navigation -->
     <div class="glass-nav-wrapper hidden sm:flex">
@@ -126,25 +103,6 @@ import LocalizedText from '../../language/LocalizedText.astro';
 <script is:inline>
   // Keep menu toggle, theme toggle and scroll behavior. Language handled by LanguageToggle + T component.
   const navbar = document.getElementById('navbar');
-  const navbarToggle = document.getElementById('navbar-toggle');
-  const navbarXIcon = document.getElementById('navbar-x-icon');
-  const navbarMenuIcon = document.getElementById('navbar-menu-icon');
-
-  if (navbarToggle) {
-    navbarToggle.addEventListener('click', () => {
-      if (navbarXIcon) navbarXIcon.classList.toggle('hidden');
-      if (navbarMenuIcon) navbarMenuIcon.classList.toggle('hidden');
-      if (navbar) navbar.classList.toggle('hidden');
-
-      document.body.style.transition = 'padding-top 0.6s ease-in-out 0.4s';
-      const isMenuOpen = navbar && !navbar.classList.contains('hidden');
-      document.body.style.paddingTop = isMenuOpen ? '100px' : '20px';
-
-      setTimeout(() => {
-        if (navbar) navbar.classList.toggle('-translate-y-[200%]');
-      }, 10);
-    });
-  }
 
   const themeToggle = document.getElementById('theme-toggle');
   const themeMoonIcon = document.getElementById('theme-moon-icon');
@@ -218,6 +176,64 @@ import LocalizedText from '../../language/LocalizedText.astro';
       '.glass-nav-wrapper label'
     );
     const mobileNavLinks = document.querySelectorAll('#navbar-links a');
+
+    // Mobile hamburger toggle: ensure the mobile nav becomes visible when hamburger is clicked
+    const navbarToggleElem = document.getElementById('navbar-toggle');
+    const navbarElem = document.getElementById('navbar');
+    if (navbarToggleElem) {
+      const toggleMobileMenu = () => {
+        const navbarXIcon = document.getElementById('navbar-x-icon');
+        const navbarMenuIcon = document.getElementById('navbar-menu-icon');
+
+        if (navbarXIcon) navbarXIcon.classList.toggle('hidden');
+        if (navbarMenuIcon) navbarMenuIcon.classList.toggle('hidden');
+
+        if (navbarElem) {
+          const isHidden = navbarElem.classList.contains('hidden');
+          if (isHidden) {
+            navbarElem.classList.remove('hidden');
+            // animate into view
+            setTimeout(
+              () => navbarElem.classList.remove('-translate-y-[200%]'),
+              10
+            );
+            document.body.style.transition =
+              'padding-top 0.6s ease-in-out 0.4s';
+            document.body.style.paddingTop = '100px';
+          } else {
+            // animate out
+            navbarElem.classList.add('-translate-y-[200%]');
+            setTimeout(() => navbarElem.classList.add('hidden'), 260);
+            document.body.style.transition = 'padding-top 0.5s ease-in-out';
+            document.body.style.paddingTop = '20px';
+          }
+        }
+      };
+
+      navbarToggleElem.addEventListener('click', toggleMobileMenu);
+
+      // Close menu when pressing Escape
+      document.addEventListener('keydown', (ev) => {
+        if (
+          ev.key === 'Escape' &&
+          navbarElem &&
+          !navbarElem.classList.contains('hidden')
+        ) {
+          toggleMobileMenu();
+        }
+      });
+
+      // Click outside to close
+      document.addEventListener('click', (ev) => {
+        if (!navbarElem) return;
+        const target = ev.target;
+        const isClickInside =
+          navbarElem.contains(target) || navbarToggleElem.contains(target);
+        if (!isClickInside && !navbarElem.classList.contains('hidden')) {
+          toggleMobileMenu();
+        }
+      });
+    }
 
     // Handle glass nav clicks with smooth scroll
     glassNavLabels.forEach((label) => {
