@@ -6,7 +6,7 @@ import type { NavRadioId, SectionId } from './types';
  * - Smooth scroll al hacer click en los labels
  * - Marca la sección activa usando IntersectionObserver
  */
-export function initGlassNavigation() {
+export function initSectionNavigation() {
   const glassNavLabels = document.querySelectorAll<HTMLLabelElement>(
     '.glass-nav-wrapper label'
   );
@@ -51,21 +51,37 @@ export function initGlassNavigation() {
   // Observer para marcar la sección activa
   const observer = new IntersectionObserver(
     (entries) => {
+      // Encontrar la sección con mayor intersección visible
+      let maxIntersectionRatio = 0;
+      let activeEntry: IntersectionObserverEntry | null = null;
+
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const sectionIndex = sections.findIndex(
-            (s) => s === entry.target.id // 👈 ahora compara con id real de <section>
-          );
-          if (sectionIndex !== -1) {
-            const radioInput = document.getElementById(
-              ids[sectionIndex]
-            ) as HTMLInputElement | null;
-            if (radioInput) radioInput.checked = true;
-          }
+        if (
+          entry.isIntersecting &&
+          entry.intersectionRatio > maxIntersectionRatio
+        ) {
+          maxIntersectionRatio = entry.intersectionRatio;
+          activeEntry = entry;
         }
       });
+
+      // Marcar la sección con mayor intersección como activa
+      if (activeEntry) {
+        const sectionIndex = sections.findIndex(
+          (s) => s === activeEntry!.target.id
+        );
+        if (sectionIndex !== -1) {
+          const radioInput = document.getElementById(
+            ids[sectionIndex]
+          ) as HTMLInputElement | null;
+          if (radioInput) radioInput.checked = true;
+        }
+      }
     },
-    { threshold: 0.6, rootMargin: '-20% 0px -20% 0px' }
+    {
+      threshold: [0.1, 0.25, 0.5, 0.75],
+      rootMargin: '-10% 0px -10% 0px',
+    }
   );
 
   // Observar cada sección real

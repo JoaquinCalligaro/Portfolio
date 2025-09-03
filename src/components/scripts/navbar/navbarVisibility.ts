@@ -1,10 +1,11 @@
-// src/scripts/navbar/scrollBehavior.ts
+// src/scripts/navbar/navbarVisibility.ts
 
 /**
- * Oculta o muestra la navbar al hacer scroll.
- * También se asegura de cerrar el menú móvil si está abierto.
+ * Controla la visibilidad de la navbar basándose en el scroll del usuario.
+ * Oculta la navbar al hacer scroll hacia abajo y la muestra al hacer scroll hacia arriba.
+ * También se asegura de cerrar el menú móvil si está abierto durante el scroll.
  */
-export function initScrollBehavior() {
+export function initNavbarVisibility() {
   const navbar = document.getElementById('navbar');
   const navbarHeader = document.getElementById('navbar-header');
   const navbarXIcon = document.getElementById('navbar-x-icon');

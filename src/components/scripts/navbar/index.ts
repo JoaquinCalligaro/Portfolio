@@ -1,9 +1,9 @@
 import { initMobileMenu } from './mobileMenu';
-import { initScrollBehavior } from './scrollBehavior';
-import { initGlassNavigation } from './glassNavigation';
+import { initNavbarVisibility } from './navbarVisibility';
+import { initSectionNavigation } from './sectionNavigation';
 
 export function initNavbar() {
   initMobileMenu();
-  initScrollBehavior();
-  initGlassNavigation();
+  initNavbarVisibility();
+  initSectionNavigation();
 }
