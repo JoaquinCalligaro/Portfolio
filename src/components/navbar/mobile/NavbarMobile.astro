@@ -1,32 +1,43 @@
 ---
+// Componente de navegación móvil - solo markup, lógica manejada por NavbarDesktop
 import LocalizedText from '../../language/LocalizedText.astro';
 ---
 
-<!-- Mobile navigation: simple vertical list, logic handled in inline script below -->
+<!-- Lista de navegación móvil (visible solo en pantallas pequeñas) -->
 <ul
   id="navbar-links"
   class="flex flex-col items-center gap-8 font-semibold sm:hidden"
 >
   <li>
-    <a href="#tech-stack" class="nav-hover-light nav-hover-dark"
-      ><LocalizedText key="navbar.home" fallback="Tech Stack" /></a
+    <a
+      href="#tech-stack"
+      class="nav-hover-light nav-hover-dark relative rounded-lg px-4 py-2 text-amber-800 transition-all duration-400 hover:scale-102 hover:text-amber-700 active:scale-98 active:text-amber-700"
     >
+      <LocalizedText key="navbar.home" fallback="Tech Stack" />
+    </a>
   </li>
   <li>
-    <a href="#projects" class="nav-hover-light nav-hover-dark"
-      ><LocalizedText key="navbar.tech" fallback="Projects" /></a
+    <a
+      href="#projects"
+      class="nav-hover-light nav-hover-dark relative rounded-lg px-4 py-2 text-amber-800 transition-all duration-400 hover:scale-102 hover:text-amber-700 active:scale-98 active:text-amber-700"
     >
+      <LocalizedText key="navbar.tech" fallback="Projects" />
+    </a>
   </li>
   <li>
-    <a href="#about" class="nav-hover-light nav-hover-dark"
-      ><LocalizedText key="navbar.projects" fallback="About" /></a
+    <a
+      href="#about"
+      class="nav-hover-light nav-hover-dark relative rounded-lg px-4 py-2 text-amber-800 transition-all duration-400 hover:scale-102 hover:text-amber-700 active:scale-98 active:text-amber-700"
     >
+      <LocalizedText key="navbar.projects" fallback="About" />
+    </a>
   </li>
   <li>
-    <a href="#contact" class="nav-hover-light nav-hover-dark"
-      ><LocalizedText key="navbar.contact" fallback="Contact" /></a
+    <a
+      href="#contact"
+      class="nav-hover-light nav-hover-dark relative rounded-lg px-4 py-2 text-amber-800 transition-all duration-400 hover:scale-102 hover:text-amber-700 active:scale-98 active:text-amber-700"
     >
+      <LocalizedText key="navbar.contact" fallback="Contact" />
+    </a>
   </li>
 </ul>
-
-<!-- Mobile behavior handled in the parent desktop component script to avoid duplication -->

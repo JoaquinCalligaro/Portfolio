@@ -1,5 +1,5 @@
 ---
-// icons are rendered inside LanguageToggle
+// Componentes y iconos para la navegación principal
 import MoonIcon from '../../../assets/svg/moon.svg';
 import SunIcon from '../../../assets/svg/sun.svg';
 import LanguageToggle from '../../language/LanguageToggle.astro';
@@ -7,40 +7,43 @@ import LocalizedText from '../../language/LocalizedText.astro';
 import NavbarMobile from '../mobile/NavbarMobile.astro';
 ---
 
+<!-- Header principal con navegación glass (desktop) y móvil -->
 <header
   id="navbar-header"
   class="header-backdrop-blur dark:navbar-glow fixed top-0 right-0 left-0 z-50 mx-auto flex max-w-4xl flex-wrap items-center justify-between rounded-2xl border-2 border-gray-400/30 bg-gray-400/10 px-5 py-4 transition-transform duration-300 ease-in-out dark:border-black/40 dark:bg-black/20"
 >
+  <!-- Espacio vacío para balancear el layout -->
   <div></div>
 
+  <!-- Botones de utilidad (tema, idioma, menú móvil) -->
   <div class="flex items-center gap-3 px-3 text-gray-900 sm:order-1">
-    <!-- Theme Toggle Button -->
+    <!-- Toggle tema claro/oscuro -->
     <button
-      title="Theme Toggle"
-      aria-label="Theme Toggle"
+      title="Alternar tema"
+      aria-label="Alternar tema"
       id="theme-toggle"
-      class="glow-hover action-button flex items-center"
+      class="glow-hover action-button flex cursor-pointer items-center rounded-lg p-2 transition-all duration-300 hover:scale-110 hover:brightness-110 active:scale-95"
     >
-      <SunIcon id="theme-sun-icon" class="mx-2 size-6" aria-label="Sun Icon" />
+      <SunIcon id="theme-sun-icon" class="mx-2 size-6" aria-label="Icono sol" />
       <MoonIcon
         id="theme-moon-icon"
         class="mx-2 size-6"
-        aria-label="Moon Icon"
+        aria-label="Icono luna"
       />
     </button>
 
-    <!-- Language Toggle Button -->
+    <!-- Toggle idioma -->
     <LanguageToggle />
 
-    <!-- Mobile Menu Toggle -->
+    <!-- Botón hamburguesa (solo móvil) -->
     <button
-      title="Navbar Toggle"
-      aria-label="Navbar Toggle"
+      title="Alternar menú"
+      aria-label="Alternar menú"
       id="navbar-toggle"
-      class="glow-hover action-button sm:hidden dark:text-white"
+      class="glow-hover action-button cursor-pointer rounded-lg p-2 transition-all duration-300 hover:scale-110 hover:brightness-110 active:scale-95 sm:hidden dark:text-white"
     >
       <svg
-        aria-label="Menu Icon"
+        aria-label="Icono menú"
         id="navbar-menu-icon"
         class="mx-3 size-6"
         fill="currentColor"
@@ -52,7 +55,7 @@ import NavbarMobile from '../mobile/NavbarMobile.astro';
         ></path>
       </svg>
       <svg
-        aria-label="Close Menu Icon"
+        aria-label="Icono cerrar"
         id="navbar-x-icon"
         class="mx-3 hidden size-6"
         fill="currentColor"
@@ -66,62 +69,84 @@ import NavbarMobile from '../mobile/NavbarMobile.astro';
     </button>
   </div>
 
+  <!-- Navegación principal -->
   <nav
     id="navbar"
     class="dark:navbar-glow hidden w-full -translate-y-[200%] rounded-sm p-4 text-sm transition-transform sm:static sm:mt-0 sm:block sm:w-auto sm:translate-y-0 sm:border-none sm:p-0 lg:text-base"
   >
-    <!-- Mobile Navigation (moved to component) -->
+    <!-- Navegación móvil -->
     <NavbarMobile />
 
-    <!-- Desktop Glass Navigation -->
+    <!-- Navegación desktop con efecto glass -->
     <div class="glass-nav-wrapper hidden sm:flex">
       <input type="radio" name="nav-section" id="glass-tech" checked />
-      <label for="glass-tech" data-target="#tech-stack">
+      <label
+        for="glass-tech"
+        data-target="#tech-stack"
+        class="relative rounded-lg px-4 py-2 text-amber-800 transition-all duration-400 hover:scale-102 hover:text-amber-700 active:scale-98 active:text-amber-700"
+      >
         <LocalizedText key="navbar.home" fallback="Tech Stack" />
       </label>
 
       <input type="radio" name="nav-section" id="glass-projects" />
-      <label for="glass-projects" data-target="#projects">
+      <label
+        for="glass-projects"
+        data-target="#projects"
+        class="relative rounded-lg px-4 py-2 text-amber-800 transition-all duration-400 hover:scale-102 hover:text-amber-700 active:scale-98 active:text-amber-700"
+      >
         <LocalizedText key="navbar.tech" fallback="Projects" />
       </label>
 
       <input type="radio" name="nav-section" id="glass-about" />
-      <label for="glass-about" data-target="#about">
+      <label
+        for="glass-about"
+        data-target="#about"
+        class="relative rounded-lg px-4 py-2 text-amber-800 transition-all duration-400 hover:scale-102 hover:text-amber-700 active:scale-98 active:text-amber-700"
+      >
         <LocalizedText key="navbar.projects" fallback="About" />
       </label>
 
       <input type="radio" name="nav-section" id="glass-contact" />
-      <label for="glass-contact" data-target="#contact">
+      <label
+        for="glass-contact"
+        data-target="#contact"
+        class="relative rounded-lg px-4 py-2 text-amber-800 transition-all duration-400 hover:scale-102 hover:text-amber-700 active:scale-98 active:text-amber-700"
+      >
         <LocalizedText key="navbar.contact" fallback="Contact" />
       </label>
 
+      <!-- Elemento deslizante del efecto glass -->
       <div class="glass-nav-glider"></div>
     </div>
   </nav>
 </header>
 
 <script is:inline>
-  // Keep menu toggle, theme toggle and scroll behavior. Language handled by LanguageToggle + T component.
+  // === INICIALIZACIÓN ===
   const navbar = document.getElementById('navbar');
+  const navbarHeader = document.getElementById('navbar-header');
 
-  const themeToggle = document.getElementById('theme-toggle');
-  const themeMoonIcon = document.getElementById('theme-moon-icon');
-  const themeSunIcon = document.getElementById('theme-sun-icon');
+  // === TEMA ===
+  function initTheme() {
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeMoonIcon = document.getElementById('theme-moon-icon');
+    const themeSunIcon = document.getElementById('theme-sun-icon');
 
-  const isDarkColorThemeSet = localStorage.getItem('color-theme') === 'dark';
-  const userPrefersDarkTheme =
-    window.matchMedia &&
-    window.matchMedia('(prefers-color-scheme: dark)').matches &&
-    !localStorage.getItem('color-theme');
+    // Detectar preferencia inicial
+    const isDarkSet = localStorage.getItem('color-theme') === 'dark';
+    const userPrefersDark =
+      !localStorage.getItem('color-theme') &&
+      window.matchMedia?.('(prefers-color-scheme: dark)').matches;
 
-  if (isDarkColorThemeSet || userPrefersDarkTheme) {
-    setDarkTheme();
-  } else {
-    setLightTheme();
-  }
+    // Aplicar tema inicial
+    if (isDarkSet || userPrefersDark) {
+      setDarkTheme();
+    } else {
+      setLightTheme();
+    }
 
-  if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
+    // Listener para cambio de tema
+    themeToggle?.addEventListener('click', () => {
       const colorTheme = localStorage.getItem('color-theme');
       if (colorTheme === 'dark') {
         setLightTheme();
@@ -129,189 +154,193 @@ import NavbarMobile from '../mobile/NavbarMobile.astro';
         setDarkTheme();
       }
     });
-  }
 
-  function setLightTheme() {
-    document.documentElement.classList.remove('dark');
-    localStorage.setItem('color-theme', 'light');
-    themeMoonIcon.classList.remove('hidden');
-    themeSunIcon.classList.add('hidden');
-  }
-
-  function setDarkTheme() {
-    localStorage.setItem('color-theme', 'dark');
-    document.documentElement.classList.add('dark');
-    themeMoonIcon.classList.add('hidden');
-    themeSunIcon.classList.remove('hidden');
-  }
-
-  // Navbar scroll behavior
-  let lastScrollTop = 0;
-  const navbarHeader = document.getElementById('navbar-header');
-
-  window.addEventListener('scroll', () => {
-    const currentScrollTop =
-      window.pageYOffset || document.documentElement.scrollTop;
-
-    if (currentScrollTop > lastScrollTop && currentScrollTop > 100) {
-      navbarHeader.classList.add('-translate-y-full');
-
-      if (navbar && !navbar.classList.contains('hidden')) {
-        if (navbarXIcon) navbarXIcon.classList.add('hidden');
-        if (navbarMenuIcon) navbarMenuIcon.classList.remove('hidden');
-        navbar.classList.add('hidden', '-translate-y-[200%]');
-        document.body.style.transition = 'padding-top 0.5s ease-in-out';
-        document.body.style.paddingTop = '80px';
-      }
-    } else if (currentScrollTop < lastScrollTop) {
-      navbarHeader.classList.remove('-translate-y-full');
+    function setLightTheme() {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('color-theme', 'light');
+      themeMoonIcon?.classList.remove('hidden');
+      themeSunIcon?.classList.add('hidden');
     }
 
-    lastScrollTop = Math.max(currentScrollTop, 0);
-  });
+    function setDarkTheme() {
+      localStorage.setItem('color-theme', 'dark');
+      document.documentElement.classList.add('dark');
+      themeMoonIcon?.classList.add('hidden');
+      themeSunIcon?.classList.remove('hidden');
+    }
+  }
 
-  // Glass Navigation functionality (Desktop only)
+  // === SCROLL NAVBAR ===
+  function initScrollBehavior() {
+    let lastScrollTop = 0;
+
+    window.addEventListener('scroll', () => {
+      const currentScrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+
+      // Ocultar navbar al hacer scroll hacia abajo
+      if (currentScrollTop > lastScrollTop && currentScrollTop > 100) {
+        navbarHeader?.classList.add('-translate-y-full');
+
+        // Cerrar menú móvil si está abierto
+        if (navbar && !navbar.classList.contains('hidden')) {
+          const navbarXIcon = document.getElementById('navbar-x-icon');
+          const navbarMenuIcon = document.getElementById('navbar-menu-icon');
+
+          navbarXIcon?.classList.add('hidden');
+          navbarMenuIcon?.classList.remove('hidden');
+          navbar.classList.add('hidden', '-translate-y-[200%]');
+          document.body.style.paddingTop = '80px';
+        }
+      }
+      // Mostrar navbar al hacer scroll hacia arriba
+      else if (currentScrollTop < lastScrollTop) {
+        navbarHeader?.classList.remove('-translate-y-full');
+      }
+
+      lastScrollTop = Math.max(currentScrollTop, 0);
+    });
+  }
+
+  // === FUNCIONALIDAD PRINCIPAL ===
   document.addEventListener('DOMContentLoaded', () => {
-    const glassNavLabels = document.querySelectorAll(
-      '.glass-nav-wrapper label'
-    );
-    const mobileNavLinks = document.querySelectorAll('#navbar-links a');
+    // === MENÚ MÓVIL ===
+    function initMobileMenu() {
+      const navbarToggle = document.getElementById('navbar-toggle');
+      if (!navbarToggle || !navbar) return;
 
-    // Mobile hamburger toggle: ensure the mobile nav becomes visible when hamburger is clicked
-    const navbarToggleElem = document.getElementById('navbar-toggle');
-    const navbarElem = document.getElementById('navbar');
-    if (navbarToggleElem) {
       const toggleMobileMenu = () => {
         const navbarXIcon = document.getElementById('navbar-x-icon');
         const navbarMenuIcon = document.getElementById('navbar-menu-icon');
+        const isHidden = navbar.classList.contains('hidden');
 
-        if (navbarXIcon) navbarXIcon.classList.toggle('hidden');
-        if (navbarMenuIcon) navbarMenuIcon.classList.toggle('hidden');
+        // Alternar iconos
+        navbarXIcon?.classList.toggle('hidden');
+        navbarMenuIcon?.classList.toggle('hidden');
 
-        if (navbarElem) {
-          const isHidden = navbarElem.classList.contains('hidden');
-          if (isHidden) {
-            navbarElem.classList.remove('hidden');
-            // animate into view
-            setTimeout(
-              () => navbarElem.classList.remove('-translate-y-[200%]'),
-              10
-            );
-            document.body.style.transition =
-              'padding-top 0.6s ease-in-out 0.4s';
-            document.body.style.paddingTop = '100px';
-          } else {
-            // animate out
-            navbarElem.classList.add('-translate-y-[200%]');
-            setTimeout(() => navbarElem.classList.add('hidden'), 260);
-            document.body.style.transition = 'padding-top 0.5s ease-in-out';
-            document.body.style.paddingTop = '20px';
-          }
+        if (isHidden) {
+          // Abrir menú
+          navbar.classList.remove('hidden');
+          setTimeout(() => navbar.classList.remove('-translate-y-[200%]'), 10);
+          document.body.style.paddingTop = '100px';
+        } else {
+          // Cerrar menú
+          navbar.classList.add('-translate-y-[200%]');
+          setTimeout(() => navbar.classList.add('hidden'), 260);
+          document.body.style.paddingTop = '20px';
         }
       };
 
-      navbarToggleElem.addEventListener('click', toggleMobileMenu);
+      // Listeners del menú móvil
+      navbarToggle.addEventListener('click', toggleMobileMenu);
 
-      // Close menu when pressing Escape
+      // Cerrar con Escape
       document.addEventListener('keydown', (ev) => {
-        if (
-          ev.key === 'Escape' &&
-          navbarElem &&
-          !navbarElem.classList.contains('hidden')
-        ) {
+        if (ev.key === 'Escape' && !navbar.classList.contains('hidden')) {
           toggleMobileMenu();
         }
       });
 
-      // Click outside to close
+      // Cerrar al hacer clic fuera
       document.addEventListener('click', (ev) => {
-        if (!navbarElem) return;
-        const target = ev.target;
         const isClickInside =
-          navbarElem.contains(target) || navbarToggleElem.contains(target);
-        if (!isClickInside && !navbarElem.classList.contains('hidden')) {
+          navbar.contains(ev.target) || navbarToggle.contains(ev.target);
+        if (!isClickInside && !navbar.classList.contains('hidden')) {
           toggleMobileMenu();
         }
       });
     }
 
-    // Handle glass nav clicks with smooth scroll
-    glassNavLabels.forEach((label) => {
-      label.addEventListener('click', (e) => {
-        e.preventDefault();
-        const target = label.getAttribute('data-target');
-        if (target) {
-          const element = document.querySelector(target);
-          if (element) {
-            element.scrollIntoView({
+    // === NAVEGACIÓN GLASS (DESKTOP) ===
+    function initGlassNavigation() {
+      const glassNavLabels = document.querySelectorAll(
+        '.glass-nav-wrapper label'
+      );
+
+      // Smooth scroll en navegación glass
+      glassNavLabels.forEach((label) => {
+        label.addEventListener('click', (e) => {
+          e.preventDefault();
+          const target = label.getAttribute('data-target');
+          if (target) {
+            document.querySelector(target)?.scrollIntoView({
               behavior: 'smooth',
               block: 'start',
             });
-          }
-        }
-      });
-    });
-
-    // Handle mobile nav clicks with smooth scroll
-    mobileNavLinks.forEach((link) => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const target = link.getAttribute('href');
-        if (target && target.startsWith('#')) {
-          const element = document.querySelector(target);
-          if (element) {
-            element.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
-            });
-          }
-
-          // Close mobile menu
-          if (navbarXIcon) navbarXIcon.classList.add('hidden');
-          if (navbarMenuIcon) navbarMenuIcon.classList.remove('hidden');
-          if (navbar) navbar.classList.add('hidden', '-translate-y-[200%]');
-          document.body.style.transition = 'padding-top 0.5s ease-in-out';
-          document.body.style.paddingTop = '80px';
-        }
-      });
-    });
-
-    // Update active section based on scroll position
-    const sections = ['#tech-stack', '#projects', '#about', '#contact'];
-    const radioInputs = [
-      document.getElementById('glass-tech'),
-      document.getElementById('glass-projects'),
-      document.getElementById('glass-about'),
-      document.getElementById('glass-contact'),
-    ];
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const sectionId = entry.target.id;
-            const sectionIndex = sections.findIndex(
-              (s) => s === `#${sectionId}`
-            );
-
-            if (sectionIndex !== -1 && radioInputs[sectionIndex]) {
-              radioInputs[sectionIndex].checked = true;
-            }
           }
         });
-      },
-      {
-        threshold: 0.6,
-        rootMargin: '-20% 0px -20% 0px',
-      }
-    );
+      });
 
-    // Observe all sections
-    sections.forEach((sectionId) => {
-      const element = document.querySelector(sectionId);
-      if (element) {
-        observer.observe(element);
-      }
-    });
+      // Actualizar sección activa según scroll
+      const sections = ['#tech-stack', '#projects', '#about', '#contact'];
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const sectionIndex = sections.findIndex(
+                (s) => s === `#${entry.target.id}`
+              );
+              if (sectionIndex !== -1) {
+                const radioInput = document.getElementById(
+                  [
+                    'glass-tech',
+                    'glass-projects',
+                    'glass-about',
+                    'glass-contact',
+                  ][sectionIndex]
+                );
+                if (radioInput) radioInput.checked = true;
+              }
+            }
+          });
+        },
+        { threshold: 0.6, rootMargin: '-20% 0px -20% 0px' }
+      );
+
+      // Observar secciones
+      sections.forEach((sectionId) => {
+        const element = document.querySelector(sectionId);
+        if (element) observer.observe(element);
+      });
+    }
+
+    // === NAVEGACIÓN MÓVIL ===
+    function initMobileNavLinks() {
+      const mobileNavLinks = document.querySelectorAll('#navbar-links a');
+
+      mobileNavLinks.forEach((link) => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const target = link.getAttribute('href');
+
+          if (target?.startsWith('#')) {
+            // Smooth scroll
+            document.querySelector(target)?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+            });
+
+            // Cerrar menú móvil
+            const navbarXIcon = document.getElementById('navbar-x-icon');
+            const navbarMenuIcon = document.getElementById('navbar-menu-icon');
+
+            navbarXIcon?.classList.add('hidden');
+            navbarMenuIcon?.classList.remove('hidden');
+            navbar?.classList.add('hidden', '-translate-y-[200%]');
+            document.body.style.paddingTop = '80px';
+          }
+        });
+      });
+    }
+
+    // Inicializar todas las funcionalidades
+    initMobileMenu();
+    initGlassNavigation();
+    initMobileNavLinks();
   });
+
+  // Inicializar funciones que no dependen del DOM
+  initTheme();
+  initScrollBehavior();
 </script>
