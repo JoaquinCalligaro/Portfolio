@@ -81,6 +81,7 @@ export const translations = {
     nameTooLong: 'El nombre es demasiado largo.',
       invalidEmail: 'Formato de email inválido.',
       messageMinLength: 'El mensaje debe tener al menos 10 caracteres.',
+      messageCharCount: 'Faltan ${count} caracteres (mínimo 10).',
       sentSuccess: 'Mensaje enviado.',
       sendError: 'Ocurrió un error al enviar. Intenta de nuevo.',
       cooldownWait: 'Espera ${timeStr} antes de enviar otro mensaje.',
@@ -195,6 +196,7 @@ export const translations = {
       sendError: 'An error occurred while sending. Try again.',
       cooldownWait: 'Please wait ${timeStr} before sending another message.',
       messageMinLength: 'The message must be at least 10 characters.',
+      messageCharCount: 'Missing ${count} characters (minimum 10).',
     },
     showMore: {
       showAll: 'Show all (${total})',

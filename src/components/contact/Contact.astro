@@ -87,6 +87,14 @@ const FORMSPREE_ACTION = import.meta.env.PUBLIC_FORMSPREE_ACTION;
           aria-live="polite"
         >
         </p>
+        
+        <!-- Character count indicator for minimum length -->
+        <p
+          id="message-count"
+          class="mt-1 hidden text-sm text-red-600"
+          aria-live="polite"
+        >
+        </p>
 
         <!-- Hidden input to submit HTML content -->
         <input type="hidden" id="message" name="message" />

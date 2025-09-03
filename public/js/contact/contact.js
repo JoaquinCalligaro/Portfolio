@@ -141,6 +141,7 @@
     var nameError = qs('#name-error');
     var emailError = qs('#email-error');
     var messageError = qs('#message-error');
+    var messageCount = qs('#message-count');
 
     // Bandera para saber si el usuario ya intentó enviar el formulario
     var hasAttemptedSubmit = false;
@@ -309,8 +310,50 @@
             errorElement.classList.add('hidden');
           }
         });
+        // Also hide character count indicator
+        if (messageCount) {
+          messageCount.textContent = '';
+          messageCount.classList.add('hidden');
+        }
         touched.name = touched.email = touched.message = false;
         hasAttemptedSubmit = false;
+      } catch {
+        // noop
+      }
+    }
+
+    function updateMessageCharCount() {
+      try {
+        if (!messageCount) return;
+        
+        var messageVal = '';
+        try {
+          if (messageEditor)
+            messageVal =
+              messageEditor.textContent || messageEditor.innerText || '';
+          else if (messageInput && typeof messageInput.value === 'string')
+            messageVal = messageInput.value;
+        } catch {
+          messageVal = '';
+        }
+        
+        var currentLength = String(messageVal || '').trim().length;
+        var minLength = 10;
+        
+        if (currentLength > 0 && currentLength < minLength) {
+          var remaining = minLength - currentLength;
+          var lang = document.documentElement.lang || 'ES';
+          var template = 
+            resolveTranslation('contact.messageCharCount', lang) || 
+            'Missing ${count} characters (minimum 10).';
+          var text = template.replace('${count}', remaining.toString());
+          
+          messageCount.textContent = text;
+          messageCount.classList.remove('hidden');
+        } else {
+          messageCount.textContent = '';
+          messageCount.classList.add('hidden');
+        }
       } catch {
         // noop
       }
@@ -363,6 +406,9 @@
       ) {
         showValidationErrors();
       }
+
+      // Update character count indicator
+      updateMessageCharCount();
 
       var disabled = !isFormValid() || isCooldownActive();
       submitBtn.disabled = !!disabled;
