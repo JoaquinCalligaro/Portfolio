@@ -125,23 +125,6 @@
   Aplica solo en pantallas >= sm para preservar vista móvil
   ====================================================== */
   @media (min-width: 640px) {
-    .glass-nav-wrapper {
-      --glass-bg: rgba(255, 255, 255, 0.06);
-      --glass-text: #e5e5e5;
-
-      display: flex;
-      position: relative;
-      background: var(--glass-bg);
-      border-radius: 1rem;
-      backdrop-filter: blur(12px);
-      box-shadow:
-        inset 1px 1px 4px rgba(255, 255, 255, 0.2),
-        inset -1px -1px 6px rgba(0, 0, 0, 0.3),
-        0 4px 12px rgba(0, 0, 0, 0.15);
-      overflow: hidden;
-      width: fit-content;
-    }
-
     .glass-nav-wrapper input {
       display: none;
     }
@@ -188,7 +171,7 @@
     }
 
     /* Tech Stack */
-    #glass-tech:checked ~ .glass-nav-glider {
+    #nav-tech-stack:checked ~ .glass-nav-glider {
       transform: translateX(0%);
       background: linear-gradient(135deg, #c0c0c055, #e0e0e0);
       box-shadow:
@@ -197,7 +180,7 @@
     }
 
     /* Projects */
-    #glass-projects:checked ~ .glass-nav-glider {
+    #nav-projects:checked ~ .glass-nav-glider {
       transform: translateX(100%);
       background: linear-gradient(135deg, #ffd70055, #ffcc00);
       box-shadow:
@@ -206,7 +189,7 @@
     }
 
     /* About */
-    #glass-about:checked ~ .glass-nav-glider {
+    #nav-about:checked ~ .glass-nav-glider {
       transform: translateX(200%);
       background: linear-gradient(135deg, #d0e7ff55, #a0d8ff);
       box-shadow:
@@ -215,7 +198,7 @@
     }
 
     /* Contact */
-    #glass-contact:checked ~ .glass-nav-glider {
+    #nav-contact:checked ~ .glass-nav-glider {
       transform: translateX(300%);
       background: linear-gradient(135deg, #ff9a9e55, #fecfef);
       box-shadow:

@@ -1,4 +1,5 @@
 // src/scripts/navbar/glassNavigation.ts
+import type { NavRadioId, SectionId } from './types';
 
 /**
  * Inicializa la navegación "glass" en desktop.
@@ -14,26 +15,46 @@ export function initGlassNavigation() {
   glassNavLabels.forEach((label) => {
     label.addEventListener('click', (e) => {
       e.preventDefault();
+      e.stopPropagation();
+
       const target = label.getAttribute('data-target');
+
       if (target) {
-        document.querySelector(target)?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
+        const targetElement = document.querySelector(target);
+
+        if (targetElement) {
+          // Usar un método más confiable de scroll
+          const rect = targetElement.getBoundingClientRect();
+          const scrollTop =
+            window.pageYOffset || document.documentElement.scrollTop;
+          const targetTop = rect.top + scrollTop - 100; // offset para el navbar
+
+          window.scrollTo({
+            top: targetTop,
+            behavior: 'smooth',
+          });
+        }
       }
     });
   });
 
-  // Actualizar sección activa según scroll
-  const sections = ['#tech-stack', '#projects', '#about', '#contact'];
-  const ids = ['glass-tech', 'glass-projects', 'glass-about', 'glass-contact'];
+  // IDs de las secciones reales en el documento (sin # en este array)
+  const sections: SectionId[] = ['tech-stack', 'projects', 'about', 'contact'];
+  // IDs de los radios que corresponden a cada sección
+  const ids: NavRadioId[] = [
+    'nav-tech-stack',
+    'nav-projects',
+    'nav-about',
+    'nav-contact',
+  ];
 
+  // Observer para marcar la sección activa
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           const sectionIndex = sections.findIndex(
-            (s) => s === `#${entry.target.id}`
+            (s) => s === entry.target.id // 👈 ahora compara con id real de <section>
           );
           if (sectionIndex !== -1) {
             const radioInput = document.getElementById(
@@ -47,9 +68,9 @@ export function initGlassNavigation() {
     { threshold: 0.6, rootMargin: '-20% 0px -20% 0px' }
   );
 
-  // Observar secciones
+  // Observar cada sección real
   sections.forEach((sectionId) => {
-    const element = document.querySelector(sectionId);
+    const element = document.getElementById(sectionId);
     if (element) observer.observe(element);
   });
 }
