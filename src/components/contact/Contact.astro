@@ -5,6 +5,7 @@ import LocalizedText from '../language/LocalizedText.astro';
 import SubmitBtn from '../ui/SubmitBtn.astro';
 import FormStatus from '../ui/FormStatus.astro';
 import CooldownDisplay from '../ui/CooldownDisplay.astro';
+import CharacterCounter from '../ui/CharacterCounter.astro';
 // Formspree action must be provided via env
 const FORMSPREE_ACTION = import.meta.env.PUBLIC_FORMSPREE_ACTION;
 ---
@@ -87,7 +88,7 @@ const FORMSPREE_ACTION = import.meta.env.PUBLIC_FORMSPREE_ACTION;
           aria-live="polite"
         >
         </p>
-        
+
         <!-- Character count indicator for minimum length -->
         <p
           id="message-count"
@@ -95,6 +96,13 @@ const FORMSPREE_ACTION = import.meta.env.PUBLIC_FORMSPREE_ACTION;
           aria-live="polite"
         >
         </p>
+
+        <!-- Character counter component -->
+        <CharacterCounter
+          id="message-char-counter"
+          targetId="message-editor"
+          maxLength={1000}
+        />
 
         <!-- Hidden input to submit HTML content -->
         <input type="hidden" id="message" name="message" />

@@ -77,11 +77,14 @@ export const translations = {
       sending: 'Enviando...',
       nameRequired: 'El nombre es requerido.',
       invalidName: 'El nombre no puede contener números.',
-    invalidNameChars: 'El nombre solo puede contener letras, espacios, guiones y apóstrofes.',
-    nameTooLong: 'El nombre es demasiado largo.',
+      invalidNameChars:
+        'El nombre solo puede contener letras, espacios, guiones y apóstrofes.',
+      nameTooLong: 'El nombre es demasiado largo.',
       invalidEmail: 'Formato de email inválido.',
       messageMinLength: 'El mensaje debe tener al menos 10 caracteres.',
       messageCharCount: 'Faltan ${count} caracteres (mínimo 10).',
+      characterLimitExceeded:
+        'Límite de caracteres excedido. Máximo ${max} caracteres permitidos.',
       sentSuccess: 'Mensaje enviado.',
       sendError: 'Ocurrió un error al enviar. Intenta de nuevo.',
       cooldownWait: 'Espera ${timeStr} antes de enviar otro mensaje.',
@@ -189,14 +192,17 @@ export const translations = {
       sending: 'Sending...',
       nameRequired: 'Name is required.',
       invalidName: 'Name cannot contain numbers.',
-    invalidNameChars: 'Name may only contain letters, spaces, hyphens and apostrophes.',
-    nameTooLong: 'Name is too long.',
+      invalidNameChars:
+        'Name may only contain letters, spaces, hyphens and apostrophes.',
+      nameTooLong: 'Name is too long.',
       invalidEmail: 'Invalid email format.',
       sentSuccess: 'Message sent!',
       sendError: 'An error occurred while sending. Try again.',
       cooldownWait: 'Please wait ${timeStr} before sending another message.',
       messageMinLength: 'The message must be at least 10 characters.',
       messageCharCount: 'Missing ${count} characters (minimum 10).',
+      characterLimitExceeded:
+        'Character limit exceeded. Maximum ${max} characters allowed.',
     },
     showMore: {
       showAll: 'Show all (${total})',

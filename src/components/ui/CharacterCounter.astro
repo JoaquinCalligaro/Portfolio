@@ -1,0 +1,190 @@
+---
+interface Props {
+  id?: string;
+  targetId: string;
+  maxLength?: number;
+  className?: string;
+}
+
+const {
+  id = undefined,
+  targetId,
+  maxLength = 1000,
+  className = '',
+} = Astro.props;
+---
+
+<div
+  id={id}
+  data-target-id={targetId}
+  data-max-length={maxLength}
+  class={`character-counter text-xs text-gray-500 dark:text-gray-400 mt-1 text-right ${className}`}
+>
+  <span id={`${id}-count`} class="font-medium">0</span>
+  <span class="mx-1">/</span>
+  <span class="text-gray-400 dark:text-gray-500">{maxLength}</span>
+</div>
+
+<!-- Error message for character limit exceeded -->
+<p
+  id={`${id}-error`}
+  class="mt-1 hidden text-right text-xs text-red-600 dark:text-red-400"
+  aria-live="polite"
+>
+</p>
+
+<script
+  is:inline
+  define:vars={{
+    counterId: id,
+    targetElementId: targetId,
+    maxChars: maxLength,
+  }}
+>
+  (function () {
+    if (!counterId || !targetElementId) return;
+
+    const counter = document.getElementById(counterId);
+    const countSpan = document.getElementById(counterId + '-count');
+    const errorElement = document.getElementById(counterId + '-error');
+
+    if (!counter || !countSpan) return;
+
+    // Function to resolve translation
+    const resolveTranslation = (key, lang) => {
+      try {
+        if (typeof window === 'undefined' || !window.TRANSLATIONS) return null;
+        const parts = key.split('.');
+        const docLang =
+          (typeof document !== 'undefined' &&
+            document.documentElement &&
+            document.documentElement.lang) ||
+          null;
+        let value =
+          (window.TRANSLATIONS &&
+            (window.TRANSLATIONS[lang] || window.TRANSLATIONS[docLang])) ||
+          null;
+
+        for (let i = 0; i < parts.length; i++) {
+          if (
+            !value ||
+            typeof value !== 'object' ||
+            value[parts[i]] === undefined
+          ) {
+            return null;
+          }
+          value = value[parts[i]];
+        }
+        return typeof value === 'string' ? value : null;
+      } catch {
+        return null;
+      }
+    };
+
+    const updateCounter = () => {
+      try {
+        // Find target element by ID or selector
+        const target =
+          document.getElementById(targetElementId) ||
+          document.querySelector(targetElementId);
+        if (!target) return;
+
+        // Get text content based on element type
+        let text = '';
+        if (target.contentEditable === 'true') {
+          text = target.textContent || target.innerText || '';
+        } else if (
+          target.tagName === 'TEXTAREA' ||
+          target.tagName === 'INPUT'
+        ) {
+          text = target.value || '';
+        }
+
+        const currentLength = text.trim().length;
+        const isOverLimit = currentLength > maxChars;
+
+        // Update counter display
+        countSpan.textContent = currentLength.toString();
+
+        // Update counter color based on length
+        if (isOverLimit) {
+          countSpan.className = 'font-medium text-red-600 dark:text-red-400';
+        } else if (currentLength > maxChars * 0.9) {
+          countSpan.className =
+            'font-medium text-orange-600 dark:text-orange-400';
+        } else {
+          countSpan.className = 'font-medium text-gray-700 dark:text-gray-300';
+        }
+
+        // Show/hide error message
+        if (errorElement) {
+          if (isOverLimit) {
+            const lang = document.documentElement.lang || 'ES';
+            const template =
+              resolveTranslation('contact.characterLimitExceeded', lang) ||
+              'Character limit exceeded. Maximum ${max} characters allowed.';
+            const errorText = template.replace('${max}', maxChars.toString());
+
+            errorElement.textContent = errorText;
+            errorElement.classList.remove('hidden');
+          } else {
+            errorElement.textContent = '';
+            errorElement.classList.add('hidden');
+          }
+        }
+
+        // Dispatch custom event for form validation
+        window.dispatchEvent(
+          new CustomEvent('characterCountUpdate', {
+            detail: {
+              targetId: targetElementId,
+              currentLength: currentLength,
+              maxLength: maxChars,
+              isOverLimit: isOverLimit,
+            },
+          })
+        );
+      } catch (e) {
+        console.warn('Error updating character counter:', e);
+      }
+    };
+
+    // Wait for target element to be available
+    const initCounter = () => {
+      const target =
+        document.getElementById(targetElementId) ||
+        document.querySelector(targetElementId);
+
+      if (target) {
+        // Add event listeners
+        ['input', 'keyup', 'paste', 'cut', 'blur'].forEach((event) => {
+          target.addEventListener(event, updateCounter);
+        });
+
+        // Initial count
+        updateCounter();
+      } else {
+        // Retry after a short delay
+        setTimeout(initCounter, 100);
+      }
+    };
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initCounter);
+    } else {
+      initCounter();
+    }
+
+    // Listen for language changes to update error message
+    window.addEventListener('langChange', () => {
+      setTimeout(updateCounter, 10);
+    });
+  })();
+</script>
+
+<style>
+  .character-counter {
+    user-select: none;
+  }
+</style>

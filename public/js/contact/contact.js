@@ -34,7 +34,7 @@
 
     if (!form || !nameInput || !emailInput || !messageInput || !submitBtn)
       return;
-    
+
     // Store the original text or use translation key if available
     var translationKey = submitBtn.dataset.translationKey;
     if (translationKey) {
@@ -61,6 +61,7 @@
 
     // Validation settings
     var NAME_MAX_LENGTH = 50; // configurable limit for name field
+    var MESSAGE_MAX_LENGTH = 1000; // maximum characters for message
 
     function validateName(v) {
       var t = String(v || '').trim();
@@ -68,7 +69,7 @@
       if (t.length < 2) return { ok: false, reason: 'tooShort' };
       if (t.length > NAME_MAX_LENGTH) return { ok: false, reason: 'tooLong' };
       // Allow only Unicode letters, spaces, hyphens and apostrophes commonly used in names
-      // 
+      //
       // Uses Unicode property escape if supported; fallbacks to conservative ascii check.
       var lettersOnly = true;
       try {
@@ -111,8 +112,10 @@
       }
 
       t = String(t || '').trim();
-      if (!t) return { ok: false };
-      if (t.length < 10) return { ok: false };
+      if (!t) return { ok: false, reason: 'required' };
+      if (t.length < 10) return { ok: false, reason: 'tooShort' };
+      if (t.length > MESSAGE_MAX_LENGTH)
+        return { ok: false, reason: 'tooLong' };
       return { ok: true };
     }
     function isFormValid() {
@@ -229,12 +232,14 @@
               if (nameValidation.reason === 'invalidChars') {
                 nameError.textContent =
                   resolveTranslation('contact.invalidNameChars', lang) ||
-                  'Name can only contain letters, spaces and -\'';
+                  "Name can only contain letters, spaces and -'";
               } else if (nameValidation.reason === 'tooLong') {
                 nameError.textContent =
                   (resolveTranslation('contact.nameTooLong', lang) ||
                     'Name is too long') +
-                  ' (' + NAME_MAX_LENGTH + ')';
+                  ' (' +
+                  NAME_MAX_LENGTH +
+                  ')';
               } else if (nameValidation.reason === 'tooShort') {
                 nameError.textContent =
                   resolveTranslation('contact.nameRequired', lang) ||
@@ -283,11 +288,26 @@
             messageVal = '';
           }
           if (messageError) {
-            var invalidMsg = !validateMessage(messageVal).ok;
+            var messageValidation = validateMessage(messageVal);
+            var invalidMsg = !messageValidation.ok;
             if (invalidMsg && (hasAttemptedSubmit || touched.message)) {
-              messageError.textContent =
-                resolveTranslation('contact.messageMinLength', lang) ||
-                'Message is too short';
+              if (messageValidation.reason === 'tooLong') {
+                var template =
+                  resolveTranslation('contact.characterLimitExceeded', lang) ||
+                  'Character limit exceeded. Maximum ${max} characters allowed.';
+                messageError.textContent = template.replace(
+                  '${max}',
+                  MESSAGE_MAX_LENGTH.toString()
+                );
+              } else if (messageValidation.reason === 'tooShort') {
+                messageError.textContent =
+                  resolveTranslation('contact.messageMinLength', lang) ||
+                  'Message is too short';
+              } else {
+                messageError.textContent =
+                  resolveTranslation('contact.messageMinLength', lang) ||
+                  'Message is too short';
+              }
               messageError.classList.remove('hidden');
             } else {
               messageError.textContent = '';
@@ -325,7 +345,7 @@
     function updateMessageCharCount() {
       try {
         if (!messageCount) return;
-        
+
         var messageVal = '';
         try {
           if (messageEditor)
@@ -336,18 +356,18 @@
         } catch {
           messageVal = '';
         }
-        
+
         var currentLength = String(messageVal || '').trim().length;
         var minLength = 10;
-        
+
         if (currentLength > 0 && currentLength < minLength) {
           var remaining = minLength - currentLength;
           var lang = document.documentElement.lang || 'ES';
-          var template = 
-            resolveTranslation('contact.messageCharCount', lang) || 
+          var template =
+            resolveTranslation('contact.messageCharCount', lang) ||
             'Missing ${count} characters (minimum 10).';
           var text = template.replace('${count}', remaining.toString());
-          
+
           messageCount.textContent = text;
           messageCount.classList.remove('hidden');
         } else {
@@ -412,7 +432,7 @@
 
       var disabled = !isFormValid() || isCooldownActive();
       submitBtn.disabled = !!disabled;
-      
+
       // Use translation key if available, otherwise use stored default
       var translationKey = submitBtn.dataset.translationKey;
       if (translationKey) {
@@ -420,7 +440,7 @@
       } else if (submitBtn.dataset.defaultLabel) {
         submitBtn.textContent = submitBtn.dataset.defaultLabel;
       }
-      
+
       updateCooldownDisplay();
     }
 
@@ -506,10 +526,11 @@
 
       submitBtn.disabled = true;
       var originalText = submitBtn.textContent;
-      
+
       // Use translation for "Sending..." text
       var lang = document.documentElement.lang || 'ES';
-      var sendingText = resolveTranslation('contact.sending', lang) || 'Sending...';
+      var sendingText =
+        resolveTranslation('contact.sending', lang) || 'Sending...';
       submitBtn.textContent = sendingText;
       try {
         var fd = new FormData(form);
@@ -568,7 +589,7 @@
         } catch {
           // noop
         }
-        
+
         // Use translation for "Sent" text
         var sentText = resolveTranslation('contact.sent', lang) || 'Sent';
         submitBtn.textContent = sentText;
@@ -601,6 +622,15 @@
     }
 
     form.addEventListener('submit', handleSubmit);
+
+    // Listen for character count updates from CharacterCounter component
+    window.addEventListener('characterCountUpdate', function (e) {
+      if (e.detail && e.detail.targetId === 'message-editor') {
+        // Update submit button state when character count changes
+        updateSubmitButtonState();
+      }
+    });
+
     setInterval(updateSubmitButtonState, 1000);
   });
 })();
