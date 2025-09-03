@@ -55,6 +55,8 @@
       var t = String(v || '').trim();
       if (!t) return { ok: false };
       if (t.length < 2) return { ok: false };
+      // Reject names that contain any digit
+      if (/\d/.test(t)) return { ok: false };
       if (t.length > 200) return { ok: false };
       return { ok: true };
     }
@@ -87,7 +89,7 @@
 
       t = String(t || '').trim();
       if (!t) return { ok: false };
-      if (t.length < 5) return { ok: false };
+      if (t.length < 10) return { ok: false };
       return { ok: true };
     }
     function isFormValid() {
@@ -198,9 +200,16 @@
           if (nameError) {
             var invalidName = !validateName(nameInput.value).ok;
             if (invalidName && (hasAttemptedSubmit || touched.name)) {
-              nameError.textContent =
-                resolveTranslation('contact.nameRequired', lang) ||
-                'Name required';
+              // If it contains any digit, show the specific invalidName message
+              if (/\d/.test(String(nameInput.value || '').trim())) {
+                nameError.textContent =
+                  resolveTranslation('contact.invalidName', lang) ||
+                  'Name cannot contain numbers';
+              } else {
+                nameError.textContent =
+                  resolveTranslation('contact.nameRequired', lang) ||
+                  'Name required';
+              }
               nameError.classList.remove('hidden');
             } else {
               nameError.textContent = '';
