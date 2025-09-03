@@ -1,8 +1,7 @@
 import { initMobileMenu } from './mobileMenu';
+import { initScrollBehavior } from './scrollBehavior';
 
-/**
- * Inicializa toda la lógica de la navbar (mobile + desktop).
- */
 export function initNavbar() {
   initMobileMenu();
+  initScrollBehavior();
 }

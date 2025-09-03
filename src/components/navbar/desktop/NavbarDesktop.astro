@@ -105,11 +105,8 @@ import NavbarMobile from '../mobile/NavbarMobile.astro';
 
   document.addEventListener('DOMContentLoaded', () => {
     initNavbar();
-
-    // Inicializar tema al cargar
     ThemeHelper.initTheme();
 
-    // Conectar botón de toggle
     document
       .getElementById('theme-toggle')
       ?.addEventListener('click', ThemeHelper.toggleTheme);
