@@ -1,4 +1,5 @@
 ---
+import { navItems } from '../shared/navData.astro';
 import Button from '../../ui/navbar/mobile/MobileNavButton.astro';
 import LocalizedText from '../../language/LocalizedText.astro';
 ---
@@ -6,25 +7,12 @@ import LocalizedText from '../../language/LocalizedText.astro';
 <!-- Navbar Mobile -->
 <nav class="flex flex-col items-center gap-6 sm:hidden">
   <ul id="navbar-links" class="flex flex-col items-center gap-8 font-semibold">
-    <li>
-      <Button href="#tech-stack">
-        <LocalizedText key="navbar.home" fallback="Tech Stack" />
-      </Button>
-    </li>
-    <li>
-      <Button href="#projects">
-        <LocalizedText key="navbar.projects" fallback="Projects" />
-      </Button>
-    </li>
-    <li>
-      <Button href="#about">
-        <LocalizedText key="navbar.about" fallback="About" />
-      </Button>
-    </li>
-    <li>
-      <Button href="#contact">
-        <LocalizedText key="navbar.contact" fallback="Contact" />
-      </Button>
-    </li>
+    {navItems.map((item) => (
+      <li>
+        <Button href={item.target}>
+          <LocalizedText key={item.textKey} fallback={item.fallback} />
+        </Button>
+      </li>
+    ))}
   </ul>
 </nav>

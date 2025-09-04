@@ -1,41 +1,27 @@
 ---
+import { navItems } from '../shared/navData.astro';
 import DesktopNavLink from './DesktopNavLink.astro';
 import DesktopGlider from './DesktopGlider.astro';
 ---
 
 <!-- Navbar desktop -->
 <div class="glass-nav-wrapper hidden sm:flex">
-  <input type="radio" name="nav-section" id="nav-tech-stack" checked />
-  <DesktopNavLink
-    id="nav-tech-stack"
-    target="#tech-stack"
-    textKey="navbar.home"
-    fallback="Tech Stack"
-  />
-
-  <input type="radio" name="nav-section" id="nav-projects" />
-  <DesktopNavLink
-    id="nav-projects"
-    target="#projects"
-    textKey="navbar.projects"
-    fallback="Projects"
-  />
-
-  <input type="radio" name="nav-section" id="nav-about" />
-  <DesktopNavLink
-    id="nav-about"
-    target="#about"
-    textKey="navbar.about"
-    fallback="About"
-  />
-
-  <input type="radio" name="nav-section" id="nav-contact" />
-  <DesktopNavLink
-    id="nav-contact"
-    target="#contact"
-    textKey="navbar.contact"
-    fallback="Contact"
-  />
-
+  {navItems.map((item, index) => (
+    <>
+      <input 
+        type="radio" 
+        name="nav-section" 
+        id={item.id} 
+        checked={index === 0}
+      />
+      <DesktopNavLink
+        id={item.id}
+        target={item.target}
+        textKey={item.textKey}
+        fallback={item.fallback}
+      />
+    </>
+  ))}
+  
   <DesktopGlider />
 </div>
