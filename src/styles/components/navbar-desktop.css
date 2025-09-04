@@ -33,7 +33,7 @@
       box-sizing: border-box;
 
       /* Espaciado interno para simular separación sin usar gap */
-      padding: 0 3rem;
+      padding: 0 2.5rem;
     }
 
     .glass-nav-wrapper label:hover {
@@ -101,7 +101,7 @@
   @media (min-width: 768px) and (max-width: 860px) {
     .glass-nav-wrapper label {
       /* Reducir padding para evitar ruptura del layout */
-      padding: 0 2.2rem;
+      padding: 0 1.5rem;
     }
   }
 }
