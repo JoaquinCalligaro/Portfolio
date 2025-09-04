@@ -1,0 +1,107 @@
+@layer navbar {
+  /* Solo estilos avanzados para la navegación glass (desktop) */
+
+  @media (min-width: 768px) {
+    .glass-nav-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+    .glass-nav-wrapper input {
+      display: none;
+    }
+    .glass-nav-wrapper label {
+      flex: 1;
+      display: flex;
+      min-width: 80px;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      position: relative;
+      z-index: 2;
+      white-space: nowrap;
+      transition: color 0.6s ease;
+      cursor: pointer;
+      color: var(--glass-text, #374151);
+      text-align: center;
+      align-items: center;
+      line-height: 1;
+      height: 100%;
+      box-sizing: border-box;
+
+      /* Espaciado interno para simular separación sin usar gap */
+      padding: 0 2.5rem;
+    }
+
+    .glass-nav-wrapper label:hover {
+      color: #fff;
+    }
+    /* Center only inner text span */
+    .glass-nav-wrapper label.nav-label .nav-label-text {
+      display: inline-flex;
+      width: 100%;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    .glass-nav-wrapper input:checked + label {
+      color: #fff;
+    }
+    .glass-nav-glider {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      height: 40px;
+      width: calc(100% / 4);
+      border-radius: 1rem;
+      z-index: 1;
+      transition:
+        transform 1s cubic-bezier(0.37, 1.95, 0.66, 0.56),
+        background 0.4s ease,
+        box-shadow 0.4s ease;
+    }
+    #nav-tech-stack:checked ~ .glass-nav-glider {
+      transform: translateX(0%) translateY(-50%);
+      background: linear-gradient(135deg, #00eaff92, #007fe1);
+      box-shadow:
+        0 0 18px rgba(0, 200, 255, 0.868),
+        0 0 10px rgba(0, 191, 255, 0.696) inset;
+    }
+    #nav-projects:checked ~ .glass-nav-glider {
+      transform: translateX(100%) translateY(-50%);
+      background: linear-gradient(135deg, #00eaff92, #007fe1);
+      box-shadow:
+        0 0 18px rgba(0, 200, 255, 0.868),
+        0 0 10px rgba(0, 191, 255, 0.696) inset;
+    }
+    #nav-about:checked ~ .glass-nav-glider {
+      transform: translateX(200%) translateY(-50%);
+      background: linear-gradient(135deg, #00eaff92, #007fe1);
+      box-shadow:
+        0 0 18px rgba(0, 200, 255, 0.868),
+        0 0 10px rgba(0, 191, 255, 0.696) inset;
+    }
+    #nav-contact:checked ~ .glass-nav-glider {
+      transform: translateX(300%) translateY(-50%);
+      background: linear-gradient(135deg, #00eaff92, #007fe1);
+      box-shadow:
+        0 0 18px rgba(0, 200, 255, 0.868),
+        0 0 10px rgba(0, 191, 255, 0.696) inset;
+    }
+    .dark .glass-nav-wrapper {
+      --glass-text: #d1d5db;
+    }
+  }
+
+  /* Media query específica para resoluciones 768px-859px */
+  @media (min-width: 768px) and (max-width: 860px) {
+    .glass-nav-wrapper label {
+      /* Reducir padding para evitar ruptura del layout */
+      padding: 0 1.5rem;
+    }
+  }
+}

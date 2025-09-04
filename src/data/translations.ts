@@ -1,9 +1,9 @@
 export const translations = {
   ES: {
     navbar: {
-      tech: 'Proyectos',
-      projects: 'Sobre Mí',
-      about: 'Inicio',
+      home: 'Stack Tecnológico',
+      projects: 'Proyectos',
+      about: 'Sobre Mí',
       contact: 'Contactame',
     },
     personal: {
@@ -116,9 +116,9 @@ export const translations = {
   },
   EN: {
     navbar: {
-      tech: 'Projects',
-      projects: 'About',
-      about: 'Home',
+      home: 'Tech Stack',
+      projects: 'Projects',
+      about: 'About',
       contact: 'Contact',
     },
     personal: {

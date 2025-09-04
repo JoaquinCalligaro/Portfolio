@@ -1,117 +1,29 @@
 ---
-import MoonIcon from '../../../assets/svg/moon.svg';
-import SunIcon from '../../../assets/svg/sun.svg';
-import LanguageToggle from '../../language/LanguageToggle.astro';
-import LocalizedText from '../../language/LocalizedText.astro';
-import NavbarMobile from '../mobile/NavbarMobile.astro';
+import { navItems } from '../shared/navData.astro';
+import DesktopNavLink from './DesktopNavLink.astro';
+import DesktopGlider from './DesktopGlider.astro';
 ---
 
-<header
-  id="navbar-header"
-  class="header-backdrop-blur dark:navbar-glow fixed top-0 right-0 left-0 z-50 mx-auto flex max-w-4xl flex-wrap items-center justify-between rounded-2xl border-2 border-gray-400/30 bg-gray-400/10 px-5 py-4 transition-transform duration-300 ease-in-out dark:border-black/40 dark:bg-black/20"
->
-  <!-- Espacio vacío para balancear el layout -->
-  <div></div>
+<!-- Navbar desktop -->
+<div class="glass-nav-wrapper hidden md:flex">
+  {
+    navItems.map((item, index) => (
+      <>
+        <input
+          type="radio"
+          name="nav-section"
+          id={item.id}
+          checked={index === 0}
+        />
+        <DesktopNavLink
+          id={item.id}
+          target={item.href}
+          textKey={item.textKey}
+          fallback={item.fallback}
+        />
+      </>
+    ))
+  }
 
-  <!-- Botones de utilidad (tema, idioma, menú móvil) -->
-  <div class="flex items-center gap-3 px-3 text-gray-900 sm:order-1">
-    <!-- Toggle tema claro/oscuro -->
-    <button
-      id="theme-toggle"
-      aria-label="Alternar tema"
-      title="Alternar tema"
-      class="glow-hover action-button flex cursor-pointer items-center rounded-lg p-2 transition-all duration-300 hover:scale-110 hover:brightness-110 active:scale-95"
-    >
-      <SunIcon id="theme-sun-icon" class="mx-2 size-6" aria-label="Icono sol" />
-      <MoonIcon
-        id="theme-moon-icon"
-        class="mx-2 hidden size-6"
-        aria-label="Icono luna"
-      />
-    </button>
-
-    <!-- Toggle idioma -->
-    <LanguageToggle />
-
-    <!-- Botón hamburguesa (solo móvil) -->
-    <button
-      id="navbar-toggle"
-      aria-label="Alternar menú"
-      title="Alternar menú"
-      class="glow-hover action-button cursor-pointer rounded-lg p-2 transition-all duration-300 hover:scale-110 hover:brightness-110 active:scale-95 sm:hidden dark:text-white"
-    >
-      <!-- Iconos -->
-      <svg
-        id="navbar-menu-icon"
-        class="mx-3 size-6"
-        fill="currentColor"
-        viewBox="0 0 448 512"
-      >
-        <path
-          d="M0 96C0 78.3 14.3 64 32 64h384c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32h384c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0-17.7-14.3-32-32-32H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h384c17.7 0 32-14.3 32-32z"
-        ></path>
-      </svg>
-      <svg
-        id="navbar-x-icon"
-        class="mx-3 hidden size-6"
-        fill="currentColor"
-        viewBox="0 0 384 512"
-      >
-        <path
-          d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
-        ></path>
-      </svg>
-    </button>
-  </div>
-
-  <!-- Navegación principal -->
-  <nav
-    id="navbar"
-    class="dark:navbar-glow hidden w-full -translate-y-[200%] rounded-sm p-4 text-sm transition-transform sm:static sm:mt-0 sm:block sm:w-auto sm:translate-y-0 sm:border-none sm:p-0 lg:text-base"
-  >
-    <NavbarMobile />
-
-    <!-- Navegación desktop con efecto glass -->
-    <div class="glass-nav-wrapper hidden sm:flex">
-      <input type="radio" name="nav-section" id="glass-tech" checked />
-      <label for="glass-tech" data-target="#tech-stack">
-        <LocalizedText key="navbar.home" fallback="Tech Stack" />
-      </label>
-
-      <input type="radio" name="nav-section" id="glass-projects" />
-      <label for="glass-projects" data-target="#projects">
-        <LocalizedText key="navbar.tech" fallback="Projects" />
-      </label>
-
-      <input type="radio" name="nav-section" id="glass-about" />
-      <label for="glass-about" data-target="#about">
-        <LocalizedText key="navbar.projects" fallback="About" />
-      </label>
-
-      <input type="radio" name="nav-section" id="glass-contact" />
-      <label for="glass-contact" data-target="#contact">
-        <LocalizedText key="navbar.contact" fallback="Contact" />
-      </label>
-
-      <div class="glass-nav-glider"></div>
-    </div>
-  </nav>
-</header>
-
-<!-- Script limpio -->
-<script type="module" is:inline>
-  import { initNavbar } from '/src/components/scripts/navbar/index.ts';
-  import { ThemeHelper } from '/src/components/scripts/theme.ts';
-
-  document.addEventListener('DOMContentLoaded', () => {
-    initNavbar();
-
-    // Inicializar tema al cargar
-    ThemeHelper.initTheme();
-
-    // Conectar botón de toggle
-    document
-      .getElementById('theme-toggle')
-      ?.addEventListener('click', ThemeHelper.toggleTheme);
-  });
-</script>
+  <DesktopGlider />
+</div>

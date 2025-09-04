@@ -7,12 +7,15 @@
 /* Contener elementos con efectos de escala dentro de sus contenedores */
 
 /*! Importaciones */
-@import './navbar.css';
-@import './techstack.css';
-@import './projects.css';
-@import './go-to-top.css';
-@import './contact.css';
-@import './about.css';
+/* Navbar */
+@import '../components/navbar-desktop.css';
+@import '../components/navbar-mobile.css';
+
+@import '../techstack.css';
+@import '../projects.css';
+@import '../go-to-top.css';
+@import '../contact.css';
+@import '../about.css';
 /*! Temas personalizados */
 @theme {
   --breakpoint-xs: 32rem;

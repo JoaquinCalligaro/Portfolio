@@ -1,0 +1,66 @@
+---
+import MoonIcon from '../../assets/svg/moon.svg';
+import SunIcon from '../../assets/svg/sun.svg';
+import LanguageToggle from '../language/LanguageToggle.astro';
+import NavbarMobile from './mobile/NavbarMobile.astro';
+import MobileToggle from './mobile/MobileToggle.astro';
+import NavbarDesktop from './desktop/NavbarDesktop.astro';
+---
+
+<header
+  id="navbar-header"
+  class="header-backdrop-blur dark:navbar-glow fixed top-0 right-0 left-0 z-50 mx-auto flex max-w-[1000px] flex-wrap items-center justify-between rounded-b-2xl border-1 border-gray-400/50 bg-gray-400/10 py-4 transition-transform duration-300 ease-in-out dark:border-cyan-950/40 dark:bg-black/20"
+>
+  <!-- Espacio vacío para balancear el layout -->
+  <div></div>
+
+  <!-- Botones de utilidad (tema, idioma, hamburguesa) -->
+  <div class="flex items-center gap-3 px-10 text-gray-900 md:order-1">
+    <!-- Toggle tema claro/oscuro -->
+    <button
+      id="theme-toggle"
+      aria-label="Alternar tema"
+      title="Alternar tema"
+      class="glow-hover action-button flex cursor-pointer items-center rounded-lg p-2 transition-all duration-300 hover:scale-110 hover:brightness-110 active:scale-95"
+    >
+      <SunIcon id="theme-sun-icon" class="mx-2 size-6" aria-label="Icono sol" />
+      <MoonIcon
+        id="theme-moon-icon"
+        class="mx-2 hidden size-6"
+        aria-label="Icono luna"
+      />
+    </button>
+
+    <!-- Toggle idioma -->
+    <LanguageToggle />
+
+    <!-- Toggle móvil (hamburguesa) -->
+    <div class="md:hidden">
+      <MobileToggle />
+    </div>
+  </div>
+  <!-- Navegación principal (Movil) -->
+  <nav
+    id="navbar"
+    class="dark:navbar-glow hidden w-full -translate-y-[200%] rounded-sm p-4 text-sm transition-transform md:static md:mt-0 md:block md:w-auto md:translate-y-0 md:border-none md:p-0 lg:text-base"
+  >
+    <!-- Navbar móvil -->
+    <NavbarMobile />
+
+    <!-- Navbar desktop -->
+    <NavbarDesktop />
+  </nav>
+</header>
+
+<script type="module" is:inline>
+  import { initNavbar } from '/src/components/scripts/navbar/index.ts';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Inicializar navbar directamente
+    try {
+      initNavbar();
+    } catch (error) {
+      console.error('Error al inicializar navbar:', error);
+    }
+  });
+</script>

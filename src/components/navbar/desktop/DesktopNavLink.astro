@@ -1,0 +1,17 @@
+---
+import LocalizedText from '../../language/LocalizedText.astro';
+
+interface Props {
+  id: string;
+  target: string;
+  textKey: string;
+  fallback: string;
+}
+const { id, target, textKey, fallback } = Astro.props;
+---
+
+<label for={id} data-target={target} class="nav-label">
+  <span class="nav-label-text">
+    <LocalizedText key={textKey} fallback={fallback} />
+  </span>
+</label>

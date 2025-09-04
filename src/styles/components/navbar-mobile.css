@@ -1,0 +1,89 @@
+@layer navbar-mobile {
+  /* Animaciones suaves para navbar mobile */
+
+  /* Transición base del contenedor de navegación */
+  #navbar {
+    transition: transform 2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Transición suave del padding del body */
+  body {
+    transition: padding-top 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Animación de los iconos hamburguesa/close */
+  #navbar-menu-icon,
+  #navbar-x-icon {
+    transition: opacity 1.15s ease-in-out;
+  }
+
+  /* Animación de entrada de los enlaces */
+  @media (max-width: 640px) {
+    #navbar-links {
+      animation-duration: 0.3s;
+      animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      animation-fill-mode: both;
+    }
+
+    /* Cuando el menú está visible */
+    #navbar:not(.hidden) #navbar-links {
+      animation-name: slideInDown;
+    }
+
+    /* Animación de los enlaces individuales */
+    #navbar-links li {
+      opacity: 0;
+      transform: translateY(-10px);
+      animation: fadeInUp 0.2s ease-out forwards;
+    }
+
+    #navbar-links li:nth-child(1) {
+      animation-delay: 0.05s;
+    }
+    #navbar-links li:nth-child(2) {
+      animation-delay: 0.1s;
+    }
+    #navbar-links li:nth-child(3) {
+      animation-delay: 0.15s;
+    }
+    #navbar-links li:nth-child(4) {
+      animation-delay: 0.2s;
+    }
+  }
+
+  /* Keyframes para animaciones */
+  @keyframes slideInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Animación hover mejorada para enlaces mobile */
+  @media (max-width: 640px) {
+    #navbar-links a {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: scale(1);
+    }
+
+    #navbar-links a:hover {
+      transform: scale(1.02) translateY(-1px);
+    }
+
+    #navbar-links a:active {
+      transform: scale(0.98);
+      transition-duration: 0.1s;
+    }
+  }
+}
