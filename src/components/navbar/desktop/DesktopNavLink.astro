@@ -10,10 +10,8 @@ interface Props {
 const { id, target, textKey, fallback } = Astro.props;
 ---
 
-<label
-  for={id}
-  data-target={target}
-  class="cursor-pointer px-4 py-2 font-medium text-gray-700 transition-colors hover:text-amber-600 dark:text-gray-300"
->
-  <LocalizedText key={textKey} fallback={fallback} />
+<label for={id} data-target={target} class="nav-label">
+  <span class="nav-label-text">
+    <LocalizedText key={textKey} fallback={fallback} />
+  </span>
 </label>
