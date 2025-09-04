@@ -3,6 +3,7 @@ import MoonIcon from '../../../assets/svg/moon.svg';
 import SunIcon from '../../../assets/svg/sun.svg';
 import LanguageToggle from '../../language/LanguageToggle.astro';
 import NavbarMobile from '../mobile/NavbarMobile.astro';
+import MobileToggle from '../mobile/MobileToggle.astro';
 import DesktopNavLink from './DesktopNavLink.astro';
 import DesktopGlider from './DesktopGlider.astro';
 ---
@@ -14,7 +15,7 @@ import DesktopGlider from './DesktopGlider.astro';
   <!-- Espacio vacío para balancear el layout -->
   <div></div>
 
-  <!-- Botones de utilidad (tema, idioma) -->
+  <!-- Botones de utilidad (tema, idioma, hamburguesa) -->
   <div class="flex items-center gap-3 px-10 text-gray-900 sm:order-1">
     <!-- Toggle tema claro/oscuro -->
     <button
@@ -33,6 +34,11 @@ import DesktopGlider from './DesktopGlider.astro';
 
     <!-- Toggle idioma -->
     <LanguageToggle />
+
+    <!-- Toggle móvil (hamburguesa) - al lado del idioma -->
+    <div class="sm:hidden">
+      <MobileToggle />
+    </div>
   </div>
 
   <!-- Navegación principal -->
@@ -83,7 +89,7 @@ import DesktopGlider from './DesktopGlider.astro';
 </header>
 
 <script type="module" is:inline>
-  import { initNavbar } from '/src/scripts/navbar/index.ts';
+  import { initNavbar } from '/src/components/scripts/navbar/index.ts';
 
   document.addEventListener('DOMContentLoaded', () => {
     initNavbar();
