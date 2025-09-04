@@ -23,20 +23,25 @@ export function initMobileMenu() {
   function toggleMobileMenu() {
     const isHidden = navbar.classList.contains('hidden');
 
-    // Alternar iconos
+    // Alternar iconos con transición suave
     navbarXIcon.classList.toggle('hidden');
     navbarMenuIcon.classList.toggle('hidden');
 
     if (isHidden) {
-      // Abrir menú
+      // Abrir menú con animación suave
       navbar.classList.remove('hidden');
-      setTimeout(() => navbar.classList.remove('-translate-y-[200%]'), 10);
-      document.body.style.paddingTop = '100px';
+      // Usar requestAnimationFrame para una animación más fluida
+      requestAnimationFrame(() => {
+        navbar.classList.remove('-translate-y-[200%]');
+      });
+      // Ajustar padding del body (la transición CSS se encarga de la suavidad)
+      document.body.style.paddingTop = '120px';
     } else {
-      // Cerrar menú
+      // Cerrar menú con animación suave
       navbar.classList.add('-translate-y-[200%]');
-      setTimeout(() => navbar.classList.add('hidden'), 260);
-      document.body.style.paddingTop = '20px';
+      // Reducir el timeout para una animación más rápida
+      setTimeout(() => navbar.classList.add('hidden'), 250);
+      document.body.style.paddingTop = '80px';
     }
   }
 

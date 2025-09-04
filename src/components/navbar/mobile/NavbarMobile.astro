@@ -1,6 +1,6 @@
 ---
 import { navItems } from '../shared/navData.astro';
-import Button from '../../ui/navbar/mobile/MobileNavButton.astro';
+import MobileNavButton from '../../ui/navbar/mobile/MobileNavButton.astro';
 import LocalizedText from '../../language/LocalizedText.astro';
 ---
 
@@ -10,9 +10,9 @@ import LocalizedText from '../../language/LocalizedText.astro';
     {
       navItems.map((item) => (
         <li>
-          <Button href={item.target}>
+          <MobileNavButton href={item.href}>
             <LocalizedText key={item.textKey} fallback={item.fallback} />
-          </Button>
+          </MobileNavButton>
         </li>
       ))
     }

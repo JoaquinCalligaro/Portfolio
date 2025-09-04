@@ -56,6 +56,11 @@ import NavbarDesktop from './desktop/NavbarDesktop.astro';
   import { initNavbar } from '/src/components/scripts/navbar/index.ts';
 
   document.addEventListener('DOMContentLoaded', () => {
-    initNavbar();
+    // Inicializar navbar directamente
+    try {
+      initNavbar();
+    } catch (error) {
+      console.error('Error al inicializar navbar:', error);
+    }
   });
 </script>
