@@ -11,9 +11,8 @@
     --tech-color-border: rgba(255, 191, 0, 0.3);
     --tech-color-border-hover: rgba(255, 191, 0, 0.8);
 
-    /* fallback explicit properties instead of @apply */
     position: relative;
-    border-radius: 1rem; /* rounded-2xl */
+    border-radius: 1rem;
     border-width: 1px;
     border-style: solid;
     border-color: var(--tech-color-border);
@@ -38,7 +37,6 @@
     background-size: 300%;
     filter: blur(8px);
     animation: glowing 8s ease-in-out infinite;
-    /* 'theme(ease.spring)' isn't available here at runtime; use a concrete easing */
     transition-timing-function: cubic-bezier(0.2, 0.85, 0.25, 1);
   }
 
@@ -58,7 +56,6 @@
     box-shadow: 0 8px 24px var(--tech-color-alpha-hover);
   }
 
-  /* Apply about.css-like glassmorph effect to the tech stack container */
   .tech-stack-card {
     position: relative;
     transform-origin: center center;
@@ -110,9 +107,8 @@
   }
 
   @layer techstack-animations {
-    /* Entrada iconos tech - evitar @apply */
     .tech-enter {
-      transform: translateY(1.75rem); /* equiv. translate-y-7 */
+      transform: translateY(1.75rem);
       opacity: 0;
       animation: fadeInUp 0.6s ease-out forwards;
     }

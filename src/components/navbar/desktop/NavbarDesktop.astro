@@ -100,15 +100,9 @@ import NavbarMobile from '../mobile/NavbarMobile.astro';
 
 <!-- Script limpio -->
 <script type="module" is:inline>
-  import { initNavbar } from '/src/components/scripts/navbar/index.ts';
-  import { ThemeHelper } from '/src/components/scripts/theme.ts';
+  import { initNavbar } from '/src/components/scripts/navbar/index.js';
 
   document.addEventListener('DOMContentLoaded', () => {
     initNavbar();
-    ThemeHelper.initTheme();
-
-    document
-      .getElementById('theme-toggle')
-      ?.addEventListener('click', ThemeHelper.toggleTheme);
   });
 </script>

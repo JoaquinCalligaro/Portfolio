@@ -1,4 +1,3 @@
-// src/scripts/navbar/glassNavigation.ts
 import type { NavRadioId, SectionId } from './types';
 
 /**
