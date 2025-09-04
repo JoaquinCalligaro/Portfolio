@@ -1,32 +1,33 @@
 ---
-// Componente de navegación móvil - solo markup, lógica manejada por NavbarDesktop
-import LocalizedText from '../../language/LocalizedText.astro';
+import MobileToggle from './MobileToggle.astro';
 import Button from '../../ui/navbar/mobile/MobileNavButton.astro';
+import LocalizedText from '../../language/LocalizedText.astro';
 ---
 
-<!-- Lista de navegación móvil (visible solo en pantallas pequeñas) -->
-<ul
-  id="navbar-links"
-  class="flex flex-col items-center gap-8 font-semibold sm:hidden"
->
-  <li>
-    <Button href="#tech-stack">
-      <LocalizedText key="navbar.home" fallback="Tech Stack" />
-    </Button>
-  </li>
-  <li>
-    <Button href="#projects">
-      <LocalizedText key="navbar.projects" fallback="Projects" />
-    </Button>
-  </li>
-  <li>
-    <Button href="#about">
-      <LocalizedText key="navbar.about" fallback="About" />
-    </Button>
-  </li>
-  <li>
-    <Button href="#contact">
-      <LocalizedText key="navbar.contact" fallback="Contact" />
-    </Button>
-  </li>
-</ul>
+<!-- Navbar Mobile -->
+<nav class="flex flex-col items-center gap-6 sm:hidden">
+  <MobileToggle />
+
+  <ul id="navbar-links" class="flex flex-col items-center gap-8 font-semibold">
+    <li>
+      <Button href="#tech-stack">
+        <LocalizedText key="navbar.home" fallback="Tech Stack" />
+      </Button>
+    </li>
+    <li>
+      <Button href="#projects">
+        <LocalizedText key="navbar.projects" fallback="Projects" />
+      </Button>
+    </li>
+    <li>
+      <Button href="#about">
+        <LocalizedText key="navbar.about" fallback="About" />
+      </Button>
+    </li>
+    <li>
+      <Button href="#contact">
+        <LocalizedText key="navbar.contact" fallback="Contact" />
+      </Button>
+    </li>
+  </ul>
+</nav>

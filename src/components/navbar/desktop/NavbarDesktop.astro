@@ -2,8 +2,9 @@
 import MoonIcon from '../../../assets/svg/moon.svg';
 import SunIcon from '../../../assets/svg/sun.svg';
 import LanguageToggle from '../../language/LanguageToggle.astro';
-import LocalizedText from '../../language/LocalizedText.astro';
 import NavbarMobile from '../mobile/NavbarMobile.astro';
+import DesktopNavLink from './DesktopNavLink.astro';
+import DesktopGlider from './DesktopGlider.astro';
 ---
 
 <header
@@ -13,7 +14,7 @@ import NavbarMobile from '../mobile/NavbarMobile.astro';
   <!-- Espacio vacío para balancear el layout -->
   <div></div>
 
-  <!-- Botones de utilidad (tema, idioma, menú móvil) -->
+  <!-- Botones de utilidad (tema, idioma) -->
   <div class="flex items-center gap-3 px-10 text-gray-900 sm:order-1">
     <!-- Toggle tema claro/oscuro -->
     <button
@@ -32,36 +33,6 @@ import NavbarMobile from '../mobile/NavbarMobile.astro';
 
     <!-- Toggle idioma -->
     <LanguageToggle />
-
-    <!-- Botón hamburguesa (solo móvil) -->
-    <button
-      id="navbar-toggle"
-      aria-label="Alternar menú"
-      title="Alternar menú"
-      class="glow-hover action-button cursor-pointer rounded-lg p-2 transition-all duration-300 hover:scale-110 hover:brightness-110 active:scale-95 sm:hidden dark:text-white"
-    >
-      <!-- Iconos -->
-      <svg
-        id="navbar-menu-icon"
-        class="mx-3 size-6"
-        fill="currentColor"
-        viewBox="0 0 448 512"
-      >
-        <path
-          d="M0 96C0 78.3 14.3 64 32 64h384c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32h384c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0-17.7-14.3-32-32-32H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h384c17.7 0 32-14.3 32-32z"
-        ></path>
-      </svg>
-      <svg
-        id="navbar-x-icon"
-        class="mx-3 hidden size-6"
-        fill="currentColor"
-        viewBox="0 0 384 512"
-      >
-        <path
-          d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
-        ></path>
-      </svg>
-    </button>
   </div>
 
   <!-- Navegación principal -->
@@ -69,38 +40,50 @@ import NavbarMobile from '../mobile/NavbarMobile.astro';
     id="navbar"
     class="dark:navbar-glow hidden w-full -translate-y-[200%] rounded-sm p-4 text-sm transition-transform sm:static sm:mt-0 sm:block sm:w-auto sm:translate-y-0 sm:border-none sm:p-0 lg:text-base"
   >
+    <!-- Navbar móvil -->
     <NavbarMobile />
 
-    <!-- Navegación desktop con efecto glass -->
+    <!-- Navbar desktop -->
     <div class="glass-nav-wrapper hidden sm:flex">
       <input type="radio" name="nav-section" id="nav-tech-stack" checked />
-      <label for="nav-tech-stack" data-target="#tech-stack">
-        <LocalizedText key="navbar.home" fallback="Tech Stack" />
-      </label>
+      <DesktopNavLink
+        id="nav-tech-stack"
+        target="#tech-stack"
+        textKey="navbar.home"
+        fallback="Tech Stack"
+      />
 
       <input type="radio" name="nav-section" id="nav-projects" />
-      <label for="nav-projects" data-target="#projects">
-        <LocalizedText key="navbar.projects" fallback="Projects" />
-      </label>
+      <DesktopNavLink
+        id="nav-projects"
+        target="#projects"
+        textKey="navbar.projects"
+        fallback="Projects"
+      />
 
       <input type="radio" name="nav-section" id="nav-about" />
-      <label for="nav-about" data-target="#about">
-        <LocalizedText key="navbar.about" fallback="About" />
-      </label>
+      <DesktopNavLink
+        id="nav-about"
+        target="#about"
+        textKey="navbar.about"
+        fallback="About"
+      />
 
       <input type="radio" name="nav-section" id="nav-contact" />
-      <label for="nav-contact" data-target="#contact">
-        <LocalizedText key="navbar.contact" fallback="Contact" />
-      </label>
+      <DesktopNavLink
+        id="nav-contact"
+        target="#contact"
+        textKey="navbar.contact"
+        fallback="Contact"
+      />
 
-      <div class="glass-nav-glider"></div>
+      <DesktopGlider />
     </div>
   </nav>
 </header>
 
-<!-- Script limpio -->
 <script type="module" is:inline>
-  import { initNavbar } from '/src/components/scripts/navbar/index.js';
+  import { initNavbar } from '/src/scripts/navbar/index.ts';
 
   document.addEventListener('DOMContentLoaded', () => {
     initNavbar();

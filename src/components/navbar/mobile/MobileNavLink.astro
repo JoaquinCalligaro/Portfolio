@@ -1,0 +1,17 @@
+---
+import LocalizedText from '../../language/LocalizedText.astro';
+
+interface Props {
+  href: string; // ID de la sección destino (#tech-stack, #projects, etc.)
+  textKey: string; // Clave de traducción (ej: "navbar.projects")
+  fallback: string; // Texto por defecto si no hay traducción
+}
+const { href, textKey, fallback } = Astro.props;
+---
+
+<a
+  href={href}
+  class="rounded-lg px-4 py-2 text-gray-700 transition-colors hover:text-amber-600 dark:text-gray-300"
+>
+  <LocalizedText key={textKey} fallback={fallback} />
+</a>
