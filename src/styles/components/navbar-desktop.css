@@ -1,7 +1,7 @@
 @layer navbar {
   /* Solo estilos avanzados para la navegación glass (desktop) */
 
-  @media (min-width: 1024px) {
+  @media (min-width: 768px) {
     .glass-nav-wrapper {
       position: relative;
       display: flex;
@@ -33,7 +33,7 @@
       box-sizing: border-box;
 
       /* Espaciado interno para simular separación sin usar gap */
-      padding: 0 3.5rem;
+      padding: 0 3rem;
     }
 
     .glass-nav-wrapper label:hover {
@@ -94,6 +94,14 @@
     }
     .dark .glass-nav-wrapper {
       --glass-text: #d1d5db;
+    }
+  }
+
+  /* Media query específica para resoluciones 768px-859px */
+  @media (min-width: 768px) and (max-width: 860px) {
+    .glass-nav-wrapper label {
+      /* Reducir padding para evitar ruptura del layout */
+      padding: 0 2.2rem;
     }
   }
 }
