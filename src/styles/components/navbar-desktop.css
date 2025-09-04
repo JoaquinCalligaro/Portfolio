@@ -48,31 +48,31 @@
     }
     #nav-tech-stack:checked ~ .glass-nav-glider {
       transform: translateX(0%);
-      background: linear-gradient(135deg, #c0c0c055, #e0e0e0);
+      background: linear-gradient(135deg, #00eaff92, #007fe1);
       box-shadow:
-        0 0 18px rgba(192, 192, 192, 0.5),
-        0 0 10px rgba(255, 255, 255, 0.4) inset;
+        0 0 18px rgba(0, 200, 255, 0.868),
+        0 0 10px rgba(0, 191, 255, 0.696) inset;
     }
     #nav-projects:checked ~ .glass-nav-glider {
       transform: translateX(100%);
-      background: linear-gradient(135deg, #ffd70055, #ffcc00);
+      background: linear-gradient(135deg, #00eaff92, #007fe1);
       box-shadow:
-        0 0 18px rgba(255, 215, 0, 0.5),
-        0 0 10px rgba(255, 235, 150, 0.4) inset;
+        0 0 18px rgba(0, 200, 255, 0.868),
+        0 0 10px rgba(0, 191, 255, 0.696) inset;
     }
     #nav-about:checked ~ .glass-nav-glider {
       transform: translateX(200%);
-      background: linear-gradient(135deg, #d0e7ff55, #a0d8ff);
+      background: linear-gradient(135deg, #00eaff92, #007fe1);
       box-shadow:
-        0 0 18px rgba(160, 216, 255, 0.5),
-        0 0 10px rgba(200, 240, 255, 0.4) inset;
+        0 0 18px rgba(0, 200, 255, 0.868),
+        0 0 10px rgba(0, 191, 255, 0.696) inset;
     }
     #nav-contact:checked ~ .glass-nav-glider {
       transform: translateX(300%);
-      background: linear-gradient(135deg, #ff9a9e55, #fecfef);
+      background: linear-gradient(135deg, #00eaff92, #007fe1);
       box-shadow:
-        0 0 18px rgba(255, 154, 158, 0.5),
-        0 0 10px rgba(254, 207, 239, 0.4) inset;
+        0 0 18px rgba(0, 200, 255, 0.868),
+        0 0 10px rgba(0, 191, 255, 0.696) inset;
     }
     .dark .glass-nav-wrapper {
       --glass-text: #d1d5db;
