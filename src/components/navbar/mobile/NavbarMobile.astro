@@ -7,12 +7,14 @@ import LocalizedText from '../../language/LocalizedText.astro';
 <!-- Navbar Mobile -->
 <nav class="flex flex-col items-center gap-6 sm:hidden">
   <ul id="navbar-links" class="flex flex-col items-center gap-8 font-semibold">
-    {navItems.map((item) => (
-      <li>
-        <Button href={item.target}>
-          <LocalizedText key={item.textKey} fallback={item.fallback} />
-        </Button>
-      </li>
-    ))}
+    {
+      navItems.map((item) => (
+        <li>
+          <Button href={item.target}>
+            <LocalizedText key={item.textKey} fallback={item.fallback} />
+          </Button>
+        </li>
+      ))
+    }
   </ul>
 </nav>

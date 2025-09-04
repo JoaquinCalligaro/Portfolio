@@ -6,22 +6,24 @@ import DesktopGlider from './DesktopGlider.astro';
 
 <!-- Navbar desktop -->
 <div class="glass-nav-wrapper hidden sm:flex">
-  {navItems.map((item, index) => (
-    <>
-      <input 
-        type="radio" 
-        name="nav-section" 
-        id={item.id} 
-        checked={index === 0}
-      />
-      <DesktopNavLink
-        id={item.id}
-        target={item.target}
-        textKey={item.textKey}
-        fallback={item.fallback}
-      />
-    </>
-  ))}
-  
+  {
+    navItems.map((item, index) => (
+      <>
+        <input
+          type="radio"
+          name="nav-section"
+          id={item.id}
+          checked={index === 0}
+        />
+        <DesktopNavLink
+          id={item.id}
+          target={item.target}
+          textKey={item.textKey}
+          fallback={item.fallback}
+        />
+      </>
+    ))
+  }
+
   <DesktopGlider />
 </div>
