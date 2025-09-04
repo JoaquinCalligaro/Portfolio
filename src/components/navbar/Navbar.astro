@@ -15,7 +15,7 @@ import NavbarDesktop from './desktop/NavbarDesktop.astro';
   <div></div>
 
   <!-- Botones de utilidad (tema, idioma, hamburguesa) -->
-  <div class="flex items-center gap-3 px-10 text-gray-900 sm:order-1">
+  <div class="flex items-center gap-3 px-10 text-gray-900 md:order-1">
     <!-- Toggle tema claro/oscuro -->
     <button
       id="theme-toggle"
@@ -35,14 +35,14 @@ import NavbarDesktop from './desktop/NavbarDesktop.astro';
     <LanguageToggle />
 
     <!-- Toggle móvil (hamburguesa) -->
-    <div class="sm:hidden">
+    <div class="md:hidden">
       <MobileToggle />
     </div>
   </div>
   <!-- Navegación principal (Movil) -->
   <nav
     id="navbar"
-    class="dark:navbar-glow hidden w-full -translate-y-[200%] rounded-sm p-4 text-sm transition-transform sm:static sm:mt-0 sm:block sm:w-auto sm:translate-y-0 sm:border-none sm:p-0 lg:text-base"
+    class="dark:navbar-glow hidden w-full -translate-y-[200%] rounded-sm p-4 text-sm transition-transform md:static md:mt-0 md:block md:w-auto md:translate-y-0 md:border-none md:p-0 lg:text-base"
   >
     <!-- Navbar móvil -->
     <NavbarMobile />
