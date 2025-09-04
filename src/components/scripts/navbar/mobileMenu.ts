@@ -35,13 +35,13 @@ export function initMobileMenu() {
         navbar.classList.remove('-translate-y-[200%]');
       });
       // Ajustar padding del body (la transición CSS se encarga de la suavidad)
-      document.body.style.paddingTop = '120px';
+      document.body.style.paddingTop = '180px';
     } else {
       // Cerrar menú con animación suave
       navbar.classList.add('-translate-y-[200%]');
       // Reducir el timeout para una animación más rápida
       setTimeout(() => navbar.classList.add('hidden'), 250);
-      document.body.style.paddingTop = '80px';
+      document.body.style.paddingTop = '40px';
     }
   }
 
