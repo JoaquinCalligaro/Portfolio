@@ -1,6 +1,7 @@
 ---
 // Componente de navegación móvil - solo markup, lógica manejada por NavbarDesktop
 import LocalizedText from '../../language/LocalizedText.astro';
+import Button from '../../ui/navbar/mobile/MobileNavButton.astro';
 ---
 
 <!-- Lista de navegación móvil (visible solo en pantallas pequeñas) -->
@@ -9,35 +10,23 @@ import LocalizedText from '../../language/LocalizedText.astro';
   class="flex flex-col items-center gap-8 font-semibold sm:hidden"
 >
   <li>
-    <a
-      href="#tech-stack"
-      class="nav-hover-light nav-hover-dark relative rounded-lg px-4 py-2 text-amber-800 transition-all duration-400 hover:scale-102 hover:text-amber-700 active:scale-98 active:text-amber-700"
-    >
+    <Button href="#tech-stack">
       <LocalizedText key="navbar.home" fallback="Tech Stack" />
-    </a>
+    </Button>
   </li>
   <li>
-    <a
-      href="#projects"
-      class="nav-hover-light nav-hover-dark relative rounded-lg px-4 py-2 text-amber-800 transition-all duration-400 hover:scale-102 hover:text-amber-700 active:scale-98 active:text-amber-700"
-    >
+    <Button href="#projects">
       <LocalizedText key="navbar.projects" fallback="Projects" />
-    </a>
+    </Button>
   </li>
   <li>
-    <a
-      href="#about"
-      class="nav-hover-light nav-hover-dark relative rounded-lg px-4 py-2 text-amber-800 transition-all duration-400 hover:scale-102 hover:text-amber-700 active:scale-98 active:text-amber-700"
-    >
+    <Button href="#about">
       <LocalizedText key="navbar.about" fallback="About" />
-    </a>
+    </Button>
   </li>
   <li>
-    <a
-      href="#contact"
-      class="nav-hover-light nav-hover-dark relative rounded-lg px-4 py-2 text-amber-800 transition-all duration-400 hover:scale-102 hover:text-amber-700 active:scale-98 active:text-amber-700"
-    >
+    <Button href="#contact">
       <LocalizedText key="navbar.contact" fallback="Contact" />
-    </a>
+    </Button>
   </li>
 </ul>
