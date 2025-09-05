@@ -1,3 +1,4 @@
+// Traducciones en español
 import type { TranslationStructure } from './types';
 
 export const esTranslations: TranslationStructure = {

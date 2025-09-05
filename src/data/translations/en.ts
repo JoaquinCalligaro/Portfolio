@@ -1,3 +1,4 @@
+// Traducciones en inglés
 import type { TranslationStructure } from './types';
 
 export const enTranslations: TranslationStructure = {

@@ -1,5 +1,7 @@
+// Tipos TypeScript para el sistema de traducciones
 export type Lang = 'ES' | 'EN';
 
+// Estructura para la sección "Sobre Mí"
 export type AboutMe = {
   title: string;
   shortBio: {
@@ -13,6 +15,7 @@ export type AboutMe = {
   };
 };
 
+// Estructura para elementos de experiencia laboral
 export type ExperienceItem = {
   dates: string;
   company: string;
@@ -20,6 +23,7 @@ export type ExperienceItem = {
   svgIcon?: string;
 };
 
+// Estructura principal de todas las traducciones
 export interface TranslationStructure {
   navbar: {
     home: string;
