@@ -23,7 +23,7 @@ export const enTranslations: TranslationStructure = {
         'I am from La Rioja, Argentina, I am 24 years old and I started venturing into web development in 2022, although technology has always attracted me since I was a child. I enrolled in a University Technical Program in Programming at the National Technological University in Argentina.',
         'In my free time I like to design, structure, and constantly learn, creating new things that challenge me.',
         'I seek to contribute my knowledge in collaborative projects, receive feedback from other developers, and thus improve my skills.',
-        'My current goal is to grow as a frontend developer, but also expand my experience towards backend and mobile.',
+        'My current goal is to grow as a frontend developer, but also expand my experience towards fullstack, mobile, and AI integrations for web services.',
         'I am currently studying English and have an A2 level certificate, with the goal of continuing to advance.',
       ],
       cvHeading: 'CV Information',
