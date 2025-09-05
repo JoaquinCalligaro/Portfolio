@@ -196,6 +196,11 @@ const resolveTechnology = (item) => {
           return;
         }
 
+        // Evitar doble inicialización
+        if (sliderElement.dataset && sliderElement.dataset.sliderInit === 'true') {
+          return;
+        }
+
         const track = sliderElement.querySelector('.slider-track');
         const slides = Array.from(sliderElement.querySelectorAll('.slide'));
         const prevBtn = sliderElement.querySelector('.slider-prev');
@@ -311,6 +316,25 @@ const resolveTechnology = (item) => {
         // Ocultar botones inicialmente
         if (prevBtn) prevBtn.style.opacity = '0';
         if (nextBtn) nextBtn.style.opacity = '0';
+
+        // Marcar como inicializado
+        if (sliderElement.dataset) sliderElement.dataset.sliderInit = 'true';
+
+        // API de refresco (cuando el slider estuvo oculto y luego aparece)
+        function refreshSlider() {
+          setSizes();
+          updateDots();
+        }
+
+        sliderElement.addEventListener('slider:refresh', refreshSlider);
+
+        // Exponer en window para otros scripts
+        if (typeof window !== 'undefined') {
+          // @ts-expect-error namespace dynamic attach
+          window.__projectSliders = window.__projectSliders || {}; // namespace
+          // @ts-expect-error index attach
+          window.__projectSliders[sliderId] = { refresh: refreshSlider };
+        }
       }
 
       // Inicializar cuando el DOM esté listo

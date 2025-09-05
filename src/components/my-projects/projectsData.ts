@@ -72,7 +72,7 @@ export const projectsData: Project[] = [
       organicStore4,
       organicStore5,
     ],
-    hidden: true,
+    hidden: false,
   },
 
   {
@@ -123,6 +123,6 @@ export const projectsData: Project[] = [
     live: 'https://calculatorjc.netlify.app/',
     technologies: ['html', 'css', 'tailwind', 'javascript'],
     images: [calculator1, calculator2],
-    hidden: false,
+    hidden: true,
   },
 ];
