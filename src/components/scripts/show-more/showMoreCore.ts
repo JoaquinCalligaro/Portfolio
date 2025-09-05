@@ -489,82 +489,28 @@ export function setButtonText(button: HTMLElement, text: string): void {
 export function initializeSliderIfExists(card: HTMLElement): void {
   const slider = card.querySelector('[id^="slider-"]') as HTMLElement;
   if (!slider) return;
-
-  // Si ya está inicializándose o inicializado, no hacer nada
-  if (
-    slider.dataset &&
-    (slider.dataset.sliderInitialized === 'true' ||
-      slider.dataset.sliderInitialized === 'initializing')
-  )
-    return;
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if ((window as any).initSlider) {
-    initSlider(slider);
-    return;
-  }
-
-  loadSliderModule(slider);
-}
-
-// Inicializar slider
-export function initSlider(sliderElement: HTMLElement): void {
+  // Si el slider expuso API de refresco, la usamos
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (typeof window !== 'undefined' && (window as any).initSlider) {
-      // Marca como inicializando para evitar llamadas concurrentes
-      try {
-        if (sliderElement.dataset)
-          sliderElement.dataset.sliderInitialized = 'initializing';
-      } catch {
-        void 0;
-      }
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (window as any).initSlider(sliderElement.id || sliderElement);
-
-      try {
-        if (sliderElement.dataset)
-          sliderElement.dataset.sliderInitialized = 'true';
-      } catch {
-        void 0;
-      }
+    const sliders = (window as any).__projectSliders;
+    if (
+      sliders &&
+      sliders[slider.id] &&
+      typeof sliders[slider.id].refresh === 'function'
+    ) {
+      sliders[slider.id].refresh();
+      return;
     }
-  } catch (error) {
-    if (typeof console !== 'undefined') {
-      console.warn('Error al inicializar slider:', error);
-    }
-  }
-}
-
-// Cargar módulo del slider
-export function loadSliderModule(sliderElement: HTMLElement): void {
-  const existingScript = document.querySelector('script[data-slider-module]');
-  if (existingScript) {
-    existingScript.addEventListener('load', () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if ((window as any).initSlider) initSlider(sliderElement);
-    });
-    return;
+  } catch {
+    /* noop */
   }
 
-  const script = document.createElement('script');
-  script.type = 'module';
-  script.src = '/js/slider/slider-client.js';
-  script.setAttribute('data-slider-module', '');
-
-  script.addEventListener('load', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((window as any).initSlider) initSlider(sliderElement);
-  });
-
-  script.addEventListener('error', () => {
-    if (typeof console !== 'undefined') {
-      console.warn('Error al cargar el módulo del slider');
-    }
-  });
-
-  document.head.appendChild(script);
+  // Fallback: disparar evento para que el propio slider se refresque
+  try {
+    slider.dispatchEvent(new CustomEvent('slider:refresh', { bubbles: false }));
+  } catch {
+    /* noop */
+  }
 }
 
 // Configurar observer de tarjetas
