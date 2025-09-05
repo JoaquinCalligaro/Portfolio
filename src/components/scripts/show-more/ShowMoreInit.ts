@@ -1,4 +1,9 @@
-import type { ShowMoreOptions, ShowMoreAPI, ShowMoreConfig, ShowMoreState } from './types';
+import type {
+  ShowMoreOptions,
+  ShowMoreAPI,
+  ShowMoreConfig,
+  ShowMoreState,
+} from './types';
 import {
   setupContainerTransitions,
   getElements,
@@ -15,7 +20,6 @@ export default function initShowMore(
   buttonId: string = 'show-more-projects',
   options: ShowMoreOptions = {}
 ): ShowMoreAPI | undefined {
-  
   // Configuración por defecto
   const config: ShowMoreConfig = {
     targetId: 'extra-projects',
@@ -33,16 +37,19 @@ export default function initShowMore(
   // Obtener elementos del DOM
   const elements = getElements(buttonId, config);
   if (!elements) return;
-  
+
   const { button, target, grid } = elements;
+
+  // Configurar el atributo data-target en el botón para referencia
+  button.setAttribute('data-target', config.targetId);
 
   // Configurar transiciones del contenedor
   setupContainerTransitions(target);
 
   // Estado inicial
-  const state: ShowMoreState = { 
-    currentCardCount: 0, 
-    isCollapsed: true 
+  const state: ShowMoreState = {
+    currentCardCount: 0,
+    isCollapsed: true,
   };
 
   // Inicializar componentes
@@ -66,7 +73,10 @@ export default function initShowMore(
     updateCards: () => updateCardsManually(button, grid, config, state),
     getCurrentCount: () => Array.from(grid.children).length,
     getRevealedCount: () =>
-      getRevealedCount(Array.from(grid.children) as HTMLElement[], config.hiddenClass),
+      getRevealedCount(
+        Array.from(grid.children) as HTMLElement[],
+        config.hiddenClass
+      ),
   };
 }
 

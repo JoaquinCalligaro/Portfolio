@@ -43,15 +43,17 @@ const hasMoreProjects = visibleProjects.length > 4 || hiddenProjects.length > 0;
         ))}
         {/* Luego los proyectos ocultos */}
         {hiddenProjects.map((project) => (
-          <ProjectCard
-            id={project.id}
-            titleKey={project.titleKey}
-            descriptionKey={project.descriptionKey}
-            repo={project.repo}
-            live={project.live}
-            technologies={project.technologies}
-            images={project.images}
-          />
+          <div class="hidden">
+            <ProjectCard
+              id={project.id}
+              titleKey={project.titleKey}
+              descriptionKey={project.descriptionKey}
+              repo={project.repo}
+              live={project.live}
+              technologies={project.technologies}
+              images={project.images}
+            />
+          </div>
         ))}
       </div>
     </div>
@@ -60,7 +62,7 @@ const hasMoreProjects = visibleProjects.length > 4 || hiddenProjects.length > 0;
     <div class="flex justify-center">
       <ShowMoreBtn 
         id="show-more-projects" 
-        text={hiddenProjects.length > 0 ? `Ver todos (${visibleProjects.length + hiddenProjects.length})` : "Ver más"}
+        text={hiddenProjects.length > 0 ? `Ver todos (${hiddenProjects.length})` : "Ver más"}
       />
     </div>
   )}

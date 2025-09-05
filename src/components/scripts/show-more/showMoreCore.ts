@@ -21,9 +21,9 @@ export function getElements(
   const button = document.getElementById(buttonId);
   const target = document.getElementById(config.targetId);
   const grid = target?.querySelector('.grid') as HTMLElement;
-  
+
   if (!button || !target || !grid) return null;
-  
+
   return { button, target, grid };
 }
 
@@ -48,15 +48,23 @@ export function initializeCards(
 
   button.style.display = '';
 
-  // Configurar texto inicial del botón usando los textos del componente
-  const { showAllText } = getLocalizedStrings(button, totalCards);
-  setButtonText(button, showAllText.replace('${total}', totalCards.toString()));
+  // Contar solo las tarjetas que YA están marcadas como ocultas desde el servidor
+  const hiddenCards = cards.filter((card) =>
+    card.classList.contains(hiddenClass)
+  );
+  const hiddenCount = hiddenCards.length;
 
-  // Ocultar todas las tarjetas si el contenedor está oculto
-  const target = grid.closest(`[id]`) as HTMLElement;
-  if (target?.classList.contains(hiddenClass)) {
-    cards.forEach((card) => card.classList.add(hiddenClass));
-  }
+  console.log(
+    `🔢 Tarjetas ocultas desde servidor: ${hiddenCount} de ${totalCards} totales`
+  );
+
+  // El botón ya debe tener el número correcto desde el servidor,
+  // pero lo actualizamos para asegurar consistencia
+  const { showAllText } = getLocalizedStrings(button, hiddenCount);
+  setButtonText(
+    button,
+    showAllText.replace('${total}', hiddenCount.toString())
+  );
 }
 
 // Configurar event listener del botón
@@ -70,8 +78,8 @@ export function setupButtonListener(
   button.addEventListener('click', async () => {
     const cards = Array.from(grid.children) as HTMLElement[];
     const revealedCount = getRevealedCount(cards, config.hiddenClass);
+    const hiddenCount = getHiddenCount(cards, config.hiddenClass);
     const totalCards = cards.length;
-    const remaining = totalCards - revealedCount;
 
     // Actualizar estado si cambió el número de tarjetas
     if (totalCards !== state.currentCardCount) {
@@ -79,8 +87,8 @@ export function setupButtonListener(
       return; // Reintentar con nuevo estado
     }
 
-    // Si no quedan tarjetas por mostrar, colapsar todo
-    if (remaining <= 0) {
+    // Si no quedan tarjetas ocultas por mostrar, colapsar todo
+    if (hiddenCount <= 0) {
       collapseAll(button, target, cards, config, state);
       return;
     }
@@ -97,12 +105,8 @@ export function setupButtonListener(
     // Revelar siguiente grupo de tarjetas (esperar a que terminen las animaciones)
     const revealed = await revealNextCards(cards, config, target);
 
-    // Actualizar texto del botón
-    updateButtonText(
-      button,
-      totalCards,
-      revealedCount + revealed
-    );
+    // Actualizar texto del botón basado en tarjetas ocultas restantes
+    updateButtonText(button, totalCards, revealedCount + revealed);
 
     // Ejecutar callback si existe
     if (typeof config.onShow === 'function') {
@@ -112,8 +116,19 @@ export function setupButtonListener(
 }
 
 // Obtener cantidad de tarjetas reveladas
-export function getRevealedCount(cards: HTMLElement[], hiddenClass: string): number {
+export function getRevealedCount(
+  cards: HTMLElement[],
+  hiddenClass: string
+): number {
   return cards.filter((card) => !card.classList.contains(hiddenClass)).length;
+}
+
+// Obtener cantidad de tarjetas ocultas
+export function getHiddenCount(
+  cards: HTMLElement[],
+  hiddenClass: string
+): number {
+  return cards.filter((card) => card.classList.contains(hiddenClass)).length;
 }
 
 // Mostrar contenedor
@@ -316,8 +331,16 @@ export function hideContainerSmoothly(
         // noop
       }
 
-      const { showAllText } = getLocalizedStrings(button, totalCards);
-      setButtonText(button, showAllText.replace('${total}', totalCards.toString()));
+      // Contar tarjetas ocultas dinámicamente después de ocultar
+      const allCards = Array.from(
+        target.querySelectorAll('.grid > *')
+      ) as HTMLElement[];
+      const hiddenCount = getHiddenCount(allCards, config.hiddenClass);
+      const { showAllText } = getLocalizedStrings(button, hiddenCount);
+      setButtonText(
+        button,
+        showAllText.replace('${total}', hiddenCount.toString())
+      );
 
       if (typeof config.onHide === 'function') {
         config.onHide();
@@ -365,19 +388,45 @@ export function expandContainerSmoothly(
 }
 
 // Actualizar texto del botón
-export function updateButtonText(button: HTMLElement, total: number, revealed: number): void {
-  const remaining = total - revealed;
-  const { showAllText, hideText } = getLocalizedStrings(button, total);
+export function updateButtonText(
+  button: HTMLElement,
+  total: number,
+  revealed: number
+): void {
+  // Intentar encontrar el grid asociado para contar dinámicamente
+  let hiddenCount = total - revealed; // fallback
 
-  if (remaining > 0) {
-    setButtonText(button, showAllText.replace('${total}', total.toString()));
+  try {
+    // Buscar el contenedor del grid relacionado
+    const targetId = button.getAttribute('data-target') || 'extra-projects';
+    const target = document.getElementById(targetId);
+    const grid = target?.querySelector('.grid');
+
+    if (grid) {
+      const cards = Array.from(grid.children) as HTMLElement[];
+      hiddenCount = getHiddenCount(cards, 'hidden');
+    }
+  } catch {
+    // usar fallback si hay error
+  }
+
+  const { showAllText, hideText } = getLocalizedStrings(button, hiddenCount);
+
+  if (hiddenCount > 0) {
+    setButtonText(
+      button,
+      showAllText.replace('${total}', hiddenCount.toString())
+    );
   } else {
     setButtonText(button, hideText);
   }
 }
 
 // Obtener strings localizados
-export function getLocalizedStrings(button: HTMLElement, total: number): LocalizedStrings {
+export function getLocalizedStrings(
+  button: HTMLElement,
+  total: number
+): LocalizedStrings {
   const lang =
     document.documentElement.lang ||
     (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
@@ -418,7 +467,9 @@ export function getLocalizedStrings(button: HTMLElement, total: number): Localiz
 // Preservar marcado interno del botón al actualizar texto (ej. spans/iconos)
 export function setButtonText(button: HTMLElement, text: string): void {
   try {
-    const textSpan = button.querySelector('.neon-showmore-btn__text') as HTMLElement;
+    const textSpan = button.querySelector(
+      '.neon-showmore-btn__text'
+    ) as HTMLElement;
     if (textSpan) {
       textSpan.textContent = text;
       return;
@@ -593,8 +644,12 @@ export function updateCardsState(
 
   if (state.isCollapsed) {
     cards.forEach((card) => card.classList.add(config.hiddenClass));
-    const { showAllText } = getLocalizedStrings(button, newCount);
-    setButtonText(button, showAllText.replace('${total}', newCount.toString()));
+    const hiddenCount = getHiddenCount(cards, config.hiddenClass);
+    const { showAllText } = getLocalizedStrings(button, hiddenCount);
+    setButtonText(
+      button,
+      showAllText.replace('${total}', hiddenCount.toString())
+    );
   } else {
     const revealedCount = getRevealedCount(cards, config.hiddenClass);
     updateButtonText(button, newCount, revealedCount);
