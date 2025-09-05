@@ -1,0 +1,37 @@
+---
+import LocalizedText from '../language/LocalizedText.astro';
+
+export interface Props {
+  name?: string;
+  description?: string;
+  nameKey?: string;
+  descriptionKey?: string;
+  className?: string;
+}
+
+const {
+  name = '',
+  description = '',
+  nameKey = 'personal.name',
+  descriptionKey = 'personal.description',
+  className = '',
+} = Astro.props;
+
+const nameFallback = name || 'Joaquin Calligaro';
+const descriptionFallback =
+  description ||
+  'Soy desarrollador frontend junior con experiencia en HTML, CSS y JavaScript. Actualmente trabajo con React, Tailwind y Astro, creando proyectos prácticos que combinan diseño moderno, rendimiento y buenas prácticas de desarrollo.';
+---
+
+<div
+  class={`flex flex-col gap-5 text-center sm:gap-5 md:gap-5 md:text-left xl:gap-0 ${className}`}
+>
+  <h1
+    class="text-4xl font-bold text-black md:text-6xl xl:mb-10 dark:text-white"
+  >
+    <LocalizedText key={nameKey} fallback={nameFallback} />
+  </h1>
+  <p class="max-w-3xl text-lg leading-relaxed text-gray-600 dark:text-gray-300">
+    <LocalizedText key={descriptionKey} fallback={descriptionFallback} />
+  </p>
+</div>

@@ -1,7 +1,7 @@
 ---
 import ProjectCard from './ProjectCard.astro';
 import { projectsData } from './projectsData.ts';
-import ShowMoreBtn from '../ui/ShowMoreBtn.astro';
+import ShowMoreBtn from './ShowMoreBtn.astro';
 
 // Separar proyectos visibles y ocultos
 const visibleProjects = projectsData.filter((project) => !project.hidden);
