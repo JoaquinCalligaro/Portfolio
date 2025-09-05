@@ -20,9 +20,11 @@ export const enTranslations: TranslationStructure = {
     shortBio: {
       heading: 'Short Bio',
       paragraphs: [
-        'I am a frontend developer focused on building clean, accessible interfaces. I turn visual designs into responsive web experiences that perform well across devices.',
-        'I work daily with HTML, CSS, and JavaScript, and use modern tools like Astro and Tailwind to ship maintainable, component-driven projects.',
-        'I enjoy improving performance, reducing load times, and applying best practices to create reliable user experiences.',
+        'I am from La Rioja, Argentina, and I started venturing into web development in 2022, although technology has always attracted me since I was a child. I enrolled in a University Technical Program in Programming at the National Technological University in Argentina.',
+        'In my free time I like to design, structure, and constantly learn, creating new things that challenge me.',
+        'I seek to contribute my knowledge in collaborative projects, receive feedback from other developers, and thus improve my skills.',
+        'My current goal is to grow as a frontend developer, but also expand my experience towards backend and mobile.',
+        'I am currently studying English at UNLaR and have an A2 level certificate, with the goal of continuing to advance to project myself in an international environment.',
       ],
       cvHeading: 'CV Information',
       cvDownload: 'Download CV',

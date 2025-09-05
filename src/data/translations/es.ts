@@ -20,9 +20,11 @@ export const esTranslations: TranslationStructure = {
     shortBio: {
       heading: 'Biografía breve',
       paragraphs: [
-        'Soy un desarrollador frontend con interés en crear interfaces limpias y accesibles. Me especializo en convertir diseños en experiencias web eficientes y responsivas.',
-        'Trabajo a diario con HTML, CSS y JavaScript, y me apoyo en herramientas modernas como Astro, Tailwind y frameworks componentizados para entregar productos mantenibles.',
-        'Me apasiona el rendimiento y las buenas prácticas; disfruto optimizar cargas, mejorar la experiencia de usuario y aprender nuevas técnicas para crear productos confiables.',
+        'Soy de La Rioja, Argentina, y comencé a incursionar en el desarrollo web en 2022, aunque desde chico siempre me atrajo la tecnología. Me anoté en una carrera de Técnicatura Universitaria en Programación en la Universidad Tecnológica Nacional en Argentina.',
+        'En mis tiempos libres me gusta diseñar, estructurar y aprender constantemente, creando cosas nuevas que me desafíen.',
+        'Busco aportar mis conocimientos en proyectos colaborativos, recibir feedback de otros desarrolladores y así mejorar mis habilidades.',
+        'Mi meta actual es crecer como frontend developer, pero también ampliar mi experiencia hacia backend y mobile.',
+        'Actualmente estudio inglés en la UNLaR y cuento con un certificado de nivel A2, con la meta de seguir avanzando para proyectarme en un entorno internacional.',
       ],
       cvHeading: 'Información CV',
       cvDownload: 'Descargar CV',
