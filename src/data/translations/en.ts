@@ -24,7 +24,7 @@ export const enTranslations: TranslationStructure = {
         'In my free time I like to design, structure, and constantly learn, creating new things that challenge me.',
         'I seek to contribute my knowledge in collaborative projects, receive feedback from other developers, and thus improve my skills.',
         'My current goal is to grow as a frontend developer, but also expand my experience towards backend and mobile.',
-        'I am currently studying English and have an A2 level certificate, with the goal of continuing to advance to project myself in an international environment.',
+        'I am currently studying English and have an A2 level certificate, with the goal of continuing to advance.',
       ],
       cvHeading: 'CV Information',
       cvDownload: 'Download CV',
@@ -110,18 +110,21 @@ export const enTranslations: TranslationStructure = {
       company: 'British Institute La Rioja',
       description:
         'Completed my A2 level English studies, improving my communication and comprehension skills in the language.',
+      iconKey: 'university',
     },
     {
       dates: ' February 2022 - September 2024 (COMPLETED)',
       company: 'National Technological University (UTN)',
       description:
         'Completed the University Technical Program in Programming, acquiring solid knowledge in software development, algorithms and data structures.',
+      iconKey: 'university',
     },
     {
       dates: 'February 2013 - December 2019 (COMPLETED)',
       company: 'Brigadier Gral. Juan Facundo Quiroga (EPET N°2)',
       description:
-        'Completed my secondary studies with knowledge in control technologies (robotics) and basic programming, laying the foundation for my future career in software development.',
+        'Completed my secondary studies with knowledge in control technologies (robotics) and basic programming.',
+      iconKey: 'university',
     },
   ],
 };

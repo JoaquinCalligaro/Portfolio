@@ -20,11 +20,11 @@ export const esTranslations: TranslationStructure = {
     shortBio: {
       heading: 'Biografía breve',
       paragraphs: [
-        'Soy de La Rioja, Argentina, Tengo 24 años comencé a incursionar en el desarrollo web en 2022, aunque desde chico siempre me atrajo la tecnología. Me anoté en una carrera de Técnicatura Universitaria en Programación en la Universidad Tecnológica Nacional en Argentina.',
+        'Soy de La Rioja, Argentina, tengo 24 años y comencé a incursionar en el desarrollo web en 2022, aunque desde chico siempre me atrajo la tecnología. Me anoté en una carrera de Técnicatura Universitaria en Programación en la Universidad Tecnológica Nacional en Argentina.',
         'En mis tiempos libres me gusta diseñar, estructurar y aprender constantemente, creando cosas nuevas que me desafíen.',
         'Busco aportar mis conocimientos en proyectos colaborativos, recibir feedback de otros desarrolladores y así mejorar mis habilidades.',
         'Mi meta actual es crecer como frontend developer, pero también ampliar mi experiencia hacia backend y mobile.',
-        'Actualmente estudio inglés además cuento con un certificado de nivel A2, con la meta de seguir avanzando para proyectarme en un entorno internacional.',
+        'Actualmente estudio inglés además cuento con un certificado de nivel A2, con la meta de seguir avanzando.',
       ],
       cvHeading: 'Información CV',
       cvDownload: 'Descargar CV',
@@ -110,18 +110,21 @@ export const esTranslations: TranslationStructure = {
       company: 'British Institute La Rioja',
       description:
         'Finalizé mis estudios de nivel A2 de inglés, mejorando mis habilidades de comunicación y comprensión en el idioma.',
+      iconKey: 'university',
     },
     {
       dates: ' Febrero 2022 - Septiembre 2024 (FINALIZADO)',
       company: 'Universidad Técnologica Nacional (UTN)',
       description:
         'Finalizé la carrera de Técnico Universitario en Programación, adquiriendo conocimientos sólidos en desarrollo de software, algoritmos y estructuras de datos.',
+      iconKey: 'university',
     },
     {
       dates: 'Febrero 2013 - Diciembre 2019 (FINALIZADO) ',
       company: 'Brigadier Gral. Juan Facundo Quiroga (EPET N°2)',
       description:
-        'Completé mis estudios secundarios con conocimientos en tecnologias de control (robotica) y programación básica, sentando las bases para mi futura carrera en desarrollo de software.',
+        'Completé mis estudios secundarios con conocimientos en tecnologias de control (robotica) y programación básica.',
+      iconKey: 'university',
     },
   ],
 };
