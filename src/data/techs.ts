@@ -10,13 +10,13 @@ export interface TechItem {
 }
 
 export interface TechStackGroup {
-  title: string;
+  categoryKey: 'frontend' | 'database' | 'tools' | 'designTools';
   items: TechItem[];
 }
 
 export const stacks: TechStackGroup[] = [
   {
-    title: 'Front-end',
+    categoryKey: 'frontend',
     items: [
       {
         name: 'HTML5',
@@ -84,7 +84,7 @@ export const stacks: TechStackGroup[] = [
     ],
   },
   {
-    title: 'Bases de datos',
+    categoryKey: 'database',
     items: [
       {
         name: 'SQL',
@@ -97,7 +97,7 @@ export const stacks: TechStackGroup[] = [
     ],
   },
   {
-    title: 'Herramientas',
+    categoryKey: 'tools',
     items: [
       {
         name: 'Git',
@@ -126,7 +126,7 @@ export const stacks: TechStackGroup[] = [
     ],
   },
   {
-    title: 'Diseño',
+    categoryKey: 'designTools',
     items: [
       {
         name: 'Figma',

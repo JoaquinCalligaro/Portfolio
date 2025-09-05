@@ -6,13 +6,21 @@ import type { TechItem } from '../../data/techs';
 interface Props {
   title: string;
   items: TechItem[];
+  'data-tech-category'?: string;
 }
 
-const { title, items } = Astro.props as Props;
+const {
+  title,
+  items,
+  'data-tech-category': categoryKey,
+} = Astro.props as Props;
 ---
 
 <div>
-  <h4 class="mb-5 text-sm font-semibold text-gray-800 dark:text-gray-200">
+  <h4
+    class="mb-5 text-sm font-semibold text-gray-800 dark:text-gray-200"
+    data-tech-category={categoryKey}
+  >
     {title}
   </h4>
   <div
