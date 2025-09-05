@@ -2,11 +2,11 @@
 export { default as initShowMore } from './ShowMoreInit';
 
 // Re-exportar tipos para uso externo si es necesario
-export type { 
-  ShowMoreOptions, 
-  ShowMoreAPI, 
+export type {
+  ShowMoreOptions,
+  ShowMoreAPI,
   ShowMoreConfig,
-  ShowMoreState 
+  ShowMoreState,
 } from './types';
 
 // Export por defecto
