@@ -20,11 +20,11 @@ export const esTranslations: TranslationStructure = {
     shortBio: {
       heading: 'Biografía breve',
       paragraphs: [
-        'Soy de La Rioja, Argentina, y comencé a incursionar en el desarrollo web en 2022, aunque desde chico siempre me atrajo la tecnología. Me anoté en una carrera de Técnicatura Universitaria en Programación en la Universidad Tecnológica Nacional en Argentina.',
+        'Soy de La Rioja, Argentina, Tengo 24 años comencé a incursionar en el desarrollo web en 2022, aunque desde chico siempre me atrajo la tecnología. Me anoté en una carrera de Técnicatura Universitaria en Programación en la Universidad Tecnológica Nacional en Argentina.',
         'En mis tiempos libres me gusta diseñar, estructurar y aprender constantemente, creando cosas nuevas que me desafíen.',
         'Busco aportar mis conocimientos en proyectos colaborativos, recibir feedback de otros desarrolladores y así mejorar mis habilidades.',
         'Mi meta actual es crecer como frontend developer, pero también ampliar mi experiencia hacia backend y mobile.',
-        'Actualmente estudio inglés en la UNLaR y cuento con un certificado de nivel A2, con la meta de seguir avanzando para proyectarme en un entorno internacional.',
+        'Actualmente estudio inglés además cuento con un certificado de nivel A2, con la meta de seguir avanzando para proyectarme en un entorno internacional.',
       ],
       cvHeading: 'Información CV',
       cvDownload: 'Descargar CV',
@@ -106,22 +106,22 @@ export const esTranslations: TranslationStructure = {
   },
   experiences: [
     {
-      dates: ' January 2025- Present',
-      company: 'University of Camagüey',
+      dates: ' Enero 2024 - Diciembre 2024 (FINALIZADO)',
+      company: 'British Institute La Rioja',
       description:
-        'Participé en proyectos de desarrollo web para entornos educativos, diseñando interfaces para recursos de aprendizaje y mejorando la accesibilidad y usabilidad de contenidos en línea.',
+        'Finalizé mis estudios de nivel A2 de inglés, mejorando mis habilidades de comunicación y comprensión en el idioma.',
     },
     {
-      dates: ' January 2025- February 2025',
-      company: 'No Country Tech Work Simulation',
+      dates: ' Febrero 2022 - Septiembre 2024 (FINALIZADO)',
+      company: 'Universidad Técnologica Nacional (UTN)',
       description:
-        'Simulación práctica de trabajo en equipo donde prototipamos funciones, integramos APIs y aplicamos metodologías ágiles para resolver casos reales de producto.',
+        'Finalizé la carrera de Técnico Universitario en Programación, adquiriendo conocimientos sólidos en desarrollo de software, algoritmos y estructuras de datos.',
     },
     {
-      dates: 'August 2024 - November 2024',
-      company: 'GotoSend',
+      dates: 'Febrero 2013 - Diciembre 2019 (FINALIZADO) ',
+      company: 'Brigadier Gral. Juan Facundo Quiroga (EPET N°2)',
       description:
-        'Colaboré en el frontend de la plataforma, implementando componentes reutilizables, mejorando la consistencia visual y optimizando tiempos de carga en interfaces de usuario.',
+        'Completé mis estudios secundarios con conocimientos en tecnologias de control (robotica) y programación básica, sentando las bases para mi futura carrera en desarrollo de software.',
     },
   ],
 };
