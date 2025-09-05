@@ -72,7 +72,7 @@ export const projectsData: Project[] = [
       organicStore4,
       organicStore5,
     ],
-    hidden: true, // Ejemplo de proyecto oculto para pruebas
+    hidden: true,
   },
 
   {
@@ -112,7 +112,7 @@ export const projectsData: Project[] = [
     live: 'https://joaquincalligaro.github.io/To-Do-List/',
     technologies: ['html', 'css', 'tailwind', 'javascript'],
     images: [todoList1, todoList2, todoList3, todoList4, todoList5],
-    hidden: true, // Ejemplo de proyecto oculto para pruebas
+    hidden: true,
   },
 
   {
