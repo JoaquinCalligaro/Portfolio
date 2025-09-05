@@ -1,5 +1,7 @@
-// Lista de tecnologías por categoría.
-// Edita este archivo para añadir/quitar tecnologías. Los iconos están en /public/svg
+// Configuración de tecnologías para el stack tecnológico
+// Edita este archivo para añadir/quitar tecnologías. Los iconos están en /src/assets/svg
+
+// Estructura de cada tecnología individual
 export interface TechItem {
   name: string;
   hex: string;
@@ -9,11 +11,13 @@ export interface TechItem {
   loading?: 'lazy' | 'eager';
 }
 
+// Grupo de tecnologías por categoría
 export interface TechStackGroup {
   categoryKey: 'frontend' | 'database' | 'tools' | 'designTools';
   items: TechItem[];
 }
 
+// Lista de todas las tecnologías organizadas por categoría
 export const stacks: TechStackGroup[] = [
   {
     categoryKey: 'frontend',

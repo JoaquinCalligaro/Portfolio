@@ -1,7 +1,10 @@
+// Clase para manejar modales con animaciones
 import { animate } from 'motion/mini';
 
+// Duración de las animaciones del modal
 const MODAL_ANIMATION_DURATION_IN_MS = 200;
 
+// Clase principal para crear y controlar modales
 export class Modal {
   private animationOptions = {
     duration: MODAL_ANIMATION_DURATION_IN_MS / 1000,
@@ -9,6 +12,7 @@ export class Modal {
   private modalEl: HTMLElement;
   private backdrop = document.createElement('div');
 
+  // Inicializa un modal con el elemento HTML correspondiente
   constructor(elementOrId: HTMLElement | string) {
     const el =
       elementOrId instanceof HTMLElement
@@ -25,6 +29,7 @@ export class Modal {
     this.backdrop.classList.add('backdrop');
   }
 
+  // Muestra el modal con animación de entrada
   show() {
     document.body.appendChild(this.backdrop);
     this.modalEl.classList.remove('hidden');
@@ -39,6 +44,7 @@ export class Modal {
     );
   }
 
+  // Oculta el modal con animación de salida
   hide() {
     animate(
       this.modalEl,

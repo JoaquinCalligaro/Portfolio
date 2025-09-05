@@ -1,16 +1,20 @@
+// API endpoint para el formulario de contacto
 import type { APIRoute } from 'astro';
 import { Resend } from 'resend';
 
+// Variables de entorno para el servicio de email
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const TO_EMAIL = process.env.CONTACT_TO_EMAIL;
 
+// Cliente de Resend para envío de emails
 const resendClient = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 
+// Maneja las peticiones POST del formulario de contacto
 export const post: APIRoute = async ({ request }) => {
   try {
     const form = await request.formData();
 
-    // Honeypot field (must be empty for human submissions)
+    // Campo honeypot para detectar spam (debe estar vacío)
     const website = form.get('website');
     if (website && String(website).trim()) {
       return new Response(
@@ -24,9 +28,8 @@ export const post: APIRoute = async ({ request }) => {
     const message = String(form.get('message') || '').trim();
     const formToken = String(form.get('form_token') || '').trim();
     const timeSpent = Number(form.get('time_spent') || 0);
-    // cf-turnstile-response no longer required
 
-    // Time-trap server-side: if elapsed is under 2.5 seconds, likely a bot
+    // Protección anti-bot: rechazar si se envía muy rápido (menos de 2.5 segundos)
     if (timeSpent && timeSpent < 2500) {
       return new Response(
         JSON.stringify({ ok: false, error: 'Spam detected (fast submit)' }),
@@ -34,6 +37,7 @@ export const post: APIRoute = async ({ request }) => {
       );
     }
 
+    // Validación de campos obligatorios
     if (!name || !email || !message) {
       return new Response(
         JSON.stringify({ ok: false, error: 'Missing required fields' }),
@@ -41,7 +45,7 @@ export const post: APIRoute = async ({ request }) => {
       );
     }
 
-    // simple token check: require token to be present
+    // Verificación de token del formulario
     if (!formToken) {
       return new Response(
         JSON.stringify({ ok: false, error: 'Invalid form token' }),
@@ -49,9 +53,7 @@ export const post: APIRoute = async ({ request }) => {
       );
     }
 
-    // Turnstile verification removed: server will not require cf-turnstile-response
-
-    // If resend is configured, send email
+    // Envía email si Resend está configurado
     if (resendClient && TO_EMAIL) {
       const subject = `Nuevo mensaje de ${name}`;
       const html = `<p><strong>Nombre:</strong> ${name}</p><p><strong>Email:</strong> ${email}</p><hr/><div>${message}</div>`;
@@ -66,13 +68,13 @@ export const post: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ ok: true }), { status: 200 });
     }
 
-    // fallback: return OK with parsed fields
+    // Respuesta de fallback sin envío de email
     return new Response(
       JSON.stringify({ ok: true, data: { name, email, message } }),
       { status: 200 }
     );
   } catch (err) {
-    // Log the real error server-side, but do not expose details to the client
+    // Log del error real en servidor, sin exponer detalles al cliente
     console.error(err);
     return new Response(
       JSON.stringify({ ok: false, error: 'Internal server error' }),
@@ -81,4 +83,5 @@ export const post: APIRoute = async ({ request }) => {
   }
 };
 
+// Desactiva prerenderizado para permitir POST requests
 export const prerender = false;

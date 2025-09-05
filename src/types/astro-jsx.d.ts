@@ -1,3 +1,4 @@
+// Declaraciones de tipos JSX para componentes Astro
 declare global {
   namespace JSX {
     interface IntrinsicElements {

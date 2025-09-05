@@ -1,14 +1,12 @@
-// src/scripts/navbar/types.ts
+// Tipos TypeScript para el sistema de navegación
 
 /**
- * IDs de las secciones reales en el documento (sections <section id="...">).
- * Se usan en IntersectionObserver y smooth scroll.
+ * IDs de las secciones principales del sitio
  */
 export type SectionId = 'tech-stack' | 'projects' | 'about' | 'contact';
 
 /**
- * IDs de los radios en la navegación desktop.
- * Deben coincidir con los atributos `id` de los <input type="radio"> en NavbarDesktop.astro.
+ * IDs de los controles de navegación desktop
  */
 export type NavRadioId =
   | 'nav-tech-stack'
@@ -17,8 +15,7 @@ export type NavRadioId =
   | 'nav-contact';
 
 /**
- * Configuración común de la navbar.
- * Centraliza referencias a los elementos clave para evitar duplicar querySelectors.
+ * Configuración de elementos del navbar
  */
 export interface NavbarConfig {
   navbar: HTMLElement | null;

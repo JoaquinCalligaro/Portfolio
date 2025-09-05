@@ -1,6 +1,5 @@
 ---
-// Sección: Layout
-// Propósito: envoltorio de la página (Navbar, Footer, main)
+// Layout principal del sitio - estructura base de todas las páginas
 import Footer from '../components/Footer.astro';
 import GoToTopBtn from '../components/ui/GoToTopBtn.astro';
 import Navbar from '../components/navbar/Navbar.astro';
@@ -22,7 +21,7 @@ import Background from '../components/background/Background.tsx';
       name="description"
       content="A small minimalist web developer portfolio built with Astro and TailwindCSS"
     />
-    <!-- Inline theme initializer: runs as early as possible to avoid white flash -->
+    <!-- Script de inicialización del tema para evitar parpadeo -->
     <script>
       (function () {
         try {

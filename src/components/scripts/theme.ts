@@ -1,9 +1,8 @@
-// src/scripts/theme.ts
-
+// Manejo del tema claro/oscuro del sitio web
 type Theme = 'light' | 'dark';
 
 /**
- * Aplica un tema en el documento y actualiza íconos + localStorage.
+ * Aplica un tema específico y actualiza la UI
  */
 function setTheme(theme: Theme) {
   const html = document.documentElement;
@@ -14,21 +13,21 @@ function setTheme(theme: Theme) {
     html.classList.add('dark');
     localStorage.setItem('color-theme', 'dark');
 
-    // Mostrar luna, ocultar sol
+    // Actualiza iconos: mostrar luna, ocultar sol
     moon?.classList.remove('hidden');
     sun?.classList.add('hidden');
   } else {
     html.classList.remove('dark');
     localStorage.setItem('color-theme', 'light');
 
-    // Mostrar sol, ocultar luna
+    // Actualiza iconos: mostrar sol, ocultar luna
     sun?.classList.remove('hidden');
     moon?.classList.add('hidden');
   }
 }
 
 /**
- * Cambia al tema opuesto.
+ * Alterna entre tema claro y oscuro
  */
 function toggleTheme() {
   const current = (localStorage.getItem('color-theme') as Theme) || 'light';
@@ -37,7 +36,7 @@ function toggleTheme() {
 }
 
 /**
- * Inicializa el tema al cargar la página.
+ * Inicializa el tema basado en preferencias guardadas o del sistema
  */
 function initTheme() {
   const stored = localStorage.getItem('color-theme') as Theme | null;
@@ -52,6 +51,7 @@ function initTheme() {
   }
 }
 
+// Exporta todas las funciones del tema
 export const ThemeHelper = {
   setTheme,
   toggleTheme,
