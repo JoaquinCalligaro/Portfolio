@@ -9,9 +9,9 @@ import organicStore3 from '../../assets/images/OrganicStore/organic-store-3.webp
 import organicStore4 from '../../assets/images/OrganicStore/organic-store-4.webp';
 import organicStore5 from '../../assets/images/OrganicStore/organic-store-5.webp';
 
-import passwordGen1 from '../../assets/images/password-generator/Password-Generator-1.webp';
-import passwordGen2 from '../../assets/images/password-generator/Password-Generator-2.webp';
-import passwordGen3 from '../../assets/images/password-generator/Password-Generator-3.webp';
+import passwordGen1 from '../../assets/images/password-generator/password-generator-1.webp';
+import passwordGen2 from '../../assets/images/password-generator/password-generator-2.webp';
+import passwordGen3 from '../../assets/images/password-generator/password-generator-3.webp';
 
 import gifApp1 from '../../assets/images/gif-app/gif-app-1.webp';
 import gifApp2 from '../../assets/images/gif-app/gif-app-2.webp';
