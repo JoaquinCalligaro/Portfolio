@@ -166,7 +166,9 @@
   --icon-glow-color: #00b3ff2e;
   background: linear-gradient(90deg, #ff000008, #ffffff0f, #ffffff08);
   background-size: 200% 200%;
-  animation: glowing 3s ease-in-out infinite, pulse-shadow 2s infinite;
+  animation:
+    glowing 3s ease-in-out infinite,
+    pulse-shadow 2s infinite;
   /* sombra base más sutil (reducida) */
   box-shadow: 0 4px 10px 0 var(--icon-glow-color);
 }

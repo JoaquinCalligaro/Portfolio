@@ -24,7 +24,13 @@ import NavbarDesktop from './desktop/NavbarDesktop.astro';
       title="Alternar tema"
       class="glow-hover action-button flex cursor-pointer items-center rounded-lg p-2 transition-all duration-300 hover:scale-110 hover:brightness-110 active:scale-95"
     >
-      <Image src={sunIcon} id="theme-sun-icon" class="mx-2 size-6" aria-label="Icono sol" alt="Sun icon" />
+      <Image
+        src={sunIcon}
+        id="theme-sun-icon"
+        class="mx-2 size-6"
+        aria-label="Icono sol"
+        alt="Sun icon"
+      />
       <Image
         src={moonIcon}
         id="theme-moon-icon"
@@ -59,7 +65,9 @@ import NavbarDesktop from './desktop/NavbarDesktop.astro';
   // === THEME HELPER ===
   function initTheme() {
     const stored = localStorage.getItem('color-theme');
-    const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+    const prefersDark = window.matchMedia?.(
+      '(prefers-color-scheme: dark)'
+    ).matches;
 
     if (stored === 'dark' || (!stored && prefersDark)) {
       setTheme('dark');
@@ -131,7 +139,8 @@ import NavbarDesktop from './desktop/NavbarDesktop.astro';
 
     document.addEventListener('click', (ev) => {
       const target = ev.target;
-      const isClickInside = navbar.contains(target) || navbarToggle.contains(target);
+      const isClickInside =
+        navbar.contains(target) || navbarToggle.contains(target);
 
       if (!isClickInside && !navbar.classList.contains('hidden')) {
         toggleMobileMenu();
@@ -147,7 +156,8 @@ import NavbarDesktop from './desktop/NavbarDesktop.astro';
           const targetElement = document.querySelector(targetId);
           if (targetElement) {
             const rect = targetElement.getBoundingClientRect();
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollTop =
+              window.pageYOffset || document.documentElement.scrollTop;
             const targetTop = rect.top + scrollTop - 100;
 
             window.scrollTo({
@@ -176,7 +186,8 @@ import NavbarDesktop from './desktop/NavbarDesktop.astro';
     let lastScrollTop = 0;
 
     window.addEventListener('scroll', () => {
-      const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const currentScrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
 
       if (currentScrollTop > lastScrollTop && currentScrollTop > 100) {
         navbarHeader.classList.add('-translate-y-full');
@@ -197,7 +208,9 @@ import NavbarDesktop from './desktop/NavbarDesktop.astro';
 
   // === SECTION NAVIGATION ===
   function initSectionNavigation() {
-    const glassNavLabels = document.querySelectorAll('.glass-nav-wrapper label');
+    const glassNavLabels = document.querySelectorAll(
+      '.glass-nav-wrapper label'
+    );
 
     glassNavLabels.forEach((label) => {
       label.addEventListener('click', (e) => {
@@ -211,7 +224,8 @@ import NavbarDesktop from './desktop/NavbarDesktop.astro';
 
           if (targetElement) {
             const rect = targetElement.getBoundingClientRect();
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollTop =
+              window.pageYOffset || document.documentElement.scrollTop;
             const targetTop = rect.top + scrollTop - 100;
 
             window.scrollTo({
@@ -232,14 +246,19 @@ import NavbarDesktop from './desktop/NavbarDesktop.astro';
         let activeEntry = null;
 
         entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio > maxIntersectionRatio) {
+          if (
+            entry.isIntersecting &&
+            entry.intersectionRatio > maxIntersectionRatio
+          ) {
             maxIntersectionRatio = entry.intersectionRatio;
             activeEntry = entry;
           }
         });
 
         if (activeEntry) {
-          const sectionIndex = sections.findIndex((s) => s === activeEntry.target.id);
+          const sectionIndex = sections.findIndex(
+            (s) => s === activeEntry.target.id
+          );
           if (sectionIndex !== -1) {
             const radioInput = document.getElementById(ids[sectionIndex]);
             if (radioInput) radioInput.checked = true;
@@ -261,7 +280,7 @@ import NavbarDesktop from './desktop/NavbarDesktop.astro';
   // === INITIALIZATION ===
   function initNavbar() {
     initTheme();
-    
+
     const themeToggle = document.getElementById('theme-toggle');
     themeToggle?.addEventListener('click', toggleTheme);
 
