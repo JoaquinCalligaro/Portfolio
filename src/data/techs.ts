@@ -26,7 +26,7 @@ export const stacks: TechStackGroup[] = [
         name: 'HTML5',
         hex: '#E34F26',
         hexAlpha: '#E34F2633',
-        icon: '/src/assets/svg/html.svg',
+        icon: '../assets/svg/html.svg',
         color: 'text-orange-500',
         loading: 'eager',
       },
