@@ -1,4 +1,7 @@
 ---
+import { Image } from 'astro:assets';
+import cssSvg from '../../assets/svg/css.svg';
+
 export interface Props {
   class?: string;
   title?: string;
@@ -19,7 +22,7 @@ const wrapper =
   wrapperClass ?? `${base} ${hover} ${glow ? 'glow-effect' : ''} icon-css`;
 ---
 
-<!-- CssIcon: usa el SVG estático desde public/svg y permite clases Tailwind -->
+<!-- CssIcon: usa el SVG estático desde assets y permite clases Tailwind -->
 <span class={wrapper} aria-hidden="true">
-  <img src="/src/assets/svg/css.svg" class={cls} alt={title} loading="lazy" />
+  <Image src={cssSvg} class={cls} alt={title} loading="lazy" />
 </span>
