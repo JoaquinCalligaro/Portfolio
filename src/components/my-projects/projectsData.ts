@@ -122,7 +122,7 @@ export const projectsData: Project[] = [
     titleKey: 'projects.jsCalculator.title',
     descriptionKey: 'projects.jsCalculator.description',
     repo: 'https://github.com/JoaquinCalligaro/Javascript-Calculator',
-    live: 'https://calculatorjc.netlify.app/',
+    live: 'https://javascript6-calculator.netlify.app/',
     technologies: ['html', 'css', 'tailwind', 'javascript'],
     images: [calculator1, calculator2],
     hidden: true,
