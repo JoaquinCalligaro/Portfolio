@@ -11,7 +11,9 @@ export const enTranslations: TranslationStructure = {
   personal: {
     name: 'Joaquin Calligaro',
     description:
-      'I am a junior frontend developer with experience in HTML, CSS and JavaScript. I work with React, Tailwind and Astro, building practical projects that combine modern design, performance and good development practices.',
+      'Hello, I am a frontend developer who enjoys turning ideas into clear and functional interfaces. ' +
+      'Currently, I am exploring web and mobile projects with a modern style focused on user experience. ' +
+      'I invite you to check out my work.',
   },
   aboutMe: {
     title: 'About Me',

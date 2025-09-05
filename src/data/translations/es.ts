@@ -11,7 +11,9 @@ export const esTranslations: TranslationStructure = {
   personal: {
     name: 'Joaquin Calligaro',
     description:
-      'Soy desarrollador frontend junior con experiencia en HTML, CSS y JavaScript. Actualmente trabajo con React, Tailwind y Astro, creando proyectos prácticos que combinan diseño moderno, rendimiento y buenas prácticas de desarrollo.',
+      'Hola, soy un desarrollador frontend que disfruta transformar ideas en interfaces claras y funcionales. ' +
+      'Actualmente exploro proyectos web y móviles con un estilo moderno y enfocado en la experiencia del usuario. ' +
+      'Te invito a ver mi trabajo.',
   },
   aboutMe: {
     title: 'Sobre Mí',

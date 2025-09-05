@@ -20,18 +20,22 @@ const {
 const nameFallback = name || 'Joaquin Calligaro';
 const descriptionFallback =
   description ||
-  'Soy desarrollador frontend junior con experiencia en HTML, CSS y JavaScript. Actualmente trabajo con React, Tailwind y Astro, creando proyectos prácticos que combinan diseño moderno, rendimiento y buenas prácticas de desarrollo.';
+  'Hola, soy un desarrollador frontend que disfruta transformar ideas en interfaces claras y funcionales. ' +
+    'Actualmente exploro proyectos web y móviles con un estilo moderno y enfocado en la experiencia del usuario. ' +
+    'Te invito a ver mi trabajo.';
 ---
 
 <div
   class={`flex flex-col gap-5 text-center sm:gap-5 md:gap-5 md:text-left xl:gap-0 ${className}`}
 >
   <h1
-    class="text-4xl font-bold text-black md:text-6xl xl:mb-10 dark:text-white"
+    class="text-4xl font-bold text-gray-950 md:text-6xl xl:mb-10 dark:text-gray-100"
   >
     <LocalizedText key={nameKey} fallback={nameFallback} />
   </h1>
-  <p class="max-w-3xl text-lg leading-relaxed text-gray-600 dark:text-gray-300">
+  <p
+    class="max-w-3xl text-lg leading-relaxed text-gray-950 xl:mb-10 dark:text-gray-100"
+  >
     <LocalizedText key={descriptionKey} fallback={descriptionFallback} />
   </p>
 </div>
