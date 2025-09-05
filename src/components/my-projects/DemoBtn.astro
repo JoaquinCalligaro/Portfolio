@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import LocalizedText from '../language/LocalizedText.astro';
 const { href = '#', label = null, className = '' } = Astro.props;
-import liveSvg from '../../assets/svg/live.svg';
+import demoSvg from '../../assets/svg/demo.svg';
 ---
 
 <a
@@ -11,8 +11,8 @@ import liveSvg from '../../assets/svg/live.svg';
   target="_blank"
   rel="noopener noreferrer"
 >
-  <Image src={liveSvg} alt="Live" class="h-5 w-5" loading="lazy" />
+  <Image src={demoSvg} alt="Demo" class="h-5 w-5" loading="lazy" />
   <span class="xl:20 inline-block w-18 text-center sm:w-18 md:w-20"
-    >{label ?? <LocalizedText key="buttons.live" />}</span
+    >{label ?? <LocalizedText key="buttons.demo" />}</span
   >
 </a>

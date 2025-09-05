@@ -66,7 +66,7 @@ export const translations = {
     },
     buttons: {
       repo: 'Repositorio',
-      live: 'Demo',
+      demo: 'Demo',
     },
     contact: {
       name: 'Nombre',
@@ -181,7 +181,7 @@ export const translations = {
     },
     buttons: {
       repo: 'Repository',
-      live: 'Live',
+      demo: 'Demo',
     },
     contact: {
       name: 'Name',

@@ -1,0 +1,17 @@
+---
+import meImage from '../../assets/images/me.webp';
+import PersonalPresentationImage from './PersonalPresentationImage.astro';
+import PersonalPresentationText from './PersonalPresentationText.astro';
+
+export interface Props {
+  className?: string;
+}
+
+const { className = '' } = Astro.props;
+---
+
+<!-- Presentación personal -->
+<div class={`flex flex-col items-center gap-15 md:flex-row ${className}`}>
+  <PersonalPresentationImage src={meImage} alt="Joaquin Calligaro" />
+  <PersonalPresentationText />
+</div>
