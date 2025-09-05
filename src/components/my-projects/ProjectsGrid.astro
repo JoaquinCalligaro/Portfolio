@@ -1,0 +1,67 @@
+---
+import ProjectCard from './ProjectCard.astro';
+import { projectsData } from './projectsData.ts';
+import ShowMoreBtn from '../ui/ShowMoreBtn.astro';
+
+// Separar proyectos visibles y ocultos
+const visibleProjects = projectsData.filter(project => !project.hidden);
+const hiddenProjects = projectsData.filter(project => project.hidden);
+const hasMoreProjects = visibleProjects.length > 4 || hiddenProjects.length > 0;
+---
+
+<div class="mt-12">
+  <!-- Grid principal con los primeros 4 proyectos visibles -->
+  <div class="grid grid-cols-1 gap-15 sm:grid-cols-2 md:grid-cols-2">
+    {visibleProjects.slice(0, 4).map((project) => (
+      <ProjectCard
+        id={project.id}
+        titleKey={project.titleKey}
+        descriptionKey={project.descriptionKey}
+        repo={project.repo}
+        live={project.live}
+        technologies={project.technologies}
+        images={project.images}
+      />
+    ))}
+  </div>
+
+  <!-- Contenedor oculto con TODOS los proyectos adicionales (resto de visibles + ocultos) -->
+  {hasMoreProjects && (
+    <div id="extra-projects" class="mt-8 hidden">
+      <div class="grid grid-cols-1 gap-15 sm:grid-cols-2 md:grid-cols-2">
+        {/* Primero los proyectos visibles restantes */}
+        {visibleProjects.slice(4).map((project) => (
+          <ProjectCard
+            id={project.id}
+            titleKey={project.titleKey}
+            descriptionKey={project.descriptionKey}
+            repo={project.repo}
+            live={project.live}
+            technologies={project.technologies}
+            images={project.images}
+          />
+        ))}
+        {/* Luego los proyectos ocultos */}
+        {hiddenProjects.map((project) => (
+          <ProjectCard
+            id={project.id}
+            titleKey={project.titleKey}
+            descriptionKey={project.descriptionKey}
+            repo={project.repo}
+            live={project.live}
+            technologies={project.technologies}
+            images={project.images}
+          />
+        ))}
+      </div>
+    </div>
+
+    <!-- Botón Show More -->
+    <div class="flex justify-center">
+      <ShowMoreBtn 
+        id="show-more-projects" 
+        text={hiddenProjects.length > 0 ? `Ver todos (${visibleProjects.length + hiddenProjects.length})` : "Ver más"}
+      />
+    </div>
+  )}
+</div>
