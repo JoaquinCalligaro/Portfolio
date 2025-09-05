@@ -112,20 +112,40 @@ const resolveTechnology = (item) => {
 
               {/* Botones de navegación */}
               <button
-                class="slider-prev absolute left-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity duration-200 hover:bg-black/70"
+                class="slider-prev absolute top-1/2 left-2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity duration-200 hover:bg-black/70"
                 aria-label="Imagen anterior"
               >
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 19l-7-7 7-7"
+                  />
                 </svg>
               </button>
 
               <button
-                class="slider-next absolute right-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity duration-200 hover:bg-black/70"
+                class="slider-next absolute top-1/2 right-2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity duration-200 hover:bg-black/70"
                 aria-label="Imagen siguiente"
               >
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </button>
 
@@ -184,168 +204,170 @@ const resolveTechnology = (item) => {
   </div>
 </article>
 
-{/* Script para inicializar el slider solo si tiene múltiples imágenes */}
-{
-  images && images.length > 1 && (
-    <script define:vars={{ sliderId }} type="module">
-      // Función simplificada para inicializar el slider
-      function initProjectSlider() {
-        const sliderElement = document.getElementById(sliderId);
-        if (!sliderElement) {
-          console.warn(`Slider element not found: ${sliderId}`);
-          return;
+<script
+  define:vars={{ sliderId, hasMultipleImages: images && images.length > 1 }}
+  type="module"
+  is:inline
+>
+  // Solo inicializar el slider si tiene múltiples imágenes
+  if (!hasMultipleImages) return;
+
+  // Función simplificada para inicializar el slider
+  function initProjectSlider() {
+    const sliderElement = document.getElementById(sliderId);
+    if (!sliderElement) {
+      console.warn(`Slider element not found: ${sliderId}`);
+      return;
+    }
+
+    // Evitar doble inicialización
+    if (sliderElement.dataset && sliderElement.dataset.sliderInit === 'true') {
+      return;
+    }
+
+    const track = sliderElement.querySelector('.slider-track');
+    const slides = Array.from(sliderElement.querySelectorAll('.slide'));
+    const prevBtn = sliderElement.querySelector('.slider-prev');
+    const nextBtn = sliderElement.querySelector('.slider-next');
+    const dots = Array.from(sliderElement.querySelectorAll('.slider-dot'));
+
+    if (!track || slides.length <= 1) return;
+
+    let currentIndex = 0;
+    let autoplayTimer = null;
+    const totalSlides = slides.length;
+
+    // Función para actualizar la posición del slider
+    function updateSliderPosition() {
+      const slideWidth = sliderElement.clientWidth;
+      track.style.transform = `translateX(${-currentIndex * slideWidth}px)`;
+    }
+
+    // Función para actualizar los dots
+    function updateDots() {
+      dots.forEach((dot, index) => {
+        if (index === currentIndex) {
+          dot.classList.remove('bg-gray-400', 'dark:bg-gray-400');
+          dot.classList.add('bg-gray-800', 'dark:bg-white');
+        } else {
+          dot.classList.remove('bg-gray-800', 'dark:bg-white');
+          dot.classList.add('bg-gray-400', 'dark:bg-gray-400');
         }
+      });
+    }
 
-        // Evitar doble inicialización
-        if (sliderElement.dataset && sliderElement.dataset.sliderInit === 'true') {
-          return;
-        }
+    // Función para ir a un slide específico
+    function goToSlide(index) {
+      currentIndex = index;
+      if (currentIndex < 0) currentIndex = totalSlides - 1;
+      if (currentIndex >= totalSlides) currentIndex = 0;
 
-        const track = sliderElement.querySelector('.slider-track');
-        const slides = Array.from(sliderElement.querySelectorAll('.slide'));
-        const prevBtn = sliderElement.querySelector('.slider-prev');
-        const nextBtn = sliderElement.querySelector('.slider-next');
-        const dots = Array.from(sliderElement.querySelectorAll('.slider-dot'));
+      updateSliderPosition();
+      updateDots();
+    }
 
-        if (!track || slides.length <= 1) return;
+    // Configurar el tamaño inicial
+    function setSizes() {
+      const slideWidth = sliderElement.clientWidth;
+      track.style.width = `${slideWidth * totalSlides}px`;
+      slides.forEach((slide) => {
+        slide.style.width = `${slideWidth}px`;
+      });
+      updateSliderPosition();
+    }
 
-        let currentIndex = 0;
-        let autoplayTimer = null;
-        const totalSlides = slides.length;
+    // Autoplay
+    function startAutoplay() {
+      stopAutoplay();
+      autoplayTimer = setInterval(() => {
+        goToSlide(currentIndex + 1);
+      }, 5000);
+    }
 
-        // Función para actualizar la posición del slider
-        function updateSliderPosition() {
-          const slideWidth = sliderElement.clientWidth;
-          track.style.transform = `translateX(${-currentIndex * slideWidth}px)`;
-        }
-
-        // Función para actualizar los dots
-        function updateDots() {
-          dots.forEach((dot, index) => {
-            if (index === currentIndex) {
-              dot.classList.remove('bg-gray-400', 'dark:bg-gray-400');
-              dot.classList.add('bg-gray-800', 'dark:bg-white');
-            } else {
-              dot.classList.remove('bg-gray-800', 'dark:bg-white');
-              dot.classList.add('bg-gray-400', 'dark:bg-gray-400');
-            }
-          });
-        }
-
-        // Función para ir a un slide específico
-        function goToSlide(index) {
-          currentIndex = index;
-          if (currentIndex < 0) currentIndex = totalSlides - 1;
-          if (currentIndex >= totalSlides) currentIndex = 0;
-          
-          updateSliderPosition();
-          updateDots();
-        }
-
-        // Configurar el tamaño inicial
-        function setSizes() {
-          const slideWidth = sliderElement.clientWidth;
-          track.style.width = `${slideWidth * totalSlides}px`;
-          slides.forEach(slide => {
-            slide.style.width = `${slideWidth}px`;
-          });
-          updateSliderPosition();
-        }
-
-        // Autoplay
-        function startAutoplay() {
-          stopAutoplay();
-          autoplayTimer = setInterval(() => {
-            goToSlide(currentIndex + 1);
-          }, 5000);
-        }
-
-        function stopAutoplay() {
-          if (autoplayTimer) {
-            clearInterval(autoplayTimer);
-            autoplayTimer = null;
-          }
-        }
-
-        // Event listeners
-        if (prevBtn) {
-          prevBtn.addEventListener('click', () => {
-            stopAutoplay();
-            goToSlide(currentIndex - 1);
-            setTimeout(startAutoplay, 3000);
-          });
-        }
-
-        if (nextBtn) {
-          nextBtn.addEventListener('click', () => {
-            stopAutoplay();
-            goToSlide(currentIndex + 1);
-            setTimeout(startAutoplay, 3000);
-          });
-        }
-
-        dots.forEach((dot, index) => {
-          dot.addEventListener('click', () => {
-            stopAutoplay();
-            goToSlide(index);
-            setTimeout(startAutoplay, 3000);
-          });
-        });
-
-        // Hover events
-        sliderElement.addEventListener('mouseenter', () => {
-          stopAutoplay();
-          if (prevBtn) prevBtn.style.opacity = '1';
-          if (nextBtn) nextBtn.style.opacity = '1';
-        });
-
-        sliderElement.addEventListener('mouseleave', () => {
-          startAutoplay();
-          if (prevBtn) prevBtn.style.opacity = '0';
-          if (nextBtn) nextBtn.style.opacity = '0';
-        });
-
-        // Resize handler
-        window.addEventListener('resize', setSizes);
-
-        // Inicializar
-        setSizes();
-        updateDots();
-        startAutoplay();
-        
-        // Ocultar botones inicialmente
-        if (prevBtn) prevBtn.style.opacity = '0';
-        if (nextBtn) nextBtn.style.opacity = '0';
-
-        // Marcar como inicializado
-        if (sliderElement.dataset) sliderElement.dataset.sliderInit = 'true';
-
-        // API de refresco (cuando el slider estuvo oculto y luego aparece)
-        function refreshSlider() {
-          setSizes();
-          updateDots();
-        }
-
-        sliderElement.addEventListener('slider:refresh', refreshSlider);
-
-        // Exponer en window para otros scripts
-        if (typeof window !== 'undefined') {
-          // @ts-expect-error namespace dynamic attach
-          window.__projectSliders = window.__projectSliders || {}; // namespace
-          // @ts-expect-error index attach
-          window.__projectSliders[sliderId] = { refresh: refreshSlider };
-        }
+    function stopAutoplay() {
+      if (autoplayTimer) {
+        clearInterval(autoplayTimer);
+        autoplayTimer = null;
       }
+    }
 
-      // Inicializar cuando el DOM esté listo
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initProjectSlider);
-      } else {
-        initProjectSlider();
-      }
-    </script>
-  )
-}
+    // Event listeners
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => {
+        stopAutoplay();
+        goToSlide(currentIndex - 1);
+        setTimeout(startAutoplay, 3000);
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => {
+        stopAutoplay();
+        goToSlide(currentIndex + 1);
+        setTimeout(startAutoplay, 3000);
+      });
+    }
+
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        stopAutoplay();
+        goToSlide(index);
+        setTimeout(startAutoplay, 3000);
+      });
+    });
+
+    // Hover events
+    sliderElement.addEventListener('mouseenter', () => {
+      stopAutoplay();
+      if (prevBtn) prevBtn.style.opacity = '1';
+      if (nextBtn) nextBtn.style.opacity = '1';
+    });
+
+    sliderElement.addEventListener('mouseleave', () => {
+      startAutoplay();
+      if (prevBtn) prevBtn.style.opacity = '0';
+      if (nextBtn) nextBtn.style.opacity = '0';
+    });
+
+    // Resize handler
+    window.addEventListener('resize', setSizes);
+
+    // Inicializar
+    setSizes();
+    updateDots();
+    startAutoplay();
+
+    // Ocultar botones inicialmente
+    if (prevBtn) prevBtn.style.opacity = '0';
+    if (nextBtn) nextBtn.style.opacity = '0';
+
+    // Marcar como inicializado
+    if (sliderElement.dataset) sliderElement.dataset.sliderInit = 'true';
+
+    // API de refresco (cuando el slider estuvo oculto y luego aparece)
+    function refreshSlider() {
+      setSizes();
+      updateDots();
+    }
+
+    sliderElement.addEventListener('slider:refresh', refreshSlider);
+
+    // Exponer en window para otros scripts
+    if (typeof window !== 'undefined') {
+      // @ts-expect-error namespace dynamic attach
+      window.__projectSliders = window.__projectSliders || {}; // namespace
+      // @ts-expect-error index attach
+      window.__projectSliders[sliderId] = { refresh: refreshSlider };
+    }
+  }
+
+  // Inicializar cuando el DOM esté listo
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initProjectSlider);
+  } else {
+    initProjectSlider();
+  }
+</script>
 
 <style>
   /* Estilos específicos para el slider de proyecto */
@@ -393,6 +415,8 @@ const resolveTechnology = (item) => {
   /* Estilos para botones de navegación */
   .slider-prev,
   .slider-next {
-    transition: opacity 0.2s ease, background-color 0.2s ease;
+    transition:
+      opacity 0.2s ease,
+      background-color 0.2s ease;
   }
 </style>

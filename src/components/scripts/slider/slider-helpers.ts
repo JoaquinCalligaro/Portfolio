@@ -72,7 +72,10 @@ export function waitForVisibilityAndSetSizes(
 /**
  * Actualiza el estado visual de los dots (puntos indicadores)
  */
-export function updateActiveDot(dots: HTMLElement[], activeIndex: number): void {
+export function updateActiveDot(
+  dots: HTMLElement[],
+  activeIndex: number
+): void {
   dots.forEach(function (dot, index) {
     // Remover clases activas de todos los dots
     dot.classList.remove('bg-gray-800', 'dark:bg-white');
@@ -174,12 +177,18 @@ export function applyFadeEffect(
 /**
  * Funciones para mostrar/ocultar flechas de navegación
  */
-export function showArrows(prevBtn: HTMLElement | null, nextBtn: HTMLElement | null): void {
+export function showArrows(
+  prevBtn: HTMLElement | null,
+  nextBtn: HTMLElement | null
+): void {
   if (prevBtn) prevBtn.style.opacity = '1'; // Mostrar flecha anterior
   if (nextBtn) nextBtn.style.opacity = '1'; // Mostrar flecha siguiente
 }
 
-export function hideArrows(prevBtn: HTMLElement | null, nextBtn: HTMLElement | null): void {
+export function hideArrows(
+  prevBtn: HTMLElement | null,
+  nextBtn: HTMLElement | null
+): void {
   if (prevBtn) prevBtn.style.opacity = '0'; // Ocultar flecha anterior
   if (nextBtn) nextBtn.style.opacity = '0'; // Ocultar flecha siguiente
 }
