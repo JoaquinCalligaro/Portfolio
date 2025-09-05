@@ -1,26 +1,41 @@
-/* eslint-env browser */
-/* global document, window, MutationObserver, setTimeout, clearTimeout, console */
-//Lógica principal: manejo de tarjetas, animaciones y observer
-// No inicializa nada, solo provee funciones puras que usa el init
+import type {
+  ShowMoreConfig,
+  ShowMoreState,
+  ShowMoreElements,
+  LocalizedStrings,
+  AnimationPromise,
+} from './types';
 
-export function setupContainerTransitions(target) {
+// Configurar transiciones del contenedor
+export function setupContainerTransitions(target: HTMLElement): void {
   if (target && target.classList) {
     target.classList.add('show-more-projects-container');
   }
 }
 
-export function getElements(buttonId, config) {
+// Obtener elementos del DOM
+export function getElements(
+  buttonId: string,
+  config: ShowMoreConfig
+): ShowMoreElements | null {
   const button = document.getElementById(buttonId);
   const target = document.getElementById(config.targetId);
-  const grid = target?.querySelector('.grid');
+  const grid = target?.querySelector('.grid') as HTMLElement;
+  
   if (!button || !target || !grid) return null;
+  
   return { button, target, grid };
 }
 
-// Implementaciones movidas desde show-more-projects.js (sin initShowMore)
-
-function initializeCards(button, grid, hiddenClass, chunkSize, state) {
-  const cards = Array.from(grid.children);
+// Inicializar tarjetas
+export function initializeCards(
+  button: HTMLElement,
+  grid: HTMLElement,
+  hiddenClass: string,
+  chunkSize: number,
+  state: ShowMoreState
+): void {
+  const cards = Array.from(grid.children) as HTMLElement[];
   const totalCards = cards.length;
 
   // Actualizar estado
@@ -35,18 +50,25 @@ function initializeCards(button, grid, hiddenClass, chunkSize, state) {
 
   // Configurar texto inicial del botón usando los textos del componente
   const { showAllText } = getLocalizedStrings(button, totalCards);
-  setButtonText(button, showAllText.replace('${total}', totalCards));
+  setButtonText(button, showAllText.replace('${total}', totalCards.toString()));
 
   // Ocultar todas las tarjetas si el contenedor está oculto
-  const target = grid.closest(`[id]`);
+  const target = grid.closest(`[id]`) as HTMLElement;
   if (target?.classList.contains(hiddenClass)) {
     cards.forEach((card) => card.classList.add(hiddenClass));
   }
 }
 
-function setupButtonListener(button, target, grid, config, state) {
+// Configurar event listener del botón
+export function setupButtonListener(
+  button: HTMLElement,
+  target: HTMLElement,
+  grid: HTMLElement,
+  config: ShowMoreConfig,
+  state: ShowMoreState
+): void {
   button.addEventListener('click', async () => {
-    const cards = Array.from(grid.children);
+    const cards = Array.from(grid.children) as HTMLElement[];
     const revealedCount = getRevealedCount(cards, config.hiddenClass);
     const totalCards = cards.length;
     const remaining = totalCards - revealedCount;
@@ -79,8 +101,7 @@ function setupButtonListener(button, target, grid, config, state) {
     updateButtonText(
       button,
       totalCards,
-      revealedCount + revealed,
-      config.chunkSize
+      revealedCount + revealed
     );
 
     // Ejecutar callback si existe
@@ -90,11 +111,17 @@ function setupButtonListener(button, target, grid, config, state) {
   });
 }
 
-function getRevealedCount(cards, hiddenClass) {
+// Obtener cantidad de tarjetas reveladas
+export function getRevealedCount(cards: HTMLElement[], hiddenClass: string): number {
   return cards.filter((card) => !card.classList.contains(hiddenClass)).length;
 }
 
-function showContainer(button, target, hiddenClass) {
+// Mostrar contenedor
+export function showContainer(
+  button: HTMLElement,
+  target: HTMLElement,
+  hiddenClass: string
+): void {
   if (target.classList.contains(hiddenClass)) {
     target.style.maxHeight = 'none';
     target.style.opacity = '1';
@@ -103,7 +130,12 @@ function showContainer(button, target, hiddenClass) {
   }
 }
 
-function revealNextCards(cards, config, target) {
+// Revelar siguientes tarjetas
+export function revealNextCards(
+  cards: HTMLElement[],
+  config: ShowMoreConfig,
+  target: HTMLElement
+): Promise<number> {
   return new Promise((resolve) => {
     const hiddenCards = cards.filter((card) =>
       card.classList.contains(config.hiddenClass)
@@ -115,7 +147,7 @@ function revealNextCards(cards, config, target) {
       return;
     }
 
-    const revealedCards = [];
+    const revealedCards: HTMLElement[] = [];
 
     for (const card of hiddenCards) {
       if (revealedCards.length >= toShow) break;
@@ -132,27 +164,27 @@ function revealNextCards(cards, config, target) {
       // noop
     }
 
-    const promises = revealedCards.map((card) => {
-      return new Promise((res) => {
+    const promises = revealedCards.map((card): AnimationPromise => {
+      return new Promise<void>((res) => {
         try {
           if (!card.classList.contains('animate-expand-vertically')) {
             card.classList.add('animate-expand-vertically');
           }
 
-          const onEnd = () => {
+          const onEnd = (): void => {
             card.removeEventListener('animationend', onEnd);
             card.classList.remove('animate-expand-vertically');
             res();
           };
 
-          const to = setTimeout(() => {
+          const timeout = setTimeout(() => {
             card.removeEventListener('animationend', onEnd);
             card.classList.remove('animate-expand-vertically');
             res();
           }, 1100);
 
-          const wrapped = () => {
-            clearTimeout(to);
+          const wrapped = (): void => {
+            clearTimeout(timeout);
             onEnd();
           };
 
@@ -169,7 +201,14 @@ function revealNextCards(cards, config, target) {
   });
 }
 
-function collapseAll(button, target, cards, config, state) {
+// Colapsar todas las tarjetas
+export function collapseAll(
+  button: HTMLElement,
+  target: HTMLElement,
+  cards: HTMLElement[],
+  config: ShowMoreConfig,
+  state: ShowMoreState
+): void {
   const visibleCards = cards.filter(
     (c) => !c.classList.contains(config.hiddenClass)
   );
@@ -186,14 +225,14 @@ function collapseAll(button, target, cards, config, state) {
     return;
   }
 
-  const promises = visibleCards.map((card) => {
-    return new Promise((resolve) => {
+  const promises = visibleCards.map((card): AnimationPromise => {
+    return new Promise<void>((resolve) => {
       try {
         if (!card.classList.contains('animate-contract-vertically')) {
           card.classList.add('animate-contract-vertically');
         }
 
-        const wrappedDone = () => {
+        const wrappedDone = (): void => {
           card.removeEventListener('animationend', wrappedDone);
           card.classList.remove('animate-contract-vertically');
           clearTimeout(timeout);
@@ -225,22 +264,23 @@ function collapseAll(button, target, cards, config, state) {
   });
 }
 
-function hideContainerSmoothly(
-  button,
-  target,
-  config,
-  state,
-  totalCards,
-  visibleCards = []
-) {
-  return new Promise((resolve) => {
+// Ocultar contenedor suavemente
+export function hideContainerSmoothly(
+  button: HTMLElement,
+  target: HTMLElement,
+  config: ShowMoreConfig,
+  state: ShowMoreState,
+  totalCards: number,
+  visibleCards: HTMLElement[] = []
+): Promise<void> {
+  return new Promise<void>((resolve) => {
     const currentHeight = target.scrollHeight;
     target.style.maxHeight = currentHeight + 'px';
     void target.offsetHeight;
 
     (
       window.requestAnimationFrame ||
-      function (fn) {
+      function (fn: FrameRequestCallback) {
         return setTimeout(fn, 16);
       }
     )(() => {
@@ -277,7 +317,7 @@ function hideContainerSmoothly(
       }
 
       const { showAllText } = getLocalizedStrings(button, totalCards);
-      setButtonText(button, showAllText.replace('${total}', totalCards));
+      setButtonText(button, showAllText.replace('${total}', totalCards.toString()));
 
       if (typeof config.onHide === 'function') {
         config.onHide();
@@ -288,7 +328,11 @@ function hideContainerSmoothly(
   });
 }
 
-function expandContainerSmoothly(target, hiddenClass = 'hidden') {
+// Expandir contenedor suavemente
+export function expandContainerSmoothly(
+  target: HTMLElement,
+  hiddenClass: string = 'hidden'
+): void {
   if (!target || !target.style) return;
 
   target.style.overflow = 'hidden';
@@ -302,7 +346,7 @@ function expandContainerSmoothly(target, hiddenClass = 'hidden') {
 
   (
     window.requestAnimationFrame ||
-    function (fn) {
+    function (fn: FrameRequestCallback) {
       return setTimeout(fn, 16);
     }
   )(() => {
@@ -320,18 +364,20 @@ function expandContainerSmoothly(target, hiddenClass = 'hidden') {
   }, 650);
 }
 
-function updateButtonText(button, total, revealed) {
+// Actualizar texto del botón
+export function updateButtonText(button: HTMLElement, total: number, revealed: number): void {
   const remaining = total - revealed;
   const { showAllText, hideText } = getLocalizedStrings(button, total);
 
   if (remaining > 0) {
-    setButtonText(button, showAllText.replace('${total}', total));
+    setButtonText(button, showAllText.replace('${total}', total.toString()));
   } else {
     setButtonText(button, hideText);
   }
 }
 
-function getLocalizedStrings(button, total) {
+// Obtener strings localizados
+export function getLocalizedStrings(button: HTMLElement, total: number): LocalizedStrings {
   const lang =
     document.documentElement.lang ||
     (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
@@ -346,13 +392,15 @@ function getLocalizedStrings(button, total) {
   let hide = dsHide || null;
 
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const windowWithTranslations = window as any;
     if (
-      window &&
-      window.TRANSLATIONS &&
-      window.TRANSLATIONS[lang] &&
-      window.TRANSLATIONS[lang].showMore
+      windowWithTranslations &&
+      windowWithTranslations.TRANSLATIONS &&
+      windowWithTranslations.TRANSLATIONS[lang] &&
+      windowWithTranslations.TRANSLATIONS[lang].showMore
     ) {
-      const sm = window.TRANSLATIONS[lang].showMore;
+      const sm = windowWithTranslations.TRANSLATIONS[lang].showMore;
       if (!showAll && sm.showAll) showAll = sm.showAll;
       if (!hide && sm.hide) hide = sm.hide;
     }
@@ -367,10 +415,10 @@ function getLocalizedStrings(button, total) {
   return { showAllText: showAll, hideText: hide };
 }
 
-// Preserve button inner markup when updating text (e.g. spans/icons)
-function setButtonText(button, text) {
+// Preservar marcado interno del botón al actualizar texto (ej. spans/iconos)
+export function setButtonText(button: HTMLElement, text: string): void {
   try {
-    const textSpan = button.querySelector('.neon-showmore-btn__text');
+    const textSpan = button.querySelector('.neon-showmore-btn__text') as HTMLElement;
     if (textSpan) {
       textSpan.textContent = text;
       return;
@@ -386,8 +434,9 @@ function setButtonText(button, text) {
   }
 }
 
-function initializeSliderIfExists(card) {
-  const slider = card.querySelector('[id^="slider-"]');
+// Inicializar slider si existe
+export function initializeSliderIfExists(card: HTMLElement): void {
+  const slider = card.querySelector('[id^="slider-"]') as HTMLElement;
   if (!slider) return;
 
   // Si ya está inicializándose o inicializado, no hacer nada
@@ -398,7 +447,8 @@ function initializeSliderIfExists(card) {
   )
     return;
 
-  if (window.initSlider) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if ((window as any).initSlider) {
     initSlider(slider);
     return;
   }
@@ -406,9 +456,11 @@ function initializeSliderIfExists(card) {
   loadSliderModule(slider);
 }
 
-function initSlider(sliderElement) {
+// Inicializar slider
+export function initSlider(sliderElement: HTMLElement): void {
   try {
-    if (typeof window !== 'undefined' && window.initSlider) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (typeof window !== 'undefined' && (window as any).initSlider) {
       // Marca como inicializando para evitar llamadas concurrentes
       try {
         if (sliderElement.dataset)
@@ -417,7 +469,8 @@ function initSlider(sliderElement) {
         void 0;
       }
 
-      window.initSlider(sliderElement.id || sliderElement);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).initSlider(sliderElement.id || sliderElement);
 
       try {
         if (sliderElement.dataset)
@@ -433,11 +486,13 @@ function initSlider(sliderElement) {
   }
 }
 
-function loadSliderModule(sliderElement) {
+// Cargar módulo del slider
+export function loadSliderModule(sliderElement: HTMLElement): void {
   const existingScript = document.querySelector('script[data-slider-module]');
   if (existingScript) {
     existingScript.addEventListener('load', () => {
-      if (window.initSlider) initSlider(sliderElement);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if ((window as any).initSlider) initSlider(sliderElement);
     });
     return;
   }
@@ -448,7 +503,8 @@ function loadSliderModule(sliderElement) {
   script.setAttribute('data-slider-module', '');
 
   script.addEventListener('load', () => {
-    if (window.initSlider) initSlider(sliderElement);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((window as any).initSlider) initSlider(sliderElement);
   });
 
   script.addEventListener('error', () => {
@@ -460,7 +516,13 @@ function loadSliderModule(sliderElement) {
   document.head.appendChild(script);
 }
 
-function setupCardObserver(button, grid, config, state) {
+// Configurar observer de tarjetas
+export function setupCardObserver(
+  button: HTMLElement,
+  grid: HTMLElement,
+  config: ShowMoreConfig,
+  state: ShowMoreState
+): MutationObserver | null {
   if (typeof MutationObserver === 'undefined') {
     if (typeof console !== 'undefined') {
       console.warn('MutationObserver no soportado en este navegador');
@@ -468,7 +530,7 @@ function setupCardObserver(button, grid, config, state) {
     return null;
   }
 
-  let timeoutId;
+  let timeoutId: number;
 
   const observer = new MutationObserver((mutations) => {
     let shouldUpdate = false;
@@ -488,7 +550,7 @@ function setupCardObserver(button, grid, config, state) {
       }
 
       if (typeof setTimeout !== 'undefined') {
-        timeoutId = setTimeout(() => {
+        timeoutId = window.setTimeout(() => {
           updateCardsState(button, grid, config, state);
         }, config.observerDelay);
       } else {
@@ -505,8 +567,14 @@ function setupCardObserver(button, grid, config, state) {
   return observer;
 }
 
-function updateCardsState(button, grid, config, state) {
-  const cards = Array.from(grid.children);
+// Actualizar estado de las tarjetas
+export function updateCardsState(
+  button: HTMLElement,
+  grid: HTMLElement,
+  config: ShowMoreConfig,
+  state: ShowMoreState
+): void {
+  const cards = Array.from(grid.children) as HTMLElement[];
   const newCount = cards.length;
   const oldCount = state.currentCardCount;
 
@@ -526,7 +594,7 @@ function updateCardsState(button, grid, config, state) {
   if (state.isCollapsed) {
     cards.forEach((card) => card.classList.add(config.hiddenClass));
     const { showAllText } = getLocalizedStrings(button, newCount);
-    setButtonText(button, showAllText.replace('${total}', newCount));
+    setButtonText(button, showAllText.replace('${total}', newCount.toString()));
   } else {
     const revealedCount = getRevealedCount(cards, config.hiddenClass);
     updateButtonText(button, newCount, revealedCount);
@@ -537,26 +605,12 @@ function updateCardsState(button, grid, config, state) {
   }
 }
 
-function updateCardsManually(button, grid, config, state) {
+// Actualizar tarjetas manualmente
+export function updateCardsManually(
+  button: HTMLElement,
+  grid: HTMLElement,
+  config: ShowMoreConfig,
+  state: ShowMoreState
+): void {
   updateCardsState(button, grid, config, state);
 }
-
-// Exportar las funciones necesarias para el init
-export {
-  initializeCards,
-  setupButtonListener,
-  setupCardObserver,
-  updateCardsState,
-  updateCardsManually,
-  getRevealedCount,
-  showContainer,
-  revealNextCards,
-  collapseAll,
-  hideContainerSmoothly,
-  expandContainerSmoothly,
-  updateButtonText,
-  getLocalizedStrings,
-  initializeSliderIfExists,
-  initSlider,
-  loadSliderModule,
-};

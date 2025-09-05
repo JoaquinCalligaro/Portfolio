@@ -1,5 +1,4 @@
 ---
-// index.astro - Refactorizado usando principalmente Tailwind
 import Layout from '../layouts/Layout.astro';
 import TechStack from '../components/tech-stack/TechStack.astro';
 import PersonalPresentation from '../components/PersonalPresentation.astro';
@@ -93,49 +92,41 @@ import ContactTitle from '../components/contact/ContactTitle.astro';
       });
     });
 
-    // Inicializar show-more button (usa window.initShowMore o inyecta script desde /js)
+    // Inicializar show-more button usando el nuevo módulo TypeScript
     (function ensureInitShowMore() {
-      function run() {
+      async function run() {
         try {
           if (typeof window === 'undefined') return;
-          if (!Object.prototype.hasOwnProperty.call(window, 'initShowMore'))
-            return;
-          const fn = (window as unknown)['initShowMore'];
-          if (typeof fn === 'function')
-            fn('show-more-projects', {
+
+          // Intentar usar la función global si ya existe
+          if (Object.prototype.hasOwnProperty.call(window, 'initShowMore')) {
+            const fn = (window as unknown)['initShowMore'];
+            if (typeof fn === 'function') {
+              fn('show-more-projects', {
+                targetId: 'extra-projects',
+                hiddenClass: 'hidden',
+              });
+              return;
+            }
+          }
+
+          // Importar y usar el nuevo módulo TypeScript
+          const { initShowMore } = await import(
+            '../components/scripts/show-more/index.js'
+          );
+          if (typeof initShowMore === 'function') {
+            initShowMore('show-more-projects', {
               targetId: 'extra-projects',
               hiddenClass: 'hidden',
             });
-        } catch {
-          // noop
+          }
+        } catch (error) {
+          console.warn('Error initializing show-more:', error);
         }
       }
 
-      try {
-        if (
-          typeof window !== 'undefined' &&
-          Object.prototype.hasOwnProperty.call(window, 'initShowMore')
-        ) {
-          run();
-          return;
-        }
-      } catch {
-        // noop
-      }
-
-      const existing = document.querySelector('script[data-show-more-module]');
-      if (existing) {
-        existing.addEventListener('load', run);
-        return;
-      }
-
-      const script = document.createElement('script');
-      script.type = 'module';
-      script.src = '/js/show-more/show-more-init.js';
-      script.setAttribute('data-show-more-module', '');
-      script.addEventListener('load', run);
-      script.addEventListener('error', () => {});
-      document.head.appendChild(script);
+      // Ejecutar la inicialización
+      run();
     })();
   </script>
 </Layout>
