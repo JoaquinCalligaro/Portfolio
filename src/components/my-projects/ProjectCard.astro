@@ -210,163 +210,166 @@ const resolveTechnology = (item) => {
   is:inline
 >
   // Solo inicializar el slider si tiene múltiples imágenes
-  if (!hasMultipleImages) return;
+  if (hasMultipleImages) {
+    // Función simplificada para inicializar el slider
+    function initProjectSlider() {
+      const sliderElement = document.getElementById(sliderId);
+      if (!sliderElement) {
+        console.warn(`Slider element not found: ${sliderId}`);
+        return;
+      }
 
-  // Función simplificada para inicializar el slider
-  function initProjectSlider() {
-    const sliderElement = document.getElementById(sliderId);
-    if (!sliderElement) {
-      console.warn(`Slider element not found: ${sliderId}`);
-      return;
-    }
+      // Evitar doble inicialización
+      if (
+        sliderElement.dataset &&
+        sliderElement.dataset.sliderInit === 'true'
+      ) {
+        return;
+      }
 
-    // Evitar doble inicialización
-    if (sliderElement.dataset && sliderElement.dataset.sliderInit === 'true') {
-      return;
-    }
+      const track = sliderElement.querySelector('.slider-track');
+      const slides = Array.from(sliderElement.querySelectorAll('.slide'));
+      const prevBtn = sliderElement.querySelector('.slider-prev');
+      const nextBtn = sliderElement.querySelector('.slider-next');
+      const dots = Array.from(sliderElement.querySelectorAll('.slider-dot'));
 
-    const track = sliderElement.querySelector('.slider-track');
-    const slides = Array.from(sliderElement.querySelectorAll('.slide'));
-    const prevBtn = sliderElement.querySelector('.slider-prev');
-    const nextBtn = sliderElement.querySelector('.slider-next');
-    const dots = Array.from(sliderElement.querySelectorAll('.slider-dot'));
+      if (!track || slides.length <= 1) return;
 
-    if (!track || slides.length <= 1) return;
+      let currentIndex = 0;
+      let autoplayTimer = null;
+      const totalSlides = slides.length;
 
-    let currentIndex = 0;
-    let autoplayTimer = null;
-    const totalSlides = slides.length;
+      // Función para actualizar la posición del slider
+      function updateSliderPosition() {
+        const slideWidth = sliderElement.clientWidth;
+        track.style.transform = `translateX(${-currentIndex * slideWidth}px)`;
+      }
 
-    // Función para actualizar la posición del slider
-    function updateSliderPosition() {
-      const slideWidth = sliderElement.clientWidth;
-      track.style.transform = `translateX(${-currentIndex * slideWidth}px)`;
-    }
+      // Función para actualizar los dots
+      function updateDots() {
+        dots.forEach((dot, index) => {
+          if (index === currentIndex) {
+            dot.classList.remove('bg-gray-400', 'dark:bg-gray-400');
+            dot.classList.add('bg-gray-800', 'dark:bg-white');
+          } else {
+            dot.classList.remove('bg-gray-800', 'dark:bg-white');
+            dot.classList.add('bg-gray-400', 'dark:bg-gray-400');
+          }
+        });
+      }
 
-    // Función para actualizar los dots
-    function updateDots() {
-      dots.forEach((dot, index) => {
-        if (index === currentIndex) {
-          dot.classList.remove('bg-gray-400', 'dark:bg-gray-400');
-          dot.classList.add('bg-gray-800', 'dark:bg-white');
-        } else {
-          dot.classList.remove('bg-gray-800', 'dark:bg-white');
-          dot.classList.add('bg-gray-400', 'dark:bg-gray-400');
+      // Función para ir a un slide específico
+      function goToSlide(index) {
+        currentIndex = index;
+        if (currentIndex < 0) currentIndex = totalSlides - 1;
+        if (currentIndex >= totalSlides) currentIndex = 0;
+
+        updateSliderPosition();
+        updateDots();
+      }
+
+      // Configurar el tamaño inicial
+      function setSizes() {
+        const slideWidth = sliderElement.clientWidth;
+        track.style.width = `${slideWidth * totalSlides}px`;
+        slides.forEach((slide) => {
+          slide.style.width = `${slideWidth}px`;
+        });
+        updateSliderPosition();
+      }
+
+      // Autoplay
+      function startAutoplay() {
+        stopAutoplay();
+        autoplayTimer = setInterval(() => {
+          goToSlide(currentIndex + 1);
+        }, 5000);
+      }
+
+      function stopAutoplay() {
+        if (autoplayTimer) {
+          clearInterval(autoplayTimer);
+          autoplayTimer = null;
         }
+      }
+
+      // Event listeners
+      if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+          stopAutoplay();
+          goToSlide(currentIndex - 1);
+          setTimeout(startAutoplay, 3000);
+        });
+      }
+
+      if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+          stopAutoplay();
+          goToSlide(currentIndex + 1);
+          setTimeout(startAutoplay, 3000);
+        });
+      }
+
+      dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+          stopAutoplay();
+          goToSlide(index);
+          setTimeout(startAutoplay, 3000);
+        });
       });
-    }
 
-    // Función para ir a un slide específico
-    function goToSlide(index) {
-      currentIndex = index;
-      if (currentIndex < 0) currentIndex = totalSlides - 1;
-      if (currentIndex >= totalSlides) currentIndex = 0;
+      // Hover events
+      sliderElement.addEventListener('mouseenter', () => {
+        stopAutoplay();
+        if (prevBtn) prevBtn.style.opacity = '1';
+        if (nextBtn) nextBtn.style.opacity = '1';
+      });
 
-      updateSliderPosition();
+      sliderElement.addEventListener('mouseleave', () => {
+        startAutoplay();
+        if (prevBtn) prevBtn.style.opacity = '0';
+        if (nextBtn) nextBtn.style.opacity = '0';
+      });
+
+      // Resize handler
+      window.addEventListener('resize', setSizes);
+
+      // Inicializar
+      setSizes();
       updateDots();
-    }
+      startAutoplay();
 
-    // Configurar el tamaño inicial
-    function setSizes() {
-      const slideWidth = sliderElement.clientWidth;
-      track.style.width = `${slideWidth * totalSlides}px`;
-      slides.forEach((slide) => {
-        slide.style.width = `${slideWidth}px`;
-      });
-      updateSliderPosition();
-    }
+      // Ocultar botones inicialmente
+      if (prevBtn) prevBtn.style.opacity = '0';
+      if (nextBtn) nextBtn.style.opacity = '0';
 
-    // Autoplay
-    function startAutoplay() {
-      stopAutoplay();
-      autoplayTimer = setInterval(() => {
-        goToSlide(currentIndex + 1);
-      }, 5000);
-    }
+      // Marcar como inicializado
+      if (sliderElement.dataset) sliderElement.dataset.sliderInit = 'true';
 
-    function stopAutoplay() {
-      if (autoplayTimer) {
-        clearInterval(autoplayTimer);
-        autoplayTimer = null;
+      // API de refresco (cuando el slider estuvo oculto y luego aparece)
+      function refreshSlider() {
+        setSizes();
+        updateDots();
+      }
+
+      sliderElement.addEventListener('slider:refresh', refreshSlider);
+
+      // Exponer en window para otros scripts
+      if (typeof window !== 'undefined') {
+        // @ts-expect-error namespace dynamic attach
+        window.__projectSliders = window.__projectSliders || {}; // namespace
+        // @ts-expect-error index attach
+        window.__projectSliders[sliderId] = { refresh: refreshSlider };
       }
     }
 
-    // Event listeners
-    if (prevBtn) {
-      prevBtn.addEventListener('click', () => {
-        stopAutoplay();
-        goToSlide(currentIndex - 1);
-        setTimeout(startAutoplay, 3000);
-      });
+    // Inicializar cuando el DOM esté listo
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initProjectSlider);
+    } else {
+      initProjectSlider();
     }
-
-    if (nextBtn) {
-      nextBtn.addEventListener('click', () => {
-        stopAutoplay();
-        goToSlide(currentIndex + 1);
-        setTimeout(startAutoplay, 3000);
-      });
-    }
-
-    dots.forEach((dot, index) => {
-      dot.addEventListener('click', () => {
-        stopAutoplay();
-        goToSlide(index);
-        setTimeout(startAutoplay, 3000);
-      });
-    });
-
-    // Hover events
-    sliderElement.addEventListener('mouseenter', () => {
-      stopAutoplay();
-      if (prevBtn) prevBtn.style.opacity = '1';
-      if (nextBtn) nextBtn.style.opacity = '1';
-    });
-
-    sliderElement.addEventListener('mouseleave', () => {
-      startAutoplay();
-      if (prevBtn) prevBtn.style.opacity = '0';
-      if (nextBtn) nextBtn.style.opacity = '0';
-    });
-
-    // Resize handler
-    window.addEventListener('resize', setSizes);
-
-    // Inicializar
-    setSizes();
-    updateDots();
-    startAutoplay();
-
-    // Ocultar botones inicialmente
-    if (prevBtn) prevBtn.style.opacity = '0';
-    if (nextBtn) nextBtn.style.opacity = '0';
-
-    // Marcar como inicializado
-    if (sliderElement.dataset) sliderElement.dataset.sliderInit = 'true';
-
-    // API de refresco (cuando el slider estuvo oculto y luego aparece)
-    function refreshSlider() {
-      setSizes();
-      updateDots();
-    }
-
-    sliderElement.addEventListener('slider:refresh', refreshSlider);
-
-    // Exponer en window para otros scripts
-    if (typeof window !== 'undefined') {
-      // @ts-expect-error namespace dynamic attach
-      window.__projectSliders = window.__projectSliders || {}; // namespace
-      // @ts-expect-error index attach
-      window.__projectSliders[sliderId] = { refresh: refreshSlider };
-    }
-  }
-
-  // Inicializar cuando el DOM esté listo
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initProjectSlider);
-  } else {
-    initProjectSlider();
-  }
+  } // Cerrar el if (hasMultipleImages)
 </script>
 
 <style>
