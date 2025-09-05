@@ -1,4 +1,4 @@
-// Importaciones de imágenes
+// Configuración y datos de todos los proyectos del portfolio
 import bgGenerator1 from '../../assets/images/BackgroundGenerator/Bg-Generator.webp';
 import bgGenerator2 from '../../assets/images/BackgroundGenerator/Bg-Generator-2.webp';
 import bgGenerator3 from '../../assets/images/BackgroundGenerator/Bg-Generator-3.webp';
@@ -28,6 +28,7 @@ import calculator2 from '../../assets/images/js-calculator/js-calculator-2.webp'
 
 import type { ImageMetadata } from 'astro';
 
+// Estructura de cada proyecto
 export type Project = {
   id: string;
   titleKey: string;
@@ -35,10 +36,11 @@ export type Project = {
   repo: string;
   live: string;
   technologies: string[];
-  images: ImageMetadata[]; // Usar ImageMetadata en lugar de any[]
-  hidden?: boolean; // Propiedad opcional para ocultar proyectos
+  images: ImageMetadata[];
+  hidden?: boolean; // Para ocultar/mostrar proyectos
 };
 
+// Lista de todos los proyectos disponibles
 export const projectsData: Project[] = [
   {
     id: 'background-generator',

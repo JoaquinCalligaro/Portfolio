@@ -1,3 +1,3 @@
-// Actions stub: the services feature was removed from the site.
-// Keeping a minimal export so Astro's action types and consumers don't break.
+// Archivo de acciones del servidor - actualmente vacío
+// Mantiene compatibilidad con tipos de Astro sin funcionalidad específica
 export const server = {};

@@ -4,6 +4,7 @@
 import TechStackSection from './TechStackSection.astro';
 import LocalizedText from '../language/LocalizedText.astro';
 import { stacks } from '../../data/techs';
+import { translations } from '../../data/translations';
 import '../../styles/techstack.css';
 
 interface Props {
@@ -11,6 +12,10 @@ interface Props {
 }
 
 const { className = '' } = Astro.props as Props;
+
+// Use ES as default for server-side rendering, then update with JavaScript
+const serverLang = 'ES';
+const serverTranslations = translations[serverLang];
 
 const splitClasses = className.split(' ');
 ---
@@ -46,9 +51,52 @@ const splitClasses = className.split(' ');
     <div class="mt-4 flex flex-col gap-4">
       {
         stacks.map((stack) => (
-          <TechStackSection title={stack.title} items={stack.items} />
+          <TechStackSection
+            title={serverTranslations.techStack.categories[stack.categoryKey]}
+            items={stack.items}
+            data-tech-category={stack.categoryKey}
+          />
         ))
       }
     </div>
   </div>
 </div>
+
+<script is:inline>
+  (function () {
+    const updateTechCategories = (lang) => {
+      // Update tech category titles based on current language
+      document.querySelectorAll('[data-tech-category]').forEach((node) => {
+        const categoryKey = node.dataset.techCategory;
+        if (
+          !categoryKey ||
+          !window.TRANSLATIONS ||
+          !window.TRANSLATIONS[lang]
+        ) {
+          return;
+        }
+
+        try {
+          const categoryTitle =
+            window.TRANSLATIONS[lang].techStack?.categories?.[categoryKey];
+          if (categoryTitle) {
+            node.textContent = categoryTitle;
+          }
+        } catch (e) {
+          console.warn('Error updating tech category:', categoryKey, e);
+        }
+      });
+    };
+
+    // Listen for language changes
+    window.addEventListener('langChange', (e) => {
+      const lang = (e && e.detail) || document.documentElement.lang || 'ES';
+      updateTechCategories(lang);
+    });
+
+    // Apply initial translations if already available
+    if (window.TRANSLATIONS && document.documentElement.lang) {
+      updateTechCategories(document.documentElement.lang);
+    }
+  })();
+</script>

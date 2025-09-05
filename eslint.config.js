@@ -1,3 +1,4 @@
+// Configuración de ESLint para el proyecto
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import astro from 'eslint-plugin-astro';
@@ -9,12 +10,12 @@ export default [
   ...astro.configs['flat/recommended'],
   prettier,
 
-  // ⬇️ Ignorar carpetas generadas
+  // Carpetas a ignorar durante el linting
   {
     ignores: ['**/.astro/**', 'dist', 'node_modules'],
   },
 
-  // ⬇️ Relajar reglas solo en archivos .d.ts
+  // Reglas relajadas para archivos de declaración de tipos
   {
     files: ['**/*.d.ts'],
     rules: {
