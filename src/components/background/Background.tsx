@@ -6,7 +6,14 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { initBackgroundRefresh } from './refreshBackground';
-import { LIGHT_MODE_CONFIG, DARK_MODE_CONFIG } from './config';
+import {
+  LIGHT_MODE_CONFIG,
+  DARK_MODE_CONFIG,
+  INTERNAL_RESOLUTION_SCALE,
+  BASE_STARS_COUNT,
+  BASE_CONNECTIONS_COUNT,
+  BASE_NEBULA_PARTICLES,
+} from './config';
 
 interface LayerProps {
   color: string;
@@ -15,27 +22,37 @@ interface LayerProps {
   theme?: 'light' | 'dark';
   particleCount?: number;
   speedMultiplier?: number;
+  lowPerf?: boolean; // modo simplificado para dispositivos de bajo rendimiento
 }
 function speedMul(s: 'slow' | 'normal' | 'fast') {
   if (s === 'slow') return 0.5;
   if (s === 'fast') return 2;
   return 1;
 }
-const StarsLayer: React.FC<LayerProps> = ({
-  color,
-  speed,
-  intensity,
-  theme,
-}) => {
+const StarsLayer: React.FC<
+  LayerProps & { disabled?: boolean; startDelay?: number }
+> = ({ color, speed, intensity, theme, disabled, startDelay = 0, lowPerf }) => {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
+    if (disabled) return; // DISABLED: en dispositivos de bajo rendimiento
     const c = ref.current;
     if (!c) return;
     const ctx = c.getContext('2d');
     if (!ctx) return;
+    let mounted = true;
+    // Dimensiones lógicas (CSS px) separadas de las internas para evitar seams.
+    let cssW = window.innerWidth;
+    let cssH = window.innerHeight;
     const resize = () => {
-      c.width = window.innerWidth;
-      c.height = window.innerHeight;
+      // HALF RESOLUTION: render interno más chico -> luego se escala vía CSS transform
+      cssW = window.innerWidth;
+      cssH = window.innerHeight;
+      c.width = cssW * INTERNAL_RESOLUTION_SCALE;
+      c.height = cssH * INTERNAL_RESOLUTION_SCALE;
+      c.style.width = cssW + 'px';
+      c.style.height = cssH + 'px';
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(INTERNAL_RESOLUTION_SCALE, INTERNAL_RESOLUTION_SCALE);
     };
     resize();
     addEventListener('resize', resize);
@@ -43,39 +60,50 @@ const StarsLayer: React.FC<LayerProps> = ({
     const chosenStarsConfig = themeIsLight
       ? LIGHT_MODE_CONFIG
       : DARK_MODE_CONFIG; // configura estrellas según tema
-    const count = Math.floor(
-      200 * intensity * chosenStarsConfig.starsCountMultiplier
-    ); // usa config por tema
+    let count = Math.floor(
+      BASE_STARS_COUNT * intensity * chosenStarsConfig.starsCountMultiplier
+    );
+    if (lowPerf) count = Math.max(50, Math.floor(count * 0.5)); // reduce en lowPerf
     const starOpacityMultiplier = chosenStarsConfig.starsOpacityMultiplier; // usa config por tema
-    const twinkleBoost = chosenStarsConfig.starsTwinkleBoost; // usa config por tema
+    const twinkleBoost = lowPerf
+      ? chosenStarsConfig.starsTwinkleBoost * 0.7
+      : chosenStarsConfig.starsTwinkleBoost; // menos twinkle
     const mul = speedMul(speed); // multiplicador de velocidad según el ajuste
     const stars = Array.from({ length: count }, () => ({
-      x: Math.random() * c.width,
-      y: Math.random() * c.height,
+      x: Math.random() * cssW,
+      y: Math.random() * cssH,
       size: Math.random() * 3 + 0.5,
       o: Math.random() * 0.8 + 0.2,
       phase: Math.random() * Math.PI * 2,
       tw: Math.random() * 0.05 + 0.02,
     }));
     let f: number;
-    const loop = () => {
-      ctx.clearRect(0, 0, c.width, c.height);
+    const targetFPS = 30; // LIMIT 30FPS
+    let last = 0;
+    const loop = (t = 0) => {
+      if (!mounted) return;
+      if (t - last < 1000 / targetFPS) {
+        f = requestAnimationFrame(loop);
+        return;
+      }
+      last = t;
+      ctx.clearRect(0, 0, cssW, cssH); // usar tamaño lógico para evitar líneas
       const g = ctx.createRadialGradient(
-        c.width / 2,
-        c.height / 2,
+        cssW / 2,
+        cssH / 2,
         0,
-        c.width / 2,
-        c.height / 2,
-        Math.max(c.width, c.height) / 2
+        cssW / 2,
+        cssH / 2,
+        Math.max(cssW, cssH) / 2
       );
       g.addColorStop(0, color + '05');
       g.addColorStop(1, color + '02');
       ctx.fillStyle = g;
-      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.fillRect(-1, -1, cssW + 2, cssH + 2); // padding para evitar seam subpixel
       // subtle warm overlay in light mode to make the effect more colorful
       if (themeIsLight) {
         ctx.fillStyle = 'rgba(255,230,180,0.06)';
-        ctx.fillRect(0, 0, c.width, c.height);
+        ctx.fillRect(-1, -1, cssW + 2, cssH + 2);
       }
       stars.forEach((s) => {
         s.phase += s.tw * mul;
@@ -110,19 +138,34 @@ const StarsLayer: React.FC<LayerProps> = ({
         ctx.restore();
         s.x += Math.sin(s.phase * 0.1) * 0.2 * mul;
         s.y += Math.cos(s.phase * 0.1) * 0.2 * mul;
-        if (s.x < -s.size) s.x = c.width + s.size;
-        if (s.x > c.width + s.size) s.x = -s.size;
-        if (s.y < -s.size) s.y = c.height + s.size;
-        if (s.y > c.height + s.size) s.y = -s.size;
+        if (s.x < -s.size) s.x = cssW + s.size;
+        if (s.x > cssW + s.size) s.x = -s.size;
+        if (s.y < -s.size) s.y = cssH + s.size;
+        if (s.y > cssH + s.size) s.y = -s.size;
       });
       f = requestAnimationFrame(loop);
     };
-    loop();
+    // OPTIONAL START DELAY (para dar idle a Lighthouse)
+    const start = () => {
+      f = requestAnimationFrame(loop);
+    };
+    if (startDelay > 0) {
+      const to = setTimeout(start, startDelay);
+      return () => {
+        mounted = false;
+        clearTimeout(to);
+        removeEventListener('resize', resize);
+        cancelAnimationFrame(f);
+      };
+    } else {
+      start();
+    }
     return () => {
+      mounted = false;
       removeEventListener('resize', resize);
       cancelAnimationFrame(f);
     };
-  }, [color, speed, intensity]);
+  }, [color, speed, intensity, disabled, startDelay, lowPerf]);
   return (
     <canvas
       ref={ref}
@@ -137,21 +180,28 @@ const StarsLayer: React.FC<LayerProps> = ({
   );
 };
 
-const ConnectionsLayer: React.FC<LayerProps> = ({
-  color,
-  speed,
-  intensity,
-  theme,
-}) => {
+const ConnectionsLayer: React.FC<
+  LayerProps & { disabled?: boolean; startDelay?: number }
+> = ({ color, speed, intensity, theme, disabled, startDelay = 0, lowPerf }) => {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
+    if (disabled) return; // skip layer entirely
     const c = ref.current;
     if (!c) return;
     const ctx = c.getContext('2d');
     if (!ctx) return;
+    let mounted = true;
+    let cssW = window.innerWidth;
+    let cssH = window.innerHeight;
     const resize = () => {
-      c.width = window.innerWidth;
-      c.height = window.innerHeight;
+      cssW = window.innerWidth;
+      cssH = window.innerHeight;
+      c.width = cssW * INTERNAL_RESOLUTION_SCALE;
+      c.height = cssH * INTERNAL_RESOLUTION_SCALE;
+      c.style.width = cssW + 'px';
+      c.style.height = cssH + 'px';
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(INTERNAL_RESOLUTION_SCALE, INTERNAL_RESOLUTION_SCALE);
     };
     resize();
     addEventListener('resize', resize);
@@ -160,41 +210,50 @@ const ConnectionsLayer: React.FC<LayerProps> = ({
     const chosenConnectionsConfig = themeIsLight
       ? LIGHT_MODE_CONFIG
       : DARK_MODE_CONFIG; // configura conexiones por tema
-    const nodes = Array.from(
-      {
-        length: Math.floor(
-          15 * intensity * chosenConnectionsConfig.connectionsCountMultiplier
-        ),
-      },
-      () => ({
-        x: Math.random() * c.width,
-        y: Math.random() * c.height,
-        vx: (Math.random() - 0.5) * speedMultiplier * 40,
-        vy: (Math.random() - 0.5) * speedMultiplier * 40,
-        r: Math.random() * 4 + 2,
-      })
+    let nodeCount = Math.floor(
+      BASE_CONNECTIONS_COUNT *
+        intensity *
+        chosenConnectionsConfig.connectionsCountMultiplier
     );
+    if (lowPerf) nodeCount = Math.max(4, Math.floor(nodeCount * 0.6));
+    const nodes = Array.from({ length: nodeCount }, () => ({
+      x: Math.random() * cssW,
+      y: Math.random() * cssH,
+      vx: (Math.random() - 0.5) * speedMultiplier * 40,
+      vy: (Math.random() - 0.5) * speedMultiplier * 40,
+      r: Math.random() * 4 + 2,
+    }));
     let f: number;
-    const loop = () => {
-      ctx.clearRect(0, 0, c.width, c.height);
+    const targetFPS = 30; // LIMIT 30FPS
+    let last = 0;
+    const loop = (t = 0) => {
+      if (!mounted) return;
+      if (t - last < 1000 / targetFPS) {
+        f = requestAnimationFrame(loop);
+        return;
+      }
+      last = t;
+      ctx.clearRect(0, 0, cssW, cssH);
       nodes.forEach((n) => {
         n.x += n.vx * 0.016;
         n.y += n.vy * 0.016;
-        if (n.x <= 0 || n.x >= c.width) n.vx *= -1;
-        if (n.y <= 0 || n.y >= c.height) n.vy *= -1;
+        if (n.x <= 0 || n.x >= cssW) n.vx *= -1;
+        if (n.y <= 0 || n.y >= cssH) n.vy *= -1;
       });
       ctx.strokeStyle = color;
-      ctx.lineWidth = themeIsLight ? 1.6 : 1; // grosor adaptativo
+      ctx.lineWidth = themeIsLight ? (lowPerf ? 1 : 1.4) : lowPerf ? 0.8 : 1;
       ctx.globalAlpha =
         (themeIsLight
-          ? 0.45 * chosenConnectionsConfig.connectionsOpacityMultiplier
-          : 0.3) * intensity; // opacidad adaptativa
+          ? 0.4 * chosenConnectionsConfig.connectionsOpacityMultiplier
+          : 0.28) *
+        intensity *
+        (lowPerf ? 0.75 : 1);
       nodes.forEach((n1, i) => {
         nodes.slice(i + 1).forEach((n2) => {
           const dx = n1.x - n2.x;
           const dy = n1.y - n2.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 120) {
+          if (dist < (lowPerf ? 90 : 120)) {
             ctx.beginPath();
             ctx.moveTo(n1.x, n1.y);
             ctx.lineTo(n2.x, n2.y);
@@ -203,7 +262,7 @@ const ConnectionsLayer: React.FC<LayerProps> = ({
         });
       });
       ctx.fillStyle = color;
-      ctx.globalAlpha = 0.6 * intensity;
+      ctx.globalAlpha = (lowPerf ? 0.45 : 0.6) * intensity;
       nodes.forEach((n) => {
         ctx.beginPath();
         ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
@@ -211,12 +270,24 @@ const ConnectionsLayer: React.FC<LayerProps> = ({
       });
       f = requestAnimationFrame(loop);
     };
-    loop();
+    const start = () => {
+      f = requestAnimationFrame(loop);
+    };
+    if (startDelay > 0) {
+      const to = setTimeout(start, startDelay);
+      return () => {
+        mounted = false;
+        clearTimeout(to);
+        removeEventListener('resize', resize);
+        cancelAnimationFrame(f);
+      };
+    } else start();
     return () => {
+      mounted = false;
       removeEventListener('resize', resize);
       cancelAnimationFrame(f);
     };
-  }, [color, speed, intensity]);
+  }, [color, speed, intensity, disabled, startDelay, lowPerf]);
   return (
     <canvas
       ref={ref}
@@ -258,13 +329,18 @@ interface NebulaCloud {
   pulsPhase: number;
   layers: number;
 }
-const NebulaLayer: React.FC<LayerProps> = ({
+const NebulaLayer: React.FC<
+  LayerProps & { disabled?: boolean; startDelay?: number }
+> = ({
   color,
   speed,
   intensity,
   theme,
   particleCount,
   speedMultiplier,
+  disabled,
+  startDelay = 0,
+  lowPerf,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>(0);
@@ -338,10 +414,14 @@ const NebulaLayer: React.FC<LayerProps> = ({
     return f;
   };
   useEffect(() => {
+    if (disabled) return; // layer deshabilitada en dispositivos débiles
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+    let mounted = true;
+    let cssW = window.innerWidth;
+    let cssH = window.innerHeight;
     const speedValue = getSpeedValue();
     const sMult = typeof speedMultiplier === 'number' ? speedMultiplier : 0.8;
     let zoomBase = 1,
@@ -367,7 +447,7 @@ const NebulaLayer: React.FC<LayerProps> = ({
     const cores = (navigator as any).hardwareConcurrency || 4;
     const isLowEndMobile =
       isMobile && (deviceMemory <= 3 || cores <= 4 || window.innerWidth <= 480);
-    const targetFPS = isLowEndMobile ? 40 : 60;
+    const internalTargetFPS = 30; // unificado a 30fps
     const noiseCellRef = { current: isLowEndMobile ? 38 : 25 };
     const enableConnections = false;
     const mobileNoShadow = isMobile;
@@ -382,11 +462,15 @@ const NebulaLayer: React.FC<LayerProps> = ({
     const resize = () => {
       const parent = canvas.parentElement;
       if (!parent) return;
-      const w = parent.offsetWidth || window.innerWidth;
-      const h = parent.offsetHeight || window.innerHeight;
-      const dpr = Math.min(devicePixelRatio || 1, isMobile ? 1 : 1.5);
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
+      cssW = parent.offsetWidth || window.innerWidth;
+      cssH = parent.offsetHeight || window.innerHeight;
+      // HALF RESOLUTION: usamos escala interna inferior + CSS sizing
+      const dprBase = Math.min(devicePixelRatio || 1, isMobile ? 1 : 1.2);
+      const dpr = dprBase * INTERNAL_RESOLUTION_SCALE;
+      canvas.width = cssW * dpr;
+      canvas.height = cssH * dpr;
+      canvas.style.width = cssW + 'px';
+      canvas.style.height = cssH + 'px';
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(dpr, dpr);
       (ctx as any).imageSmoothingEnabled = true;
@@ -395,21 +479,26 @@ const NebulaLayer: React.FC<LayerProps> = ({
       } catch {
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
-        canvas.style.width = w + 'px';
-        canvas.style.height = h + 'px';
-        noiseFieldRef.current = generateNoiseField(w, h, noiseCellRef.current);
+        noiseFieldRef.current = generateNoiseField(
+          cssW,
+          cssH,
+          noiseCellRef.current
+        );
       }
     };
     const initParticles = () => {
       particlesRef.current = [];
       const parent = canvas.parentElement;
       if (!parent) return;
-      const w = parent.offsetWidth || window.innerWidth;
-      const h = parent.offsetHeight || window.innerHeight;
-      const baseCount = typeof particleCount === 'number' ? particleCount : 180;
-      const effCount = isLowEndMobile
-        ? Math.max(70, Math.floor(baseCount * 0.5))
-        : baseCount;
+      const w = cssW;
+      const h = cssH;
+      const baseCount =
+        typeof particleCount === 'number'
+          ? particleCount
+          : BASE_NEBULA_PARTICLES;
+      let effCount = baseCount;
+      if (isLowEndMobile || lowPerf)
+        effCount = Math.max(60, Math.floor(baseCount * 0.45));
       for (let i = 0; i < effCount; i++) {
         const life = 200 + Math.random() * 400;
         const baseHue = mainHSL.h;
@@ -577,9 +666,17 @@ const NebulaLayer: React.FC<LayerProps> = ({
         });
       }
     };
-    const animate = () => {
+    const targetFPS = 30; // 30FPS throttle (general limiter)
+    let last = 0;
+    const animate = (t = 0) => {
+      if (!mounted) return;
+      if (t - last < 1000 / targetFPS) {
+        animationRef.current = requestAnimationFrame(animate);
+        return;
+      }
+      last = t;
       const now = performance.now();
-      if (now - lastFrame.current < 1000 / targetFPS) {
+      if (now - lastFrame.current < 1000 / internalTargetFPS) {
         animationRef.current = requestAnimationFrame(animate);
         return;
       }
@@ -606,7 +703,7 @@ const NebulaLayer: React.FC<LayerProps> = ({
         }
       } else zoomBase = 1;
       ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.clearRect(0, 0, w, h);
+      ctx.clearRect(0, 0, cssW, cssH);
       ctx.save();
       ctx.translate(w / 2, h / 2);
       ctx.scale(zoomBase, zoomBase);
@@ -640,7 +737,7 @@ const NebulaLayer: React.FC<LayerProps> = ({
         grad.addColorStop(1, 'rgba(8,10,25,0.01)');
       }
       ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, w, h);
+      ctx.fillRect(-1, -1, w + 2, h + 2);
       if (!starsInit || staticStars.length === 0) initStars(w, h);
       ctx.save();
       // Use 'screen' on light theme so nebula remains visible over bright backgrounds
@@ -1017,12 +1114,33 @@ const NebulaLayer: React.FC<LayerProps> = ({
       initClouds();
     };
     window.addEventListener('resize', onResize);
-    animate();
+    const start = () => {
+      animationRef.current = requestAnimationFrame(animate);
+    };
+    if (startDelay > 0) {
+      const to = setTimeout(start, startDelay);
+      return () => {
+        mounted = false;
+        clearTimeout(to);
+        window.removeEventListener('resize', onResize);
+        if (animationRef.current) cancelAnimationFrame(animationRef.current);
+      };
+    } else start();
     return () => {
+      mounted = false;
       window.removeEventListener('resize', onResize);
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
-  }, [color, speed, intensity]);
+  }, [
+    color,
+    speed,
+    intensity,
+    particleCount,
+    speedMultiplier,
+    disabled,
+    startDelay,
+    lowPerf,
+  ]);
   return (
     <canvas
       ref={canvasRef}
@@ -1111,6 +1229,8 @@ export default function BackgroundExport(props: BackgroundExportProps) {
   const [refreshKey, setRefreshKey] = useState(0);
   // Wait for theme readiness to avoid race with initializer; fallback timeout
   const [themeReady, setThemeReady] = useState(false);
+  // Estado para detección de dispositivo de bajo rendimiento (evaluado solo en cliente)
+  const [isLowEndDevice, setIsLowEndDevice] = useState<boolean | null>(null);
 
   useEffect(() => {
     let done = false;
@@ -1165,6 +1285,24 @@ export default function BackgroundExport(props: BackgroundExportProps) {
       );
     };
   }, []);
+  // Detect low-end device una sola vez en el cliente
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const cores = (navigator as any).hardwareConcurrency || 4;
+      const lowMem =
+        (navigator as any).deviceMemory && (navigator as any).deviceMemory <= 3;
+      const smallScreen = window.innerWidth < 768;
+      const prefersReducedMotion =
+        window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const lowEnd =
+        cores <= 4 || lowMem || smallScreen || prefersReducedMotion;
+      setIsLowEndDevice(lowEnd);
+    } catch {
+      setIsLowEndDevice(false);
+    }
+  }, []);
   return (
     <div
       style={{
@@ -1218,6 +1356,7 @@ export default function BackgroundExport(props: BackgroundExportProps) {
       >
         {themeReady ? (
           <>
+            {/* Siempre render, low-end => lowPerf con menos partículas y sin eliminar estética */}
             <StarsLayer
               color={color}
               speed={speedSafe}
@@ -1225,6 +1364,8 @@ export default function BackgroundExport(props: BackgroundExportProps) {
               theme={themeState}
               particleCount={particleCountSafe}
               speedMultiplier={speedMultiplierSafe}
+              startDelay={isLowEndDevice ? 0 : 2000}
+              lowPerf={!!isLowEndDevice}
             />
             <ConnectionsLayer
               color={color}
@@ -1233,6 +1374,8 @@ export default function BackgroundExport(props: BackgroundExportProps) {
               theme={themeState}
               particleCount={particleCountSafe}
               speedMultiplier={speedMultiplierSafe}
+              startDelay={isLowEndDevice ? 0 : 2000}
+              lowPerf={!!isLowEndDevice}
             />
             <NebulaLayer
               color={color}
@@ -1241,6 +1384,8 @@ export default function BackgroundExport(props: BackgroundExportProps) {
               theme={themeState}
               particleCount={particleCountSafe}
               speedMultiplier={speedMultiplierSafe}
+              startDelay={isLowEndDevice ? 0 : 2000}
+              lowPerf={!!isLowEndDevice}
             />
           </>
         ) : null}
