@@ -20,6 +20,7 @@ export type ExperienceItem = {
   dates: string;
   company: string;
   description: string;
+  iconKey?: string; // Clave opcional para el tipo de icono: 'university', 'work', 'certificate', etc.
   svgIcon?: string;
 };
 

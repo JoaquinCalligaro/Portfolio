@@ -11,16 +11,20 @@ export const esTranslations: TranslationStructure = {
   personal: {
     name: 'Joaquin Calligaro',
     description:
-      'Soy desarrollador frontend junior con experiencia en HTML, CSS y JavaScript. Actualmente trabajo con React, Tailwind y Astro, creando proyectos prácticos que combinan diseño moderno, rendimiento y buenas prácticas de desarrollo.',
+      'Hola, soy un desarrollador frontend que disfruta transformar ideas en interfaces claras y funcionales. ' +
+      'Actualmente exploro proyectos web y móviles con un estilo moderno y enfocado en la experiencia del usuario. ' +
+      'Te invito a ver mi trabajo.',
   },
   aboutMe: {
     title: 'Sobre Mí',
     shortBio: {
       heading: 'Biografía breve',
       paragraphs: [
-        'Soy un desarrollador frontend con interés en crear interfaces limpias y accesibles. Me especializo en convertir diseños en experiencias web eficientes y responsivas.',
-        'Trabajo a diario con HTML, CSS y JavaScript, y me apoyo en herramientas modernas como Astro, Tailwind y frameworks componentizados para entregar productos mantenibles.',
-        'Me apasiona el rendimiento y las buenas prácticas; disfruto optimizar cargas, mejorar la experiencia de usuario y aprender nuevas técnicas para crear productos confiables.',
+        'Soy de La Rioja, Argentina, tengo 24 años y comencé a incursionar en el desarrollo web en 2022, aunque desde chico siempre me atrajo la tecnología. Me anoté en una carrera de Técnicatura Universitaria en Programación en la Universidad Tecnológica Nacional en Argentina.',
+        'En mis tiempos libres me gusta diseñar, estructurar y aprender constantemente, creando cosas nuevas que me desafíen.',
+        'Busco aportar mis conocimientos en proyectos colaborativos, recibir feedback de otros desarrolladores y así mejorar mis habilidades.',
+        'Mi meta actual es crecer como frontend developer, pero también ampliar mi experiencia hacia fullstack, mobile e integraciones de IA para servicios web.',
+        'Actualmente estudio inglés además cuento con un certificado de nivel A2, con la meta de seguir avanzando.',
       ],
       cvHeading: 'Información CV',
       cvDownload: 'Descargar CV',
@@ -102,22 +106,25 @@ export const esTranslations: TranslationStructure = {
   },
   experiences: [
     {
-      dates: ' January 2025- Present',
-      company: 'University of Camagüey',
+      dates: ' Enero 2024 - Diciembre 2024 (FINALIZADO)',
+      company: 'British Institute La Rioja',
       description:
-        'Participé en proyectos de desarrollo web para entornos educativos, diseñando interfaces para recursos de aprendizaje y mejorando la accesibilidad y usabilidad de contenidos en línea.',
+        'Finalizé mis estudios de nivel A2 de inglés, mejorando mis habilidades de comunicación y comprensión en el idioma.',
+      iconKey: 'university',
     },
     {
-      dates: ' January 2025- February 2025',
-      company: 'No Country Tech Work Simulation',
+      dates: ' Febrero 2022 - Septiembre 2024 (FINALIZADO)',
+      company: 'Universidad Técnologica Nacional (UTN)',
       description:
-        'Simulación práctica de trabajo en equipo donde prototipamos funciones, integramos APIs y aplicamos metodologías ágiles para resolver casos reales de producto.',
+        'Finalizé la carrera de Técnico Universitario en Programación, adquiriendo conocimientos sólidos en desarrollo de software, algoritmos y estructuras de datos.',
+      iconKey: 'university',
     },
     {
-      dates: 'August 2024 - November 2024',
-      company: 'GotoSend',
+      dates: 'Febrero 2013 - Diciembre 2019 (FINALIZADO) ',
+      company: 'Brigadier Gral. Juan Facundo Quiroga (EPET N°2)',
       description:
-        'Colaboré en el frontend de la plataforma, implementando componentes reutilizables, mejorando la consistencia visual y optimizando tiempos de carga en interfaces de usuario.',
+        'Completé mis estudios secundarios con conocimientos en tecnologias de control (robotica) y programación básica.',
+      iconKey: 'university',
     },
   ],
 };

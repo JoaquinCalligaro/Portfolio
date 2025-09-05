@@ -11,16 +11,20 @@ export const enTranslations: TranslationStructure = {
   personal: {
     name: 'Joaquin Calligaro',
     description:
-      'I am a junior frontend developer with experience in HTML, CSS and JavaScript. I work with React, Tailwind and Astro, building practical projects that combine modern design, performance and good development practices.',
+      'Hello, I am a frontend developer who enjoys turning ideas into clear and functional interfaces. ' +
+      'Currently, I am exploring web and mobile projects with a modern style focused on user experience. ' +
+      'I invite you to check out my work.',
   },
   aboutMe: {
     title: 'About Me',
     shortBio: {
       heading: 'Short Bio',
       paragraphs: [
-        'I am a frontend developer focused on building clean, accessible interfaces. I turn visual designs into responsive web experiences that perform well across devices.',
-        'I work daily with HTML, CSS, and JavaScript, and use modern tools like Astro and Tailwind to ship maintainable, component-driven projects.',
-        'I enjoy improving performance, reducing load times, and applying best practices to create reliable user experiences.',
+        'I am from La Rioja, Argentina, I am 24 years old and I started venturing into web development in 2022, although technology has always attracted me since I was a child. I enrolled in a University Technical Program in Programming at the National Technological University in Argentina.',
+        'In my free time I like to design, structure, and constantly learn, creating new things that challenge me.',
+        'I seek to contribute my knowledge in collaborative projects, receive feedback from other developers, and thus improve my skills.',
+        'My current goal is to grow as a frontend developer, but also expand my experience towards fullstack, mobile, and AI integrations for web services.',
+        'I am currently studying English and have an A2 level certificate, with the goal of continuing to advance.',
       ],
       cvHeading: 'CV Information',
       cvDownload: 'Download CV',
@@ -102,22 +106,25 @@ export const enTranslations: TranslationStructure = {
   },
   experiences: [
     {
-      dates: ' January 2025- Present',
-      company: 'University of Camagüey',
+      dates: ' January 2024 - December 2024 (COMPLETED)',
+      company: 'British Institute La Rioja',
       description:
-        'Worked on educational web development projects, designing interfaces for learning resources and improving the accessibility and usability of online content.',
+        'Completed my A2 level English studies, improving my communication and comprehension skills in the language.',
+      iconKey: 'university',
     },
     {
-      dates: ' January 2025- February 2025',
-      company: 'No Country Tech Work Simulation',
+      dates: ' February 2022 - September 2024 (COMPLETED)',
+      company: 'National Technological University (UTN)',
       description:
-        'Hands-on teamwork simulation where we prototyped features, integrated APIs, and applied agile methodologies to solve real-world product cases.',
+        'Completed the University Technical Program in Programming, acquiring solid knowledge in software development, algorithms and data structures.',
+      iconKey: 'university',
     },
     {
-      dates: 'August 2024 - November 2024',
-      company: 'GotoSend',
+      dates: 'February 2013 - December 2019 (COMPLETED)',
+      company: 'Brigadier Gral. Juan Facundo Quiroga (EPET N°2)',
       description:
-        "Collaborated on the platform's frontend, implementing reusable components, improving visual consistency, and optimizing load times in user interfaces.",
+        'Completed my secondary studies with knowledge in control technologies (robotics) and basic programming.',
+      iconKey: 'university',
     },
   ],
 };
