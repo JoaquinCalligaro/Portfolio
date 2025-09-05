@@ -1,16 +1,9 @@
 ---
-// index.astro - Refactorizado usando principalmente Tailwind
 import Layout from '../layouts/Layout.astro';
 import TechStack from '../components/tech-stack/TechStack.astro';
 import PersonalPresentation from '../components/PersonalPresentation.astro';
 import ProjectTitle from '../components/my-projects/ProyectsTitle.astro';
-import ProjectCard1 from '../components/my-projects/ProjectCard1.astro';
-import ProjectCard2 from '../components/my-projects/ProjectCard2.astro';
-import ProjectCard3 from '../components/my-projects/ProjectCard3.astro';
-import ProjectCard4 from '../components/my-projects/ProjectCard4.astro';
-import ProjectCard5 from '../components/my-projects/ProjectCard5.astro';
-import ProjectCard6 from '../components/my-projects/ProjectCard6.astro';
-import ShowMoreBtn from '../components/ui/ShowMoreBtn.astro';
+import ProjectsGrid from '../components/my-projects/ProjectsGrid.astro';
 import AboutMeTitle from '../components/about-me/AboutMeTitle.astro';
 import ShortBio from '../components/about-me/ShortBio.astro';
 import '../styles/base/global.css';
@@ -32,27 +25,7 @@ import ContactTitle from '../components/contact/ContactTitle.astro';
       </div>
       <div id="projects">
         <ProjectTitle />
-        <div class="mt-12">
-          <div class="grid grid-cols-1 gap-15 sm:grid-cols-2 md:grid-cols-2">
-            <ProjectCard1 />
-            <ProjectCard2 />
-            <ProjectCard3 />
-            <ProjectCard4 />
-          </div>
-
-          <!-- Contenedor oculto con los proyectos adicionales (5 y 6) -->
-          <div id="extra-projects" class="mt-8 hidden">
-            <div class="grid grid-cols-1 gap-15 sm:grid-cols-2 md:grid-cols-2">
-              <ProjectCard5 />
-              <ProjectCard6 />
-            </div>
-          </div>
-
-          <!-- Botón aislado reusable en ui -->
-          <div class="flex justify-center">
-            <ShowMoreBtn id="show-more-projects" />
-          </div>
-        </div>
+        <ProjectsGrid />
       </div>
 
       <!-- Sección Sobre Mí -->
@@ -119,49 +92,41 @@ import ContactTitle from '../components/contact/ContactTitle.astro';
       });
     });
 
-    // Inicializar show-more button (usa window.initShowMore o inyecta script desde /js)
+    // Inicializar show-more button usando el nuevo módulo TypeScript
     (function ensureInitShowMore() {
-      function run() {
+      async function run() {
         try {
           if (typeof window === 'undefined') return;
-          if (!Object.prototype.hasOwnProperty.call(window, 'initShowMore'))
-            return;
-          const fn = (window as unknown)['initShowMore'];
-          if (typeof fn === 'function')
-            fn('show-more-projects', {
+
+          // Intentar usar la función global si ya existe
+          if (Object.prototype.hasOwnProperty.call(window, 'initShowMore')) {
+            const fn = (window as unknown)['initShowMore'];
+            if (typeof fn === 'function') {
+              fn('show-more-projects', {
+                targetId: 'extra-projects',
+                hiddenClass: 'hidden',
+              });
+              return;
+            }
+          }
+
+          // Importar y usar el nuevo módulo TypeScript
+          const { initShowMore } = await import(
+            '../components/scripts/show-more/index.js'
+          );
+          if (typeof initShowMore === 'function') {
+            initShowMore('show-more-projects', {
               targetId: 'extra-projects',
               hiddenClass: 'hidden',
             });
-        } catch {
-          // noop
+          }
+        } catch (error) {
+          console.warn('Error initializing show-more:', error);
         }
       }
 
-      try {
-        if (
-          typeof window !== 'undefined' &&
-          Object.prototype.hasOwnProperty.call(window, 'initShowMore')
-        ) {
-          run();
-          return;
-        }
-      } catch {
-        // noop
-      }
-
-      const existing = document.querySelector('script[data-show-more-module]');
-      if (existing) {
-        existing.addEventListener('load', run);
-        return;
-      }
-
-      const script = document.createElement('script');
-      script.type = 'module';
-      script.src = '/js/show-more/show-more-init.js';
-      script.setAttribute('data-show-more-module', '');
-      script.addEventListener('load', run);
-      script.addEventListener('error', () => {});
-      document.head.appendChild(script);
+      // Ejecutar la inicialización
+      run();
     })();
   </script>
 </Layout>

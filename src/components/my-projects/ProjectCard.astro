@@ -1,0 +1,374 @@
+---
+import type { ImageMetadata } from 'astro';
+
+export interface Props {
+  id: string;
+  titleKey: string;
+  descriptionKey: string;
+  repo: string;
+  live: string;
+  technologies: string[];
+  images: ImageMetadata[]; // Usar ImageMetadata en lugar de any[]
+}
+
+const props = (Astro.props as Props) || ({} as Props);
+const {
+  id,
+  titleKey,
+  descriptionKey,
+  repo,
+  live,
+  technologies = [],
+  images = [],
+} = props;
+
+import { Image } from 'astro:assets';
+import RepositoryBtn from '../ui/RepositoryBtn.astro';
+import LiveBtn from '../ui/LiveBtn.astro';
+import LocalizedText from '../language/LocalizedText.astro';
+import HtmlIcon from '../icons/HtmlIcon.astro';
+import CssIcon from '../icons/CssIcon.astro';
+import JavascriptIcon from '../icons/JavascriptIcon.astro';
+import TailwindIcon from '../icons/TailwindIcon.astro';
+import ReactIcon from '../icons/ReactIcon.astro';
+import TypescriptIcon from '../icons/TypescriptIcon.astro';
+import '../../styles/projects.css';
+
+// Generar ID único para el slider de este card
+const sliderId = `slider-${id}`;
+
+// Mapeo de tecnologías a iconos
+const iconMap = {
+  html: HtmlIcon,
+  css: CssIcon,
+  tailwind: TailwindIcon,
+  javascript: JavascriptIcon,
+  typescript: TypescriptIcon,
+  react: ReactIcon,
+};
+
+// Función para resolver tecnología a componente de icono
+const resolveTechnology = (item) => {
+  if (!item) return null;
+  const base = { cls: 'h-6 w-6', title: '' };
+  if (typeof item === 'string') {
+    const Component = iconMap[item.toLowerCase()];
+    return Component ? { Component, ...base } : null;
+  }
+  if (typeof item === 'object' && item.component)
+    return {
+      Component: item.component,
+      cls: item.class ?? base.cls,
+      title: item.title ?? base.title,
+    };
+  return null;
+};
+---
+
+<article
+  id={id}
+  class="card-root flex h-full transform flex-col rounded-2xl border border-white/20 bg-gray-100/30 px-4 pb-6 shadow-sm backdrop-blur-md transition-transform duration-500 ease-in-out hover:scale-105 hover:border-cyan-400/30 dark:border-white/10 dark:bg-gray-900/30 dark:hover:border-cyan-400/50"
+  style="will-change: transform;"
+>
+  <div class="card-inner flex h-full flex-col justify-between">
+    <div class="w-full max-w-full">
+      {
+        images && images.length > 0 ? (
+          images.length === 1 ? (
+            // Una sola imagen - sin slider
+            <div class="group relative h-64 w-full overflow-hidden rounded-sm bg-transparent sm:h-56 md:h-64 dark:bg-transparent">
+              <div class="slide flex h-full items-center justify-center overflow-hidden rounded-sm">
+                <Image
+                  src={images[0]}
+                  alt={`${id} - Imagen 1`}
+                  class="block max-h-full max-w-full rounded-xl object-contain"
+                  sizes="(max-width:640px) 90vw, (max-width:1024px) 720px, 1080px"
+                  quality={90}
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          ) : (
+            // Múltiples imágenes - con slider
+            <div
+              id={sliderId}
+              class="group relative h-64 w-full overflow-hidden rounded-sm bg-transparent sm:h-56 md:h-64 dark:bg-transparent"
+            >
+              {/* Track del slider */}
+              <div class="slider-track flex h-full w-full transition-transform duration-300 ease-in-out">
+                {images.map((image, index) => (
+                  <div class="slide flex h-full w-full flex-shrink-0 items-center justify-center overflow-hidden rounded-sm">
+                    <Image
+                      src={image}
+                      alt={`${id} - Imagen ${index + 1}`}
+                      class="block max-h-full max-w-full rounded-xl object-contain"
+                      sizes="(max-width:640px) 90vw, (max-width:1024px) 720px, 1080px"
+                      quality={90}
+                      loading="lazy"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {/* Botones de navegación */}
+              <button
+                class="slider-prev absolute left-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity duration-200 hover:bg-black/70"
+                aria-label="Imagen anterior"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+
+              <button
+                class="slider-next absolute right-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity duration-200 hover:bg-black/70"
+                aria-label="Imagen siguiente"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+
+              {/* Indicadores (dots) */}
+              {images.length > 1 && (
+                <div class="absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 space-x-1">
+                  {images.map((_, index) => (
+                    <button
+                      class="slider-dot h-2 w-2 rounded-full bg-gray-400 transition-colors duration-200 dark:bg-gray-400"
+                      aria-label={`Ir a imagen ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )
+        ) : (
+          <div class="h-64 w-full rounded-sm bg-gray-200 sm:h-56 md:h-64 dark:bg-gray-800" />
+        )
+      }
+    </div>
+
+    <div class="mb-4 p-4">
+      <div class="flex items-center">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+          {titleKey ? <LocalizedText key={titleKey} /> : ''}
+        </h3>
+      </div>
+
+      {
+        technologies && technologies.length > 0 && (
+          <div class="my-4 mt-4 flex flex-wrap items-center gap-2">
+            {technologies.map((item) => {
+              const resolved = resolveTechnology(item);
+              if (!resolved) return null;
+              const { Component, cls, title: techTitle } = resolved;
+              return <Component class={cls} title={techTitle} />;
+            })}
+          </div>
+        )
+      }
+
+      <p
+        class="pt-1.5 text-sm leading-relaxed text-slate-600 dark:text-slate-300"
+      >
+        {descriptionKey ? <LocalizedText key={descriptionKey} /> : ''}
+      </p>
+    </div>
+
+    <div
+      class="flex items-center justify-center gap-15 pt-4 pb-2 sm:gap-15 md:gap-10 xl:gap-25"
+    >
+      <RepositoryBtn href={repo} />
+      <LiveBtn href={live} />
+    </div>
+  </div>
+</article>
+
+{/* Script para inicializar el slider solo si tiene múltiples imágenes */}
+{
+  images && images.length > 1 && (
+    <script define:vars={{ sliderId }} type="module">
+      // Función simplificada para inicializar el slider
+      function initProjectSlider() {
+        const sliderElement = document.getElementById(sliderId);
+        if (!sliderElement) {
+          console.warn(`Slider element not found: ${sliderId}`);
+          return;
+        }
+
+        const track = sliderElement.querySelector('.slider-track');
+        const slides = Array.from(sliderElement.querySelectorAll('.slide'));
+        const prevBtn = sliderElement.querySelector('.slider-prev');
+        const nextBtn = sliderElement.querySelector('.slider-next');
+        const dots = Array.from(sliderElement.querySelectorAll('.slider-dot'));
+
+        if (!track || slides.length <= 1) return;
+
+        let currentIndex = 0;
+        let autoplayTimer = null;
+        const totalSlides = slides.length;
+
+        // Función para actualizar la posición del slider
+        function updateSliderPosition() {
+          const slideWidth = sliderElement.clientWidth;
+          track.style.transform = `translateX(${-currentIndex * slideWidth}px)`;
+        }
+
+        // Función para actualizar los dots
+        function updateDots() {
+          dots.forEach((dot, index) => {
+            if (index === currentIndex) {
+              dot.classList.remove('bg-gray-400', 'dark:bg-gray-400');
+              dot.classList.add('bg-gray-800', 'dark:bg-white');
+            } else {
+              dot.classList.remove('bg-gray-800', 'dark:bg-white');
+              dot.classList.add('bg-gray-400', 'dark:bg-gray-400');
+            }
+          });
+        }
+
+        // Función para ir a un slide específico
+        function goToSlide(index) {
+          currentIndex = index;
+          if (currentIndex < 0) currentIndex = totalSlides - 1;
+          if (currentIndex >= totalSlides) currentIndex = 0;
+          
+          updateSliderPosition();
+          updateDots();
+        }
+
+        // Configurar el tamaño inicial
+        function setSizes() {
+          const slideWidth = sliderElement.clientWidth;
+          track.style.width = `${slideWidth * totalSlides}px`;
+          slides.forEach(slide => {
+            slide.style.width = `${slideWidth}px`;
+          });
+          updateSliderPosition();
+        }
+
+        // Autoplay
+        function startAutoplay() {
+          stopAutoplay();
+          autoplayTimer = setInterval(() => {
+            goToSlide(currentIndex + 1);
+          }, 5000);
+        }
+
+        function stopAutoplay() {
+          if (autoplayTimer) {
+            clearInterval(autoplayTimer);
+            autoplayTimer = null;
+          }
+        }
+
+        // Event listeners
+        if (prevBtn) {
+          prevBtn.addEventListener('click', () => {
+            stopAutoplay();
+            goToSlide(currentIndex - 1);
+            setTimeout(startAutoplay, 3000);
+          });
+        }
+
+        if (nextBtn) {
+          nextBtn.addEventListener('click', () => {
+            stopAutoplay();
+            goToSlide(currentIndex + 1);
+            setTimeout(startAutoplay, 3000);
+          });
+        }
+
+        dots.forEach((dot, index) => {
+          dot.addEventListener('click', () => {
+            stopAutoplay();
+            goToSlide(index);
+            setTimeout(startAutoplay, 3000);
+          });
+        });
+
+        // Hover events
+        sliderElement.addEventListener('mouseenter', () => {
+          stopAutoplay();
+          if (prevBtn) prevBtn.style.opacity = '1';
+          if (nextBtn) nextBtn.style.opacity = '1';
+        });
+
+        sliderElement.addEventListener('mouseleave', () => {
+          startAutoplay();
+          if (prevBtn) prevBtn.style.opacity = '0';
+          if (nextBtn) nextBtn.style.opacity = '0';
+        });
+
+        // Resize handler
+        window.addEventListener('resize', setSizes);
+
+        // Inicializar
+        setSizes();
+        updateDots();
+        startAutoplay();
+        
+        // Ocultar botones inicialmente
+        if (prevBtn) prevBtn.style.opacity = '0';
+        if (nextBtn) nextBtn.style.opacity = '0';
+      }
+
+      // Inicializar cuando el DOM esté listo
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initProjectSlider);
+      } else {
+        initProjectSlider();
+      }
+    </script>
+  )
+}
+
+<style>
+  /* Estilos específicos para el slider de proyecto */
+  .slider-track {
+    will-change: transform;
+    display: flex;
+    height: 100%;
+  }
+
+  .slide {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+
+  /* Efectos hover para los botones */
+  .slider-prev:hover,
+  .slider-next:hover {
+    background-color: rgba(0, 0, 0, 0.8) !important;
+  }
+
+  .slider-dot {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .slider-dot:hover {
+    background-color: rgba(75, 85, 99, 0.8) !important;
+  }
+
+  /* Asegurar que las imágenes se muestren correctamente */
+  .slide img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  /* Transiciones suaves para el track */
+  .slider-track {
+    transition: transform 0.3s ease-in-out;
+  }
+
+  /* Estilos para botones de navegación */
+  .slider-prev,
+  .slider-next {
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+  }
+</style>
