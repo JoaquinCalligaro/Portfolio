@@ -110,7 +110,7 @@ export const SmoothBackgroundSwitcher: FC<SmoothBackgroundSwitcherProps> = ({
       {/* Capa previa (fade out) */}
       {prevMode && (
         <div
-          className="absolute inset-0 will-change-opacity"
+          className="will-change-opacity absolute inset-0"
           style={{
             opacity: isTransitioning ? 0 : 1,
             transition: `opacity ${transitionDurationMs}ms ${easing}`,
@@ -127,7 +127,7 @@ export const SmoothBackgroundSwitcher: FC<SmoothBackgroundSwitcherProps> = ({
       )}
       {/* Capa activa (fade in) */}
       <div
-        className="absolute inset-0 will-change-opacity"
+        className="will-change-opacity absolute inset-0"
         style={{
           opacity: isTransitioning ? incomingOpacity : 1,
           transition: `opacity ${transitionDurationMs}ms ${easing}`,

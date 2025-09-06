@@ -55,8 +55,12 @@ import '../styles/base/global.css';
     <!-- Turnstile script is injected only on pages that need it (Contact.astro) -->
   </head>
   <body class="page-root min-h-screen">
-  <!-- Background dinámico dark/light con transición suave -->
-  <SmoothBackgroundSwitcher client:only="react" transitionDurationMs={700} fadeStartOpacity={0.15} />
+    <!-- Background dinámico dark/light con transición suave -->
+    <SmoothBackgroundSwitcher
+      client:only="react"
+      transitionDurationMs={1200}
+      fadeStartOpacity={0}
+    />
 
     <Navbar />
     <main
