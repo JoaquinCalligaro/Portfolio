@@ -17,16 +17,21 @@ import { useTheme } from '@/hooks/useTheme';
  */
 interface SmoothBackgroundSwitcherProps {
   className?: string;
-  transitionDurationMs?: number; // Duración del fade-out del modo previo.
-  // Permite sobrescribir parcialmente la config global si se pasa.
-  configOverride?: Partial<typeof backgroundConfig>;
+  transitionDurationMs?: number; // Duración del crossfade total.
+  easing?: string; // Easing CSS.
+  fadeStartOpacity?: number; // Opacidad inicial de la capa entrante (0 - 1).
+  addFilterTransition?: boolean; // Añade ligera transición de blur/brightness.
+  configOverride?: Partial<typeof backgroundConfig>; // Sobrescribir config global.
 }
 
 type Mode = 'dark' | 'light';
 
 export const SmoothBackgroundSwitcher: FC<SmoothBackgroundSwitcherProps> = ({
   className = '',
-  transitionDurationMs = 500,
+  transitionDurationMs = 650,
+  easing = 'cubic-bezier(0.4, 0.0, 0.2, 1)',
+  fadeStartOpacity = 0.1,
+  addFilterTransition = true,
   configOverride,
 }) => {
   const isDark = useTheme();
@@ -43,6 +48,7 @@ export const SmoothBackgroundSwitcher: FC<SmoothBackgroundSwitcherProps> = ({
   const [activeMode, setActiveMode] = useState<Mode>(targetMode);
   const [prevMode, setPrevMode] = useState<Mode | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [incomingOpacity, setIncomingOpacity] = useState(1);
   const timeoutRef = useRef<number | null>(null);
 
   // Cuando cambia el modo externo iniciamos transición crossfade.
@@ -51,12 +57,14 @@ export const SmoothBackgroundSwitcher: FC<SmoothBackgroundSwitcherProps> = ({
     setPrevMode(activeMode);
     setActiveMode(targetMode);
     setIsTransitioning(true);
+    setIncomingOpacity(fadeStartOpacity);
 
     // Limpiamos prev layer tras la duración del fade.
     if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
     timeoutRef.current = window.setTimeout(() => {
       setPrevMode(null);
       setIsTransitioning(false);
+      setIncomingOpacity(1);
     }, transitionDurationMs);
     return () => {
       if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
@@ -102,18 +110,35 @@ export const SmoothBackgroundSwitcher: FC<SmoothBackgroundSwitcherProps> = ({
       {/* Capa previa (fade out) */}
       {prevMode && (
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 will-change-opacity"
           style={{
             opacity: isTransitioning ? 0 : 1,
-            transition: `opacity ${transitionDurationMs}ms ease-in-out`,
+            transition: `opacity ${transitionDurationMs}ms ${easing}`,
+            filter: addFilterTransition
+              ? isTransitioning
+                ? 'brightness(1) blur(0px)'
+                : 'brightness(1) blur(0px)'
+              : undefined,
           }}
           aria-hidden="true"
         >
           {renderMode(prevMode)}
         </div>
       )}
-      {/* Capa activa */}
-      <div className="absolute inset-0" style={{ opacity: 1 }}>
+      {/* Capa activa (fade in) */}
+      <div
+        className="absolute inset-0 will-change-opacity"
+        style={{
+          opacity: isTransitioning ? incomingOpacity : 1,
+          transition: `opacity ${transitionDurationMs}ms ${easing}`,
+          filter: addFilterTransition
+            ? isTransitioning
+              ? 'brightness(1.08) saturate(1.05)'
+              : 'brightness(1) saturate(1)'
+            : undefined,
+        }}
+        onTransitionEnd={() => setIncomingOpacity(1)}
+      >
         {renderMode(activeMode)}
       </div>
     </div>

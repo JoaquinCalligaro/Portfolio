@@ -3,7 +3,7 @@
 import Footer from '../components/Footer.astro';
 import GoToTopBtn from '../components/ui/GoToTopBtn.astro';
 import Navbar from '../components/navbar/Navbar.astro';
-import BackgroundSwitcher from '../components/ui/background/BackgroundSwitcher';
+import SmoothBackgroundSwitcher from '../components/ui/background/SmoothBackgroundSwitcher';
 
 import '../styles/base/global.css';
 ---
@@ -55,8 +55,8 @@ import '../styles/base/global.css';
     <!-- Turnstile script is injected only on pages that need it (Contact.astro) -->
   </head>
   <body class="page-root min-h-screen">
-    <!-- Background dinámico dark/light -->
-    <BackgroundSwitcher client:only="react" />
+  <!-- Background dinámico dark/light con transición suave -->
+  <SmoothBackgroundSwitcher client:only="react" transitionDurationMs={700} fadeStartOpacity={0.15} />
 
     <Navbar />
     <main
