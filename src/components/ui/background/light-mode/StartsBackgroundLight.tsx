@@ -25,6 +25,7 @@ interface StarBackgroundProps {
   minTwinkleSpeed?: number;
   maxTwinkleSpeed?: number;
   className?: string;
+  intensity?: number;
 }
 
 export const StarsBackgroundLight: FC<StarBackgroundProps> = ({
@@ -34,6 +35,7 @@ export const StarsBackgroundLight: FC<StarBackgroundProps> = ({
   minTwinkleSpeed = 0.5,
   maxTwinkleSpeed = 1,
   className,
+  intensity = 1,
 }) => {
   const [stars, setStars] = useState<StarProps[]>([]);
   const canvasRef: RefObject<HTMLCanvasElement> =
@@ -59,8 +61,11 @@ export const StarsBackgroundLight: FC<StarBackgroundProps> = ({
         return {
           x: Math.random() * width,
           y: Math.random() * height,
-          radius: Math.random() * 0.8 + 0.3, // Estrellas ligeramente más grandes
-          opacity: Math.random() * 0.4 + 0.3, // Opacidad reducida para modo claro
+          radius: (Math.random() * 0.9 + 0.5) * intensity,
+          opacity: Math.min(
+            1,
+            (Math.random() * 0.3 + 0.5) * (0.85 + intensity * 0.15)
+          ),
           twinkleSpeed: shouldTwinkle
             ? minTwinkleSpeed +
               Math.random() * (maxTwinkleSpeed - minTwinkleSpeed)

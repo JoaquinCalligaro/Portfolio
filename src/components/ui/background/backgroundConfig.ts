@@ -22,6 +22,7 @@ export interface StarsCanvasConfig {
   baseStarColor?: string; // ej: '255, 255, 255'
   starColors?: string[]; // solo light mode
   backgroundClass?: string; // clases tailwind para el canvas
+  intensity?: number; // factor para radio/opacity (1 = base)
 }
 
 export interface BackgroundModeConfig {
@@ -54,7 +55,8 @@ export const backgroundConfig: BackgroundConfig = {
       minTwinkleSpeed: 0.5,
       maxTwinkleSpeed: 1,
       baseStarColor: '255, 255, 255',
-      backgroundClass: 'bg-cyan-950 text-cyan-500',
+      backgroundClass: 'bg-cyan-950/50 text-cyan-500',
+      intensity: 1.15,
     },
     zIndex: { background: '-z-30', shooting: '-z-20' },
   },
@@ -83,7 +85,8 @@ export const backgroundConfig: BackgroundConfig = {
         '239, 68, 68', // Red
         '139, 92, 246', // Violet
       ],
-      backgroundClass: 'bg-transparent',
+      backgroundClass: 'bg-gray-300/50',
+      intensity: 1.5,
     },
     zIndex: { background: '-z-30', shooting: '-z-20' },
   },

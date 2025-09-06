@@ -24,6 +24,7 @@ interface StarBackgroundProps {
   minTwinkleSpeed?: number;
   maxTwinkleSpeed?: number;
   className?: string;
+  intensity?: number; // factor para radio y opacidad
 }
 
 export const StarsBackground: FC<StarBackgroundProps> = ({
@@ -33,6 +34,7 @@ export const StarsBackground: FC<StarBackgroundProps> = ({
   minTwinkleSpeed = 0.5,
   maxTwinkleSpeed = 1,
   className,
+  intensity = 1,
 }) => {
   const [stars, setStars] = useState<StarProps[]>([]);
   const canvasRef: RefObject<HTMLCanvasElement> =
@@ -48,8 +50,11 @@ export const StarsBackground: FC<StarBackgroundProps> = ({
         return {
           x: Math.random() * width,
           y: Math.random() * height,
-          radius: Math.random() * 0.05 + 0.5,
-          opacity: Math.random() * 0.5 + 0.5,
+          radius: (Math.random() * 0.1 + 0.7) * intensity,
+          opacity: Math.min(
+            1,
+            (Math.random() * 0.4 + 0.6) * (0.85 + intensity * 0.15)
+          ),
           twinkleSpeed: shouldTwinkle
             ? minTwinkleSpeed +
               Math.random() * (maxTwinkleSpeed - minTwinkleSpeed)
@@ -138,10 +143,7 @@ export const StarsBackground: FC<StarBackgroundProps> = ({
   return (
     <canvas
       ref={canvasRef}
-      className={cn(
-        'absolute inset-0 h-full w-full bg-cyan-950 text-cyan-500',
-        className
-      )}
+      className={cn('absolute inset-0 h-full w-full', className)}
     />
   );
 };

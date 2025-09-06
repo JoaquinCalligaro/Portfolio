@@ -3,7 +3,7 @@ import { StarsBackground } from './dark-mode/StarsBackground';
 import { ShootingStars } from './dark-mode/ShootingStarts';
 import { StarsBackgroundLight } from './light-mode/StartsBackgroundLight';
 import { ShootingStarsLight } from './light-mode/ShootingStarts';
-import backgroundConfig from '.';
+import backgroundConfig from './backgroundConfig';
 
 interface BackgroundSwitcherProps {
   className?: string;
@@ -39,6 +39,7 @@ export const BackgroundSwitcher: FC<BackgroundSwitcherProps> = ({
           twinkleProbability={dStars.twinkleProbability}
           minTwinkleSpeed={dStars.minTwinkleSpeed}
           maxTwinkleSpeed={dStars.maxTwinkleSpeed}
+          intensity={dStars.intensity}
           className={`${dStars.backgroundClass || ''} ${dZ.background}`}
         />
         <ShootingStars
@@ -61,6 +62,7 @@ export const BackgroundSwitcher: FC<BackgroundSwitcherProps> = ({
           twinkleProbability={lStars.twinkleProbability}
           minTwinkleSpeed={lStars.minTwinkleSpeed}
           maxTwinkleSpeed={lStars.maxTwinkleSpeed}
+          intensity={lStars.intensity}
           className={`${lStars.backgroundClass || ''} ${lZ.background}`}
         />
         <ShootingStarsLight
