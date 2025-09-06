@@ -3,7 +3,7 @@
 import Footer from '../components/Footer.astro';
 import GoToTopBtn from '../components/ui/GoToTopBtn.astro';
 import Navbar from '../components/navbar/Navbar.astro';
-import BackgroundSwitcher from '../components/ui/background/BackgroundSwitcher.astro';
+import BackgroundSwitcher from '../components/ui/background/BackgroundSwitcher';
 
 import '../styles/base/global.css';
 ---
@@ -56,7 +56,7 @@ import '../styles/base/global.css';
   </head>
   <body class="page-root min-h-screen">
     <!-- Background dinámico dark/light -->
-    <BackgroundSwitcher />
+    <BackgroundSwitcher client:only="react" />
 
     <Navbar />
     <main
