@@ -1,4 +1,7 @@
 ---
+import { Image } from 'astro:assets';
+import reactSvg from '../../assets/svg/react.svg';
+
 export interface Props {
   class?: string;
   title?: string;
@@ -19,7 +22,7 @@ const wrapper =
   wrapperClass ?? `${base} ${hover} ${glow ? 'glow-effect' : ''} icon-react`;
 ---
 
-<!-- ReactIcon: usa el SVG estático desde public/svg y permite clases Tailwind -->
+<!-- ReactIcon: usa el SVG estático desde assets y permite clases Tailwind -->
 <span class={wrapper} aria-hidden="true">
-  <img src="/src/assets/svg/react.svg" class={cls} alt={title} loading="lazy" />
+  <Image src={reactSvg} class={cls} alt={title} loading="lazy" />
 </span>

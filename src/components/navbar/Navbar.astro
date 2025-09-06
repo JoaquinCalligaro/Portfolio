@@ -1,6 +1,7 @@
 ---
-import MoonIcon from '../../assets/svg/moon.svg';
-import SunIcon from '../../assets/svg/sun.svg';
+import { Image } from 'astro:assets';
+import moonIcon from '../../assets/svg/moon.svg';
+import sunIcon from '../../assets/svg/sun.svg';
 import LanguageToggle from '../language/LanguageToggle.astro';
 import NavbarMobile from './mobile/NavbarMobile.astro';
 import MobileToggle from './mobile/MobileToggle.astro';
@@ -23,11 +24,19 @@ import NavbarDesktop from './desktop/NavbarDesktop.astro';
       title="Alternar tema"
       class="glow-hover action-button flex cursor-pointer items-center rounded-lg p-2 transition-all duration-300 hover:scale-110 hover:brightness-110 active:scale-95"
     >
-      <SunIcon id="theme-sun-icon" class="mx-2 size-6" aria-label="Icono sol" />
-      <MoonIcon
+      <Image
+        src={sunIcon}
+        id="theme-sun-icon"
+        class="mx-2 size-6"
+        aria-label="Icono sol"
+        alt="Sun icon"
+      />
+      <Image
+        src={moonIcon}
         id="theme-moon-icon"
         class="mx-2 hidden size-6"
         aria-label="Icono luna"
+        alt="Moon icon"
       />
     </button>
 
@@ -52,15 +61,238 @@ import NavbarDesktop from './desktop/NavbarDesktop.astro';
   </nav>
 </header>
 
-<script type="module" is:inline>
-  import { initNavbar } from '/src/components/scripts/navbar/index.ts';
+<script is:inline>
+  // === THEME HELPER ===
+  function initTheme() {
+    const stored = localStorage.getItem('color-theme');
+    const prefersDark = window.matchMedia?.(
+      '(prefers-color-scheme: dark)'
+    ).matches;
 
-  document.addEventListener('DOMContentLoaded', () => {
-    // Inicializar navbar directamente
-    try {
-      initNavbar();
-    } catch (error) {
-      console.error('Error al inicializar navbar:', error);
+    if (stored === 'dark' || (!stored && prefersDark)) {
+      setTheme('dark');
+    } else {
+      setTheme('light');
     }
-  });
+  }
+
+  function setTheme(theme) {
+    const html = document.documentElement;
+    const moon = document.getElementById('theme-moon-icon');
+    const sun = document.getElementById('theme-sun-icon');
+
+    if (theme === 'dark') {
+      html.classList.add('dark');
+      localStorage.setItem('color-theme', 'dark');
+      moon?.classList.remove('hidden');
+      sun?.classList.add('hidden');
+    } else {
+      html.classList.remove('dark');
+      localStorage.setItem('color-theme', 'light');
+      sun?.classList.remove('hidden');
+      moon?.classList.add('hidden');
+    }
+  }
+
+  function toggleTheme() {
+    const current = localStorage.getItem('color-theme') || 'light';
+    const newTheme = current === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+  }
+
+  // === MOBILE MENU ===
+  function initMobileMenu() {
+    const navbar = document.getElementById('navbar');
+    const navbarToggle = document.getElementById('navbar-toggle');
+    const navbarXIcon = document.getElementById('navbar-x-icon');
+    const navbarMenuIcon = document.getElementById('navbar-menu-icon');
+    const navbarLinks = document.querySelectorAll('#navbar-links a');
+
+    if (!navbar || !navbarToggle || !navbarXIcon || !navbarMenuIcon) return;
+
+    function toggleMobileMenu() {
+      const isHidden = navbar.classList.contains('hidden');
+
+      navbarXIcon.classList.toggle('hidden');
+      navbarMenuIcon.classList.toggle('hidden');
+
+      if (isHidden) {
+        navbar.classList.remove('hidden');
+        requestAnimationFrame(() => {
+          navbar.classList.remove('-translate-y-[200%]');
+        });
+        document.body.style.paddingTop = '180px';
+      } else {
+        navbar.classList.add('-translate-y-[200%]');
+        setTimeout(() => navbar.classList.add('hidden'), 250);
+        document.body.style.paddingTop = '40px';
+      }
+    }
+
+    navbarToggle.addEventListener('click', toggleMobileMenu);
+
+    document.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape' && !navbar.classList.contains('hidden')) {
+        toggleMobileMenu();
+      }
+    });
+
+    document.addEventListener('click', (ev) => {
+      const target = ev.target;
+      const isClickInside =
+        navbar.contains(target) || navbarToggle.contains(target);
+
+      if (!isClickInside && !navbar.classList.contains('hidden')) {
+        toggleMobileMenu();
+      }
+    });
+
+    navbarLinks.forEach((link) => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href');
+
+        if (targetId?.startsWith('#')) {
+          const targetElement = document.querySelector(targetId);
+          if (targetElement) {
+            const rect = targetElement.getBoundingClientRect();
+            const scrollTop =
+              window.pageYOffset || document.documentElement.scrollTop;
+            const targetTop = rect.top + scrollTop - 100;
+
+            window.scrollTo({
+              top: targetTop,
+              behavior: 'smooth',
+            });
+          }
+
+          if (!navbar.classList.contains('hidden')) {
+            toggleMobileMenu();
+          }
+        }
+      });
+    });
+  }
+
+  // === NAVBAR VISIBILITY ===
+  function initNavbarVisibility() {
+    const navbar = document.getElementById('navbar');
+    const navbarHeader = document.getElementById('navbar-header');
+    const navbarXIcon = document.getElementById('navbar-x-icon');
+    const navbarMenuIcon = document.getElementById('navbar-menu-icon');
+
+    if (!navbar || !navbarHeader) return;
+
+    let lastScrollTop = 0;
+
+    window.addEventListener('scroll', () => {
+      const currentScrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+
+      if (currentScrollTop > lastScrollTop && currentScrollTop > 100) {
+        navbarHeader.classList.add('-translate-y-full');
+
+        if (!navbar.classList.contains('hidden')) {
+          navbarXIcon?.classList.add('hidden');
+          navbarMenuIcon?.classList.remove('hidden');
+          navbar.classList.add('hidden', '-translate-y-[200%]');
+          document.body.style.paddingTop = '80px';
+        }
+      } else if (currentScrollTop < lastScrollTop) {
+        navbarHeader.classList.remove('-translate-y-full');
+      }
+
+      lastScrollTop = Math.max(currentScrollTop, 0);
+    });
+  }
+
+  // === SECTION NAVIGATION ===
+  function initSectionNavigation() {
+    const glassNavLabels = document.querySelectorAll(
+      '.glass-nav-wrapper label'
+    );
+
+    glassNavLabels.forEach((label) => {
+      label.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const target = label.getAttribute('data-target');
+
+        if (target) {
+          const targetElement = document.querySelector(target);
+
+          if (targetElement) {
+            const rect = targetElement.getBoundingClientRect();
+            const scrollTop =
+              window.pageYOffset || document.documentElement.scrollTop;
+            const targetTop = rect.top + scrollTop - 100;
+
+            window.scrollTo({
+              top: targetTop,
+              behavior: 'smooth',
+            });
+          }
+        }
+      });
+    });
+
+    const sections = ['tech-stack', 'projects', 'about', 'contact'];
+    const ids = ['nav-tech-stack', 'nav-projects', 'nav-about', 'nav-contact'];
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        let maxIntersectionRatio = 0;
+        let activeEntry = null;
+
+        entries.forEach((entry) => {
+          if (
+            entry.isIntersecting &&
+            entry.intersectionRatio > maxIntersectionRatio
+          ) {
+            maxIntersectionRatio = entry.intersectionRatio;
+            activeEntry = entry;
+          }
+        });
+
+        if (activeEntry) {
+          const sectionIndex = sections.findIndex(
+            (s) => s === activeEntry.target.id
+          );
+          if (sectionIndex !== -1) {
+            const radioInput = document.getElementById(ids[sectionIndex]);
+            if (radioInput) radioInput.checked = true;
+          }
+        }
+      },
+      {
+        threshold: [0.1, 0.25, 0.5, 0.75],
+        rootMargin: '-10% 0px -10% 0px',
+      }
+    );
+
+    sections.forEach((sectionId) => {
+      const element = document.getElementById(sectionId);
+      if (element) observer.observe(element);
+    });
+  }
+
+  // === INITIALIZATION ===
+  function initNavbar() {
+    initTheme();
+
+    const themeToggle = document.getElementById('theme-toggle');
+    themeToggle?.addEventListener('click', toggleTheme);
+
+    initMobileMenu();
+    initNavbarVisibility();
+    initSectionNavigation();
+  }
+
+  // Initialize on DOM content loaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initNavbar);
+  } else {
+    initNavbar();
+  }
 </script>
