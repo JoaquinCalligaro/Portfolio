@@ -46,6 +46,7 @@ html.dark,
 html.dark body,
 .dark .page-root {
   background-color: #071029;
+  transition: background-color 1.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Light mode fallback background */
@@ -53,4 +54,5 @@ html:not(.dark),
 html:not(.dark) body,
 html:not(.dark) .page-root {
   background-color: #f7fafc;
+  transition: background-color 1.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
