@@ -3,8 +3,9 @@
 import Footer from '../components/Footer.astro';
 import GoToTopBtn from '../components/ui/GoToTopBtn.astro';
 import Navbar from '../components/navbar/Navbar.astro';
+import BackgroundSwitcher from '../components/ui/background/BackgroundSwitcher.astro';
+
 import '../styles/base/global.css';
-import Background from '../components/background/Background.tsx';
 ---
 
 <!doctype html>
@@ -54,7 +55,8 @@ import Background from '../components/background/Background.tsx';
     <!-- Turnstile script is injected only on pages that need it (Contact.astro) -->
   </head>
   <body class="page-root min-h-screen">
-    <Background client:only="react" />
+    <!-- Background dinámico dark/light -->
+    <BackgroundSwitcher />
 
     <Navbar />
     <main

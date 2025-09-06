@@ -2,6 +2,11 @@
   "extends": "astro/tsconfigs/base",
   "compilerOptions": {
     "skipLibCheck": true,
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    // Alias @ -> src para imports limpios
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   }
 }

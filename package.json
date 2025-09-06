@@ -13,12 +13,14 @@
     "@astrojs/react": "^4.3.0",
     "@midudev/tailwind-animations": "^0.2.0",
     "astro": "^5.13.2",
+    "clsx": "^2.1.1",
     "framer-motion": "^12.23.12",
     "handlebars": "^4.7.8",
     "motion": "^12.23.12",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "resend": "^6.0.1"
+    "resend": "^6.0.1",
+    "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
     "@astrojs/vercel": "^8.2.6",
