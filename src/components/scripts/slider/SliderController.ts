@@ -30,9 +30,9 @@ export class SliderController {
     this.container = container;
     this.elements = elements;
     this.options = {
-      autoplayDelay: 4000,
-      animationDuration: '800ms',
-      resumeAutoplayDelay: 5000,
+      autoplayDelay: 8000,
+      animationDuration: '1000ms',
+      resumeAutoplayDelay: 10000,
       ...options,
     };
 
