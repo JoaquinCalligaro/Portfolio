@@ -109,14 +109,14 @@ export const esTranslations: TranslationStructure = {
       dates: ' Enero 2024 - Diciembre 2024 (FINALIZADO)',
       company: 'British Institute La Rioja',
       description:
-        'Finalizé mis estudios de nivel A2 de inglés, mejorando mis habilidades de comunicación y comprensión en el idioma.',
+        'Finalicé mis estudios de nivel A2 de inglés, mejorando mis habilidades de comunicación y comprensión en el idioma.',
       iconKey: 'university',
     },
     {
       dates: ' Febrero 2022 - Septiembre 2024 (FINALIZADO)',
       company: 'Universidad Técnologica Nacional (UTN)',
       description:
-        'Finalizé la carrera de Técnico Universitario en Programación, adquiriendo conocimientos sólidos en desarrollo de software, algoritmos y estructuras de datos.',
+        'Finalicé la carrera de Técnico Universitario en Programación, adquiriendo conocimientos sólidos en desarrollo de software, algoritmos y estructuras de datos.',
       iconKey: 'university',
     },
     {
