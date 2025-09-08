@@ -11,7 +11,7 @@ export const esTranslations: TranslationStructure = {
   personal: {
     name: 'Joaquin Calligaro',
     description:
-      'Hola, soy un desarrollador frontend que disfruta transformar ideas en interfaces claras y funcionales. ' +
+      'Hola, soy un desarrollador front-end que disfruta transformar ideas en interfaces claras y funcionales. ' +
       'Actualmente exploro proyectos web y móviles con un estilo moderno y enfocado en la experiencia del usuario. ' +
       'Te invito a ver mi trabajo.',
   },
@@ -23,7 +23,7 @@ export const esTranslations: TranslationStructure = {
         'Soy de La Rioja, Argentina, tengo 24 años y comencé a incursionar en el desarrollo web en 2022, aunque desde chico siempre me atrajo la tecnología. Me anoté en una carrera de Técnicatura Universitaria en Programación en la Universidad Tecnológica Nacional en Argentina.',
         'En mis tiempos libres me gusta diseñar, estructurar y aprender constantemente, creando cosas nuevas que me desafíen.',
         'Busco aportar mis conocimientos en proyectos colaborativos, recibir feedback de otros desarrolladores y así mejorar mis habilidades.',
-        'Mi meta actual es crecer como frontend developer, pero también ampliar mi experiencia hacia fullstack, mobile e integraciones de IA para servicios web.',
+        'Mi meta actual es crecer como front-end developer, pero también ampliar mi experiencia hacia fullstack, mobile e integraciones de IA para servicios web.',
         'Actualmente estudio inglés además cuento con un certificado de nivel A2, con la meta de seguir avanzando.',
       ],
       cvHeading: 'Información CV',
