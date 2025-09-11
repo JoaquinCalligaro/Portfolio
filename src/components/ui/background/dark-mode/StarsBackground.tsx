@@ -79,9 +79,15 @@ export const StarsBackground: FC<StarBackgroundProps> = ({
         if (!ctx) return;
 
         // Use full document dimensions to cover entire scrollable content
-        const width = Math.max(document.documentElement.scrollWidth, window.innerWidth);
-        const height = Math.max(document.documentElement.scrollHeight, window.innerHeight);
-        
+        const width = Math.max(
+          document.documentElement.scrollWidth,
+          window.innerWidth
+        );
+        const height = Math.max(
+          document.documentElement.scrollHeight,
+          window.innerHeight
+        );
+
         canvas.width = width;
         canvas.height = height;
         setStars(generateStars(width, height));
@@ -131,7 +137,10 @@ export const StarsBackground: FC<StarBackgroundProps> = ({
   return (
     <canvas
       ref={canvasRef}
-  className={cn('absolute inset-0 w-full pointer-events-none -z-10', className)}
+      className={cn(
+        'pointer-events-none absolute inset-0 -z-10 w-full',
+        className
+      )}
     />
   );
 };
