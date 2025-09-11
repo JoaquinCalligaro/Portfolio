@@ -90,7 +90,16 @@ export const StarsBackgroundLight: FC<StarBackgroundProps> = ({
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        const { width, height } = canvas.getBoundingClientRect();
+        // Use full document dimensions to cover entire scrollable content
+        const width = Math.max(
+          document.documentElement.scrollWidth,
+          window.innerWidth
+        );
+        const height = Math.max(
+          document.documentElement.scrollHeight,
+          window.innerHeight
+        );
+
         canvas.width = width;
         canvas.height = height;
         setStars(generateStars(width, height));
@@ -98,25 +107,10 @@ export const StarsBackgroundLight: FC<StarBackgroundProps> = ({
     };
 
     updateStars();
+    window.addEventListener('resize', updateStars);
 
-    const resizeObserver = new ResizeObserver(updateStars);
-    if (canvasRef.current) {
-      resizeObserver.observe(canvasRef.current);
-    }
-
-    return () => {
-      if (canvasRef.current) {
-        resizeObserver.unobserve(canvasRef.current);
-      }
-    };
-  }, [
-    starDensity,
-    allStarsTwinkle,
-    twinkleProbability,
-    minTwinkleSpeed,
-    maxTwinkleSpeed,
-    generateStars,
-  ]);
+    return () => window.removeEventListener('resize', updateStars);
+  }, [generateStars]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -169,7 +163,10 @@ export const StarsBackgroundLight: FC<StarBackgroundProps> = ({
   return (
     <canvas
       ref={canvasRef}
-      className={cn('absolute inset-0 h-full w-full', className)}
+      className={cn(
+        'pointer-events-none absolute inset-0 -z-10 w-full',
+        className
+      )}
     />
   );
 };
