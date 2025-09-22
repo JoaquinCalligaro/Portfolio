@@ -12,7 +12,7 @@
   "dependencies": {
     "@astrojs/react": "^4.3.0",
     "@midudev/tailwind-animations": "^0.2.0",
-    "astro": "^5.13.2",
+    "astro": "^5.13.10",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.12",
     "handlebars": "^4.7.8",
