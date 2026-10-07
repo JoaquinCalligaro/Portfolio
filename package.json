@@ -33,6 +33,7 @@
     "@astrojs/vercel": "^8.2.6",
     "@eslint/js": "^9.33.0",
     "@tailwindcss/vite": "^4.1.12",
+    "@types/node": "^26.6.4",
     "@typescript-eslint/eslint-plugin": "^8.40.0",
     "@typescript-eslint/parser": "^8.40.0",
     "drizzle-kit": "^0.31.11",
@@ -50,6 +51,9 @@
     "typescript-eslint": "^8.40.0"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["esbuild", "sharp"]
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp"
+    ]
   }
 }

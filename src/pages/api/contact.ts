@@ -10,7 +10,7 @@ const TO_EMAIL = process.env.CONTACT_TO_EMAIL;
 const resendClient = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 
 // Maneja las peticiones POST del formulario de contacto
-export const post: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request }) => {
   try {
     const form = await request.formData();
 

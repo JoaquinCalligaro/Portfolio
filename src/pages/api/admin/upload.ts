@@ -2,7 +2,7 @@
 import type { APIRoute } from 'astro';
 import { uploadImageToCloudinary } from '../../../lib/cloudinary';
 
-export const post: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request }) => {
   try {
     const form = await request.formData();
     const file = form.get('file');

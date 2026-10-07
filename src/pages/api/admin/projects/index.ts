@@ -3,7 +3,7 @@ import type { APIRoute } from 'astro';
 import { listProjects, createProject } from '../../../../db/queries';
 import { isDbConfigured } from '../../../../db/client';
 
-export const get: APIRoute = async () => {
+export const GET: APIRoute = async () => {
   if (!isDbConfigured) {
     return new Response(
       JSON.stringify({ ok: false, error: 'La base de datos no está configurada' }),
@@ -16,7 +16,7 @@ export const get: APIRoute = async () => {
   });
 };
 
-export const post: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request }) => {
   if (!isDbConfigured) {
     return new Response(
       JSON.stringify({ ok: false, error: 'La base de datos no está configurada' }),

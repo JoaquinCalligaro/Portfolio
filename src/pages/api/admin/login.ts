@@ -7,7 +7,7 @@ import {
   SESSION_COOKIE_MAX_AGE,
 } from '../../../lib/auth';
 
-export const post: APIRoute = async ({ request, cookies }) => {
+export const POST: APIRoute = async ({ request, cookies }) => {
   try {
     const form = await request.formData();
     const username = String(form.get('username') || '').trim();
