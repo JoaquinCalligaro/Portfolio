@@ -1,4 +1,4 @@
-// Notifica cambios en los proyectos vía Pusher para actualizar la web y el
+// Notifica cambios en el contenido del sitio vía Pusher para actualizar la web y el
 // panel admin en tiempo real, sin que nadie tenga que recargar la página.
 import Pusher from 'pusher';
 import { env } from './env';
@@ -31,7 +31,7 @@ const pusher = isPusherConfigured
 
 export type RealtimeResult = { ok: boolean; error?: string };
 
-export async function notifyProjectsUpdated(): Promise<RealtimeResult> {
+export async function notifySiteUpdated(): Promise<RealtimeResult> {
   if (!pusher) {
     const error = `Faltan en el .env del servidor: ${missing.join(', ')}`;
     console.warn(`[realtime] ${error}`);
@@ -39,7 +39,7 @@ export async function notifyProjectsUpdated(): Promise<RealtimeResult> {
   }
 
   try {
-    await pusher.trigger('projects', 'updated', {});
+    await pusher.trigger('site', 'updated', {});
     console.info('[realtime] aviso de cambio enviado a Pusher');
     return { ok: true };
   } catch (err) {

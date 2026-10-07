@@ -1,153 +1,83 @@
 ---
-// Panel principal: lista de proyectos con acciones rápidas
+// Tablero principal del panel: acceso a cada sección del portfolio
 import AdminLayout from '../../layouts/AdminLayout.astro';
-import { listProjects } from '../../db/queries';
+import {
+  getProfile,
+  listEducation,
+  listProjects,
+  listSocialLinks,
+  listTechCategoriesWithTechs,
+} from '../../db/queries';
 import { isDbConfigured } from '../../db/client';
-import RealtimeProjectsSync from '../../components/realtime/RealtimeProjectsSync.astro';
 
 export const prerender = false;
 
-const projectsList = isDbConfigured ? await listProjects() : [];
+const [profile, projects, categories, education, socials] = await Promise.all([
+  getProfile(),
+  listProjects(),
+  listTechCategoriesWithTechs(),
+  listEducation(),
+  listSocialLinks(),
+]);
+const techCount = categories.reduce((sum, c) => sum + c.techs.length, 0);
+
+const sections = [
+  {
+    href: '/admin/profile',
+    title: 'Perfil',
+    text: 'Nombre, foto, presentación, CV, biografía y redes sociales.',
+    meta: `${profile?.name ? profile.name : 'Sin completar'}, ${socials.length} redes`,
+  },
+  {
+    href: '/admin/tech-stack',
+    title: 'Tech Stack',
+    text: 'Categorías y tecnologías con su ícono.',
+    meta: `${categories.length} categorías, ${techCount} tecnologías`,
+  },
+  {
+    href: '/admin/education',
+    title: 'Educación',
+    text: 'Línea de tiempo de estudios, trabajos y certificados.',
+    meta: `${education.length} entradas`,
+  },
+  {
+    href: '/admin/projects',
+    title: 'Proyectos',
+    text: 'Tus proyectos, su orden y cuáles se destacan.',
+    meta: `${projects.length} proyectos`,
+  },
+];
 ---
 
-<AdminLayout title="Proyectos">
-  <div class="mb-6 flex items-center justify-between">
-    <h1 class="text-xl font-semibold text-white">Tus proyectos</h1>
-    <a
-      href="/admin/new"
-      class="rounded-md bg-cyan-500 px-4 py-2 text-sm font-medium text-gray-950 transition-colors hover:bg-cyan-400"
-    >
-      + Nuevo proyecto
-    </a>
-  </div>
+<AdminLayout title="Inicio">
+  <h1 class="mb-2 text-xl font-semibold text-white">Panel del portfolio</h1>
+  <p class="mb-6 text-sm text-gray-400">
+    Todo lo que se ve en tu portfolio se edita desde acá. Escribí solo en
+    español: el inglés se traduce solo al guardar.
+  </p>
 
   {
     !isDbConfigured && (
       <div class="mb-6 rounded-md border border-amber-500/40 bg-amber-950/40 p-4 text-sm text-amber-200">
         Todavía no conectaste la base de datos (Neon). Configurá la variable{' '}
-        <code>DATABASE_URL</code> para poder crear y guardar proyectos desde
-        acá. Mientras tanto, el sitio público sigue mostrando los proyectos
-        fijos del código.
+        <code>DATABASE_URL</code> para poder editar el contenido. Mientras
+        tanto, el sitio público se muestra vacío.
       </div>
     )
   }
 
-  <p
-    id="realtime-warning"
-    class="mb-6 hidden rounded-md border border-amber-500/40 bg-amber-950/40 p-4 text-sm text-amber-200"
-  >
-  </p>
-
-  <div data-realtime-sync="projects">
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     {
-      isDbConfigured && projectsList.length === 0 && (
-        <p class="text-gray-400">Todavía no agregaste ningún proyecto.</p>
-      )
+      sections.map((section) => (
+        <a
+          href={section.href}
+          class="flex flex-col gap-2 rounded-xl border border-white/10 bg-gray-900/40 p-5 backdrop-blur-md transition-colors hover:border-cyan-400/50"
+        >
+          <h2 class="text-lg font-medium text-white">{section.title}</h2>
+          <p class="text-sm text-gray-400">{section.text}</p>
+          <p class="mt-auto pt-2 text-xs text-cyan-300">{section.meta}</p>
+        </a>
+      ))
     }
-
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-      {
-        projectsList.map((project) => (
-          <div
-            class="flex flex-col gap-3 rounded-xl border border-white/10 bg-gray-900/40 p-4 backdrop-blur-md"
-            data-project-id={project.id}
-          >
-            <div class="flex items-start justify-between gap-2">
-              <h2 class="font-medium text-white">{project.titleEs}</h2>
-              {project.featured && (
-                <span class="shrink-0 rounded-full bg-cyan-500/20 px-2 py-0.5 text-xs text-cyan-300">
-                  Destacado
-                </span>
-              )}
-            </div>
-            <p class="line-clamp-2 text-sm text-gray-400">
-              {project.descriptionEs}
-            </p>
-            <div class="mt-auto flex flex-wrap gap-2 pt-2">
-              <a
-                href={`/admin/edit/${project.id}`}
-                class="rounded-md border border-white/20 px-3 py-1.5 text-xs text-gray-200 hover:border-cyan-400/50 hover:text-cyan-400"
-              >
-                Editar
-              </a>
-              <button
-                class="toggle-featured-btn rounded-md border border-white/20 px-3 py-1.5 text-xs text-gray-200 hover:border-cyan-400/50 hover:text-cyan-400"
-                data-featured={String(project.featured)}
-              >
-                {project.featured ? 'Quitar destacado' : 'Destacar'}
-              </button>
-              <button
-                class="toggle-hidden-btn rounded-md border border-white/20 px-3 py-1.5 text-xs text-gray-200 hover:border-cyan-400/50 hover:text-cyan-400"
-                data-hidden={String(project.hidden)}
-              >
-                {project.hidden ? 'Mostrar' : 'Ocultar'}
-              </button>
-              <button class="delete-btn rounded-md border border-red-500/30 px-3 py-1.5 text-xs text-red-300 hover:bg-red-500/10">
-                Borrar
-              </button>
-            </div>
-          </div>
-        ))
-      }
-    </div>
   </div>
-
-  <RealtimeProjectsSync />
-
-  <script>
-    // Delegación de eventos en document: así los botones siguen funcionando
-    // incluso después de que la lista se actualice sola en tiempo real.
-    document.addEventListener('click', async (e) => {
-      const target = e.target as HTMLElement;
-      const card = target.closest('[data-project-id]');
-      const id = card?.getAttribute('data-project-id');
-      if (!id) return;
-
-      const isRealtimeEnabled = Boolean(
-        (window as unknown as Record<string, unknown>)
-          .__REALTIME_PROJECTS_ENABLED__
-      );
-      const refresh = (data: { realtime?: { ok: boolean; error?: string } }) => {
-        const warning = document.getElementById('realtime-warning');
-        if (data.realtime && !data.realtime.ok && warning) {
-          warning.textContent = `El cambio se guardó, pero el aviso en vivo falló: ${data.realtime.error}`;
-          warning.classList.remove('hidden');
-        } else {
-          warning?.classList.add('hidden');
-        }
-
-        if (isRealtimeEnabled) {
-          window.dispatchEvent(new Event('projects:changed'));
-        } else {
-          window.location.reload();
-        }
-      };
-
-      const send = async (method: string, body?: unknown) => {
-        const res = await fetch(`/api/admin/projects/${id}`, {
-          method,
-          headers: { 'Content-Type': 'application/json' },
-          body: body ? JSON.stringify(body) : undefined,
-        });
-        if (res.ok) refresh(await res.json());
-      };
-
-      const featuredBtn = target.closest('.toggle-featured-btn') as HTMLButtonElement | null;
-      if (featuredBtn) {
-        await send('PATCH', { featured: featuredBtn.dataset.featured !== 'true' });
-        return;
-      }
-
-      const hiddenBtn = target.closest('.toggle-hidden-btn') as HTMLButtonElement | null;
-      if (hiddenBtn) {
-        await send('PATCH', { hidden: hiddenBtn.dataset.hidden !== 'true' });
-        return;
-      }
-
-      if (target.closest('.delete-btn')) {
-        if (!confirm('¿Borrar este proyecto? No se puede deshacer.')) return;
-        await send('DELETE');
-      }
-    });
-  </script>
 </AdminLayout>

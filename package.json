@@ -12,7 +12,7 @@
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
     "hash-password": "node scripts/hash-password.mjs",
-    "migrate-static-projects": "node --env-file=.env scripts/migrate-static-projects.mjs"
+    "migrate-site-content": "node --env-file=.env scripts/migrate-site-content.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^4.3.0",
@@ -29,6 +29,7 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "resend": "^6.0.1",
+    "simple-icons": "^16.34.0",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {

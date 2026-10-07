@@ -1,0 +1,45 @@
+---
+// Tech Stack: categorías y tecnologías editables en el lugar
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ListEditor from '../../components/admin/ListEditor.astro';
+import TechCategoryCard from '../../components/admin/TechCategoryCard.astro';
+import { listTechCategoriesWithTechs } from '../../db/queries';
+import { isDbConfigured } from '../../db/client';
+
+export const prerender = false;
+
+const categories = await listTechCategoriesWithTechs();
+---
+
+<AdminLayout title="Tech Stack">
+  <h1 class="mb-2 text-xl font-semibold text-white">Tech Stack</h1>
+  <p class="mb-6 text-sm text-gray-400">
+    Escribí el nombre del ícono (por ejemplo <code>docker</code>) o subí una
+    imagen. Si subís una imagen, se usa la imagen.
+  </p>
+
+  {
+    !isDbConfigured && (
+      <div class="mb-6 rounded-md border border-amber-500/40 bg-amber-950/40 p-4 text-sm text-amber-200">
+        Configurá <code>DATABASE_URL</code> para poder guardar cambios.
+      </div>
+    )
+  }
+
+  <ListEditor
+    endpoint="/api/admin/tech-categories"
+    itemLabel="categoría"
+    confirmText="¿Borrar esta categoría y todas sus tecnologías? No se puede deshacer."
+    addLabel="+ Agregar categoría"
+    emptyText="Todavía no agregaste ninguna categoría."
+    isEmpty={categories.length === 0}
+  >
+    {categories.map((category) => <TechCategoryCard item={category} />)}
+    <Fragment slot="template"><TechCategoryCard /></Fragment>
+  </ListEditor>
+
+  <script>
+    import { initEditors } from '../../components/scripts/admin/listEditor';
+    initEditors();
+  </script>
+</AdminLayout>

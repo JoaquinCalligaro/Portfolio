@@ -1,0 +1,24 @@
+---
+import AdminCard from './AdminCard.astro';
+import { inputCls, labelCls } from './ui';
+
+interface Props {
+  text?: string;
+  // Marca de "ya guardado" (los párrafos no tienen id propio en la base).
+  id?: string;
+}
+const { text = '', id = '' } = Astro.props as Props;
+---
+
+<AdminCard id={id} showHide={false}>
+  <div>
+    <label class={labelCls}>Párrafo</label>
+    <textarea
+      data-field="text"
+      data-autofocus
+      rows="3"
+      placeholder="Escribí un párrafo de tu biografía"
+      class={inputCls + ' resize-none overflow-hidden'}>{text}</textarea
+    >
+  </div>
+</AdminCard>

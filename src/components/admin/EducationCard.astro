@@ -1,0 +1,70 @@
+---
+import type { EducationRow } from '../../db/schema';
+import AdminCard from './AdminCard.astro';
+import { inputCls, labelCls } from './ui';
+
+interface Props {
+  item?: EducationRow;
+}
+const { item } = Astro.props as Props;
+
+const ICONS = [
+  { value: 'university', label: '🎓 Estudio' },
+  { value: 'work', label: '💼 Trabajo' },
+  { value: 'certificate', label: '📜 Certificado' },
+];
+---
+
+<AdminCard id={item?.id} hidden={item?.hidden}>
+  <div>
+    <label class={labelCls}>Institución o empresa</label>
+    <input
+      data-field="institution"
+      data-autofocus
+      value={item?.institution ?? ''}
+      placeholder="Ej. Universidad Tecnológica Nacional"
+      class={inputCls}
+    />
+  </div>
+  <div>
+    <label class={labelCls}>Fechas</label>
+    <input
+      data-field="datesEs"
+      value={item?.datesEs ?? ''}
+      placeholder="Feb 2022 - Sep 2024"
+      class={inputCls}
+    />
+  </div>
+  <div>
+    <label class={labelCls}>Descripción</label>
+    <textarea
+      data-field="descriptionEs"
+      rows="3"
+      placeholder="Qué estudiaste o hiciste"
+      class={inputCls + ' resize-none overflow-hidden'}
+      >{item?.descriptionEs ?? ''}</textarea
+    >
+  </div>
+  <div data-choice-group>
+    <span class={labelCls}>Tipo</span>
+    <input
+      type="hidden"
+      data-field="iconKey"
+      value={item?.iconKey ?? 'university'}
+    />
+    <div class="mt-1 grid grid-cols-3 gap-2">
+      {
+        ICONS.map((icon) => (
+          <button
+            type="button"
+            data-choice={icon.value}
+            aria-pressed="false"
+            class="min-h-12 rounded-md border border-white/20 px-2 py-2 text-sm text-gray-200 transition-colors"
+          >
+            {icon.label}
+          </button>
+        ))
+      }
+    </div>
+  </div>
+</AdminCard>

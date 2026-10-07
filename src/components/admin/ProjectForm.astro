@@ -1,5 +1,5 @@
 ---
-// Formulario para crear/editar un proyecto. Se usa tanto en /admin/new como en /admin/edit/[id]
+// Formulario para crear/editar un proyecto. Se usa tanto en /admin/projects/new como en /admin/projects/edit/[id]
 import type { ProjectRow } from '../../db/schema';
 
 interface Props {
@@ -143,7 +143,7 @@ const TECH_OPTIONS = [
     >
       {mode === 'create' ? 'Crear proyecto' : 'Guardar cambios'}
     </button>
-    <a href="/admin" class="text-sm text-gray-400 hover:text-gray-200">
+    <a href="/admin/projects" class="text-sm text-gray-400 hover:text-gray-200">
       Cancelar
     </a>
   </div>
@@ -151,13 +151,9 @@ const TECH_OPTIONS = [
 
 <script>
   const form = document.getElementById('project-form') as HTMLFormElement;
-  const imageInput = document.getElementById(
-    'image-input'
-  ) as HTMLInputElement;
+  const imageInput = document.getElementById('image-input') as HTMLInputElement;
   const preview = document.getElementById('images-preview') as HTMLElement;
-  const uploadStatus = document.getElementById(
-    'upload-status'
-  ) as HTMLElement;
+  const uploadStatus = document.getElementById('upload-status') as HTMLElement;
   const errorEl = document.getElementById('form-error') as HTMLElement;
 
   let uploadedImages: string[] = JSON.parse(
@@ -239,9 +235,10 @@ const TECH_OPTIONS = [
 
     const mode = form.dataset.mode;
     const projectId = form.dataset.projectId;
-    const url = mode === 'create'
-      ? '/api/admin/projects'
-      : `/api/admin/projects/${projectId}`;
+    const url =
+      mode === 'create'
+        ? '/api/admin/projects'
+        : `/api/admin/projects/${projectId}`;
     const method = mode === 'create' ? 'POST' : 'PATCH';
 
     const res = await fetch(url, {
@@ -253,7 +250,7 @@ const TECH_OPTIONS = [
 
     if (data.ok) {
       if (data.warning) alert(data.warning);
-      window.location.href = '/admin';
+      window.location.href = '/admin/projects';
     } else {
       errorEl.textContent = data.error || 'Error al guardar el proyecto';
       errorEl.classList.remove('hidden');

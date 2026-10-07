@@ -1,0 +1,43 @@
+---
+import type { TechCategoryRow, TechRow } from '../../db/schema';
+import AdminCard from './AdminCard.astro';
+import ListEditor from './ListEditor.astro';
+import TechItemCard from './TechItemCard.astro';
+import { inputCls, labelCls } from './ui';
+
+interface Props {
+  item?: TechCategoryRow & { techs: TechRow[] };
+}
+const { item } = Astro.props as Props;
+---
+
+<AdminCard id={item?.id} showHide={false}>
+  <div>
+    <label class={labelCls}>Categoría</label>
+    <input
+      data-field="nameEs"
+      data-autofocus
+      value={item?.nameEs ?? ''}
+      placeholder="Front-end, Herramientas..."
+      class={inputCls}
+    />
+  </div>
+  <div
+    slot="after"
+    data-requires-id
+    class:list={['mt-5 border-t border-white/10 pt-4', !item && 'hidden']}
+  >
+    <h3 class="mb-3 text-sm font-semibold text-gray-200">Tecnologías</h3>
+    <ListEditor
+      endpoint="/api/admin/techs"
+      parentField="categoryId"
+      itemLabel="tecnología"
+      addLabel="+ Agregar tecnología"
+      emptyText="Todavía no hay tecnologías en esta categoría."
+      isEmpty={!item || item.techs.length === 0}
+    >
+      {item?.techs.map((tech) => <TechItemCard item={tech} />)}
+      <Fragment slot="template"><TechItemCard /></Fragment>
+    </ListEditor>
+  </div>
+</AdminCard>

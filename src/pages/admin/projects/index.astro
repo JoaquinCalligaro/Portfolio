@@ -1,0 +1,179 @@
+---
+// Panel principal: lista de proyectos con acciones rápidas
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { listProjects } from '../../../db/queries';
+import { isDbConfigured } from '../../../db/client';
+import RealtimeSiteSync from '../../../components/realtime/RealtimeSiteSync.astro';
+
+export const prerender = false;
+
+const projectsList = isDbConfigured ? await listProjects() : [];
+---
+
+<AdminLayout title="Proyectos">
+  <div class="mb-6 flex items-center justify-between">
+    <h1 class="text-xl font-semibold text-white">Tus proyectos</h1>
+    <a
+      href="/admin/projects/new"
+      class="rounded-md bg-cyan-500 px-4 py-2 text-sm font-medium text-gray-950 transition-colors hover:bg-cyan-400"
+    >
+      + Nuevo proyecto
+    </a>
+  </div>
+
+  {
+    !isDbConfigured && (
+      <div class="mb-6 rounded-md border border-amber-500/40 bg-amber-950/40 p-4 text-sm text-amber-200">
+        Todavía no conectaste la base de datos (Neon). Configurá la variable{' '}
+        <code>DATABASE_URL</code> para poder crear y guardar proyectos desde
+        acá. Mientras tanto, el sitio público no muestra proyectos.
+      </div>
+    )
+  }
+
+  <div data-realtime-sync="projects">
+    {
+      isDbConfigured && projectsList.length === 0 && (
+        <p class="text-gray-400">Todavía no agregaste ningún proyecto.</p>
+      )
+    }
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      {
+        projectsList.map((project) => (
+          <div
+            class="flex flex-col gap-3 rounded-xl border border-white/10 bg-gray-900/40 p-4 backdrop-blur-md"
+            data-project-id={project.id}
+          >
+            <div class="flex items-start justify-between gap-2">
+              <h2 class="font-medium text-white">{project.titleEs}</h2>
+              {project.featured && (
+                <span class="shrink-0 rounded-full bg-cyan-500/20 px-2 py-0.5 text-xs text-cyan-300">
+                  Destacado
+                </span>
+              )}
+            </div>
+            <p class="line-clamp-2 text-sm text-gray-400">
+              {project.descriptionEs}
+            </p>
+            <div class="mt-auto flex flex-wrap gap-2 pt-2">
+              <button
+                class="move-up-btn min-h-11 min-w-11 rounded-md border border-white/20 px-3 py-1.5 text-sm text-gray-200 hover:border-cyan-400/50 hover:text-cyan-400"
+                aria-label="Subir"
+              >
+                ↑
+              </button>
+              <button
+                class="move-down-btn min-h-11 min-w-11 rounded-md border border-white/20 px-3 py-1.5 text-sm text-gray-200 hover:border-cyan-400/50 hover:text-cyan-400"
+                aria-label="Bajar"
+              >
+                ↓
+              </button>
+              <a
+                href={`/admin/projects/edit/${project.id}`}
+                class="rounded-md border border-white/20 px-3 py-2 text-xs text-gray-200 hover:border-cyan-400/50 hover:text-cyan-400"
+              >
+                Editar
+              </a>
+              <button
+                class="toggle-featured-btn rounded-md border border-white/20 px-3 py-2 text-xs text-gray-200 hover:border-cyan-400/50 hover:text-cyan-400"
+                data-featured={String(project.featured)}
+              >
+                {project.featured ? 'Quitar destacado' : 'Destacar'}
+              </button>
+              <button
+                class="toggle-hidden-btn rounded-md border border-white/20 px-3 py-2 text-xs text-gray-200 hover:border-cyan-400/50 hover:text-cyan-400"
+                data-hidden={String(project.hidden)}
+              >
+                {project.hidden ? 'Mostrar' : 'Ocultar'}
+              </button>
+              <button class="delete-btn rounded-md border border-red-500/30 px-3 py-2 text-xs text-red-300 hover:bg-red-500/10">
+                Borrar
+              </button>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+
+  <RealtimeSiteSync />
+
+  <script>
+    import {
+      request,
+      showMessages,
+      type ApiResult,
+    } from '../../../components/scripts/admin/listEditor';
+
+    // Delegación de eventos en document: así los botones siguen funcionando
+    // incluso después de que la lista se actualice sola en tiempo real.
+    document.addEventListener('click', async (e) => {
+      const target = e.target as HTMLElement;
+      const card = target.closest('[data-project-id]');
+      const id = card?.getAttribute('data-project-id');
+      if (!id) return;
+
+      const isRealtimeEnabled = Boolean(
+        (window as unknown as Record<string, unknown>).__REALTIME_SITE_ENABLED__
+      );
+      const refresh = (data: ApiResult) => {
+        showMessages(data);
+        if (!isRealtimeEnabled) window.location.reload();
+      };
+
+      const send = async (method: string, body?: unknown) => {
+        const data = await request(`/api/admin/projects/${id}`, method, body);
+        if (data.ok) refresh(data);
+        else showMessages({ ...data, warning: data.error });
+      };
+
+      const move = async (direction: -1 | 1) => {
+        const ids = Array.from(
+          document.querySelectorAll('[data-project-id]')
+        ).map((el) => el.getAttribute('data-project-id') as string);
+        const from = ids.indexOf(id);
+        const to = from + direction;
+        if (to < 0 || to >= ids.length) return;
+        [ids[from], ids[to]] = [ids[to], ids[from]];
+        const data = await request('/api/admin/projects/reorder', 'POST', {
+          ids,
+        });
+        if (data.ok) refresh(data);
+        else showMessages({ ...data, warning: data.error });
+      };
+
+      if (target.closest('.move-up-btn')) {
+        await move(-1);
+        return;
+      }
+      if (target.closest('.move-down-btn')) {
+        await move(1);
+        return;
+      }
+
+      const featuredBtn = target.closest(
+        '.toggle-featured-btn'
+      ) as HTMLButtonElement | null;
+      if (featuredBtn) {
+        await send('PATCH', {
+          featured: featuredBtn.dataset.featured !== 'true',
+        });
+        return;
+      }
+
+      const hiddenBtn = target.closest(
+        '.toggle-hidden-btn'
+      ) as HTMLButtonElement | null;
+      if (hiddenBtn) {
+        await send('PATCH', { hidden: hiddenBtn.dataset.hidden !== 'true' });
+        return;
+      }
+
+      if (target.closest('.delete-btn')) {
+        if (!confirm('¿Borrar este proyecto? No se puede deshacer.')) return;
+        await send('DELETE');
+      }
+    });
+  </script>
+</AdminLayout>

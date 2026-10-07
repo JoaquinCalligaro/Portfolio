@@ -1,0 +1,43 @@
+---
+// Educación: línea de tiempo editable en el lugar (una sola pantalla)
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ListEditor from '../../components/admin/ListEditor.astro';
+import EducationCard from '../../components/admin/EducationCard.astro';
+import { listEducation } from '../../db/queries';
+import { isDbConfigured } from '../../db/client';
+
+export const prerender = false;
+
+const items = await listEducation();
+---
+
+<AdminLayout title="Educación">
+  <h1 class="mb-2 text-xl font-semibold text-white">Educación</h1>
+  <p class="mb-6 text-sm text-gray-400">
+    Escribí solo en español: el inglés se traduce solo al guardar.
+  </p>
+
+  {
+    !isDbConfigured && (
+      <div class="mb-6 rounded-md border border-amber-500/40 bg-amber-950/40 p-4 text-sm text-amber-200">
+        Configurá <code>DATABASE_URL</code> para poder guardar cambios.
+      </div>
+    )
+  }
+
+  <ListEditor
+    endpoint="/api/admin/education"
+    itemLabel="estudio"
+    addLabel="+ Agregar estudio"
+    emptyText="Todavía no agregaste ningún estudio."
+    isEmpty={items.length === 0}
+  >
+    {items.map((item) => <EducationCard item={item} />)}
+    <Fragment slot="template"><EducationCard /></Fragment>
+  </ListEditor>
+
+  <script>
+    import { initEditors } from '../../components/scripts/admin/listEditor';
+    initEditors();
+  </script>
+</AdminLayout>
