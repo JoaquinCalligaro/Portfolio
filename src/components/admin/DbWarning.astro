@@ -1,0 +1,15 @@
+---
+import { isDbConfigured } from '../../db/client';
+---
+
+{
+  !isDbConfigured && (
+    <div
+      role="alert"
+      class="admin-enter mb-6 rounded-xl border border-amber-500/40 bg-amber-950/40 p-4 text-sm text-amber-200"
+    >
+      Todavía no conectaste la base de datos (Neon). Configurá la variable{' '}
+      <code>DATABASE_URL</code> para poder guardar cambios.
+    </div>
+  )
+}

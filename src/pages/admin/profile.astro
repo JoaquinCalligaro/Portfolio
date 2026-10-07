@@ -1,337 +1,62 @@
 ---
-// Perfil: datos personales, biografía (párrafos) y redes sociales
 import AdminLayout from '../../layouts/AdminLayout.astro';
-import ListEditor from '../../components/admin/ListEditor.astro';
-import BioCard from '../../components/admin/BioCard.astro';
-import SocialLinkCard from '../../components/admin/SocialLinkCard.astro';
-import {
-  inputCls,
-  labelCls,
-  primaryBtnCls,
-  smallBtnCls,
-} from '../../components/admin/ui';
+import PageHeader from '../../components/admin/PageHeader.astro';
+import DbWarning from '../../components/admin/DbWarning.astro';
+import ProfileForm from '../../components/admin/react/ProfileForm';
+import BioEditor from '../../components/admin/react/BioEditor';
+import SocialEditor from '../../components/admin/react/SocialEditor';
 import { getProfile, listSocialLinks } from '../../db/queries';
-import { isDbConfigured } from '../../db/client';
 
 export const prerender = false;
 
 const [profile, socials] = await Promise.all([getProfile(), listSocialLinks()]);
+
+const values = {
+  name: profile?.name ?? '',
+  headlineEs: profile?.headlineEs ?? '',
+  photoUrl: profile?.photoUrl ?? '',
+  cvUrl: profile?.cvUrl ?? '',
+};
 const paragraphs = profile?.bioEs ?? [];
+const socialItems = socials.map((item) => ({
+  id: item.id,
+  label: item.label ?? '',
+  url: item.url ?? '',
+  iconSlug: item.iconSlug ?? '',
+  iconUrl: item.iconUrl ?? '',
+  hidden: item.hidden ?? false,
+}));
 ---
 
 <AdminLayout title="Perfil">
-  <h1 class="mb-2 text-xl font-semibold text-white">Perfil</h1>
-  <p class="mb-6 text-sm text-gray-400">
-    Escribí solo en español: el inglés se traduce solo al guardar.
-  </p>
+  <PageHeader
+    title="Perfil"
+    description="Escribí solo en español: el inglés se traduce solo al guardar."
+  />
+  <DbWarning />
 
-  {
-    !isDbConfigured && (
-      <div class="mb-6 rounded-md border border-amber-500/40 bg-amber-950/40 p-4 text-sm text-amber-200">
-        Configurá <code>DATABASE_URL</code> para poder guardar cambios.
-      </div>
-    )
-  }
-
-  <section class="mb-10">
-    <h2 class="mb-3 text-lg font-medium text-white">Presentación</h2>
-    <form
-      id="profile-form"
-      class="space-y-5 rounded-xl border border-cyan-400/30 bg-gray-900/40 p-4 backdrop-blur-md sm:p-6"
-    >
-      <div>
-        <label class={labelCls} for="profile-name">Nombre</label>
-        <input
-          id="profile-name"
-          name="name"
-          value={profile?.name ?? ''}
-          class={inputCls}
-        />
-      </div>
-
-      <div>
-        <label class={labelCls} for="profile-headline"
-          >Descripción de presentación</label
-        >
-        <textarea
-          id="profile-headline"
-          name="headlineEs"
-          rows="4"
-          class={inputCls + ' resize-none overflow-hidden'}
-          >{profile?.headlineEs ?? ''}</textarea
-        >
-      </div>
-
-      <div class="space-y-2">
-        <span class={labelCls}>Foto</span>
-        <div class="flex items-center gap-4">
-          <div
-            class="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-gray-800"
-          >
-            <img
-              id="photo-preview"
-              src={profile?.photoUrl || undefined}
-              alt="Foto actual"
-              class:list={[
-                'h-full w-full object-cover',
-                !profile?.photoUrl && 'hidden',
-              ]}
-            />
-            <span
-              id="photo-empty"
-              class:list={[
-                'text-xs text-gray-500',
-                profile?.photoUrl && 'hidden',
-              ]}
-            >
-              Sin foto
-            </span>
-          </div>
-          <label class={smallBtnCls + ' cursor-pointer'}>
-            Subir foto
-            <input
-              id="photo-file"
-              type="file"
-              accept="image/*"
-              class="sr-only"
-            />
-          </label>
-        </div>
-        <input type="hidden" name="photoUrl" value={profile?.photoUrl ?? ''} />
-      </div>
-
-      <div class="space-y-2">
-        <span class={labelCls}>CV (PDF)</span>
-        <p class="text-sm text-gray-400">
-          <a
-            id="cv-link"
-            href={profile?.cvUrl || undefined}
-            target="_blank"
-            rel="noopener noreferrer"
-            class:list={[
-              'text-cyan-300 underline',
-              !profile?.cvUrl && 'hidden',
-            ]}
-          >
-            Ver CV actual
-          </a>
-          <span id="cv-empty" class:list={[profile?.cvUrl && 'hidden']}
-            >Todavía no subiste un CV.</span
-          >
-        </p>
-        <label class={smallBtnCls + ' cursor-pointer'}>
-          Subir CV
-          <input
-            id="cv-file"
-            type="file"
-            accept="application/pdf"
-            class="sr-only"
-          />
-        </label>
-        <input type="hidden" name="cvUrl" value={profile?.cvUrl ?? ''} />
-      </div>
-
-      <div class="flex flex-wrap items-center gap-3">
-        <button id="profile-save" type="submit" disabled class={primaryBtnCls}
-          >Guardar</button
-        >
-        <span id="profile-status" class="text-sm text-gray-400" role="status"
-        ></span>
-      </div>
-    </form>
+  <section class="mb-10" aria-labelledby="profile-intro">
+    <h2 id="profile-intro" class="mb-3 text-lg font-medium text-white">
+      Presentación
+    </h2>
+    <ProfileForm client:load profile={values} />
   </section>
 
-  <section class="mb-10">
-    <h2 class="mb-1 text-lg font-medium text-white">Sobre mí (biografía)</h2>
-    <p class="mb-3 text-sm text-gray-400">Cada párrafo es una tarjeta.</p>
-    <div id="bio-editor">
-      <ListEditor
-        itemLabel="párrafo"
-        addLabel="+ Agregar párrafo"
-        emptyText="Todavía no escribiste ningún párrafo."
-        isEmpty={paragraphs.length === 0}
-      >
-        {
-          paragraphs.map((text, index) => (
-            <BioCard id={`p${index}`} text={text} />
-          ))
-        }
-        <Fragment slot="template"><BioCard /></Fragment>
-      </ListEditor>
-    </div>
+  <section class="mb-10" aria-labelledby="profile-bio">
+    <h2 id="profile-bio" class="mb-1 text-lg font-medium text-white">
+      Sobre mí (biografía)
+    </h2>
+    <p class="mb-3 text-sm text-gray-300">Cada párrafo es una tarjeta.</p>
+    <BioEditor client:load paragraphs={paragraphs} />
   </section>
 
-  <section>
-    <h2 class="mb-1 text-lg font-medium text-white">Redes sociales</h2>
-    <p class="mb-3 text-sm text-gray-400">
-      Aparecen en "Sobre mí" y en el pie de página. Escribí el nombre del ícono
-      (por ejemplo <code>github</code>, <code>instagram</code>) o subí una
-      imagen.
+  <section aria-labelledby="profile-social">
+    <h2 id="profile-social" class="mb-1 text-lg font-medium text-white">
+      Redes sociales
+    </h2>
+    <p class="mb-3 text-sm text-gray-300">
+      Links que se muestran en tu portfolio.
     </p>
-    <ListEditor
-      endpoint="/api/admin/social-links"
-      itemLabel="link"
-      addLabel="+ Agregar red"
-      emptyText="Todavía no agregaste ninguna red."
-      isEmpty={socials.length === 0}
-    >
-      {socials.map((item) => <SocialLinkCard item={item} />)}
-      <Fragment slot="template"><SocialLinkCard /></Fragment>
-    </ListEditor>
+    <SocialEditor client:load items={socialItems} />
   </section>
-
-  <script>
-    import {
-      initAutoGrow,
-      initEditors,
-      request,
-      setAdapter,
-      showMessages,
-      uploadFile,
-      type Adapter,
-      type ApiResult,
-    } from '../../components/scripts/admin/listEditor';
-
-    // ---- Formulario de presentación -------------------------------------
-    const form = document.getElementById('profile-form') as HTMLFormElement;
-    const saveBtn = document.getElementById(
-      'profile-save'
-    ) as HTMLButtonElement;
-    const status = document.getElementById('profile-status') as HTMLElement;
-    const photoInput = document.getElementById(
-      'photo-file'
-    ) as HTMLInputElement;
-    const cvInput = document.getElementById('cv-file') as HTMLInputElement;
-
-    const read = () => ({
-      name: (form.elements.namedItem('name') as HTMLInputElement).value,
-      headlineEs: (form.elements.namedItem('headlineEs') as HTMLTextAreaElement)
-        .value,
-      photoUrl: (form.elements.namedItem('photoUrl') as HTMLInputElement).value,
-      cvUrl: (form.elements.namedItem('cvUrl') as HTMLInputElement).value,
-    });
-    let saved = JSON.stringify(read());
-    initAutoGrow(form);
-
-    const refreshDirty = () => {
-      const dirty = JSON.stringify(read()) !== saved;
-      saveBtn.disabled = !dirty;
-      status.textContent = dirty ? 'Cambios sin guardar' : '';
-      status.className = 'text-sm text-gray-400';
-    };
-    form.addEventListener('input', refreshDirty);
-
-    const renderPhoto = () => {
-      const url = read().photoUrl;
-      const img = document.getElementById('photo-preview') as HTMLImageElement;
-      img.classList.toggle('hidden', !url);
-      if (url) img.src = url;
-      document
-        .getElementById('photo-empty')
-        ?.classList.toggle('hidden', Boolean(url));
-    };
-    const renderCv = () => {
-      const url = read().cvUrl;
-      const link = document.getElementById('cv-link') as HTMLAnchorElement;
-      link.classList.toggle('hidden', !url);
-      if (url) link.href = url;
-      document
-        .getElementById('cv-empty')
-        ?.classList.toggle('hidden', Boolean(url));
-    };
-
-    const upload = async (
-      input: HTMLInputElement,
-      field: 'photoUrl' | 'cvUrl',
-      kind: 'image' | 'raw'
-    ) => {
-      const file = input.files?.[0];
-      if (!file) return;
-      status.textContent = 'Subiendo…';
-      const result = await uploadFile(file, kind);
-      input.value = '';
-      if (!result.ok || !result.url) {
-        status.textContent = result.error || 'No se pudo subir el archivo';
-        status.className = 'text-sm text-red-400';
-        return;
-      }
-      (form.elements.namedItem(field) as HTMLInputElement).value = result.url;
-      field === 'photoUrl' ? renderPhoto() : renderCv();
-      refreshDirty();
-    };
-    photoInput.addEventListener('change', () =>
-      upload(photoInput, 'photoUrl', 'image')
-    );
-    cvInput.addEventListener('change', () => upload(cvInput, 'cvUrl', 'raw'));
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      saveBtn.disabled = true;
-      status.textContent = 'Guardando…';
-      const result = await request('/api/admin/profile', 'PATCH', read());
-      if (result.ok) {
-        saved = JSON.stringify(read());
-        status.textContent = 'Guardado ✓';
-        status.className = 'text-sm text-emerald-400';
-        showMessages(result);
-      } else {
-        status.textContent = result.error || 'No se pudo guardar';
-        status.className = 'text-sm text-red-400';
-        saveBtn.disabled = false;
-      }
-    });
-
-    // ---- Párrafos de la bio (se guardan como lista en el perfil) ---------
-    const bioRoot = document.querySelector(
-      '#bio-editor [data-list-editor]'
-    ) as HTMLElement;
-    const bioList = bioRoot.querySelector(
-      ':scope > [data-list]'
-    ) as HTMLElement;
-
-    // Párrafos ya guardados, en el orden actual de la pantalla.
-    const savedParagraphs = (
-      current?: { card: HTMLElement; text: string },
-      skip?: HTMLElement
-    ) =>
-      Array.from(bioList.children)
-        .filter(
-          (el): el is HTMLElement => el instanceof HTMLElement && el !== skip
-        )
-        .map((card) => {
-          if (current && card === current.card) return current.text;
-          if (!card.dataset.id) return '';
-          try {
-            return (
-              (JSON.parse(card.dataset.snapshot || '{}').text as string) ?? ''
-            );
-          } catch {
-            return '';
-          }
-        })
-        .filter((text) => text.trim() !== '');
-
-    const saveBio = (bioEs: string[]): Promise<ApiResult> =>
-      request('/api/admin/profile', 'PATCH', { bioEs });
-
-    const bioAdapter: Adapter = {
-      save: async (card, values) => {
-        const text = String(values.text ?? '').trim();
-        if (!text) return { ok: false, error: 'Escribí algo antes de guardar' };
-        const result = await saveBio(savedParagraphs({ card, text }));
-        return result.ok
-          ? {
-              ...result,
-              item: { id: card.dataset.id || `p${Date.now()}`, text },
-            }
-          : result;
-      },
-      remove: (card) => saveBio(savedParagraphs(undefined, card)),
-      reorder: () => saveBio(savedParagraphs()),
-      toggleHidden: async () => ({ ok: true }),
-    };
-    setAdapter(bioRoot, bioAdapter);
-
-    initEditors();
-  </script>
 </AdminLayout>

@@ -1,101 +1,24 @@
 ---
-// Contacto: mail donde llegan los mensajes del formulario
 import AdminLayout from '../../layouts/AdminLayout.astro';
-import { inputCls, labelCls, primaryBtnCls } from '../../components/admin/ui';
+import PageHeader from '../../components/admin/PageHeader.astro';
+import DbWarning from '../../components/admin/DbWarning.astro';
+import ContactForm from '../../components/admin/react/ContactForm';
 import { getProfile } from '../../db/queries';
-import { isDbConfigured } from '../../db/client';
 
 export const prerender = false;
 
 const profile = await getProfile();
+const settings = {
+  contactToEmail: profile?.contactToEmail ?? '',
+  contactFromEmail: profile?.contactFromEmail ?? '',
+};
 ---
 
 <AdminLayout title="Contacto">
-  <h1 class="mb-2 text-xl font-semibold text-white">Contacto</h1>
-  <p class="mb-6 text-sm text-gray-400">
-    Configurá a qué mail te llegan los mensajes del formulario.
-  </p>
-
-  {
-    !isDbConfigured && (
-      <div class="mb-6 rounded-md border border-amber-500/40 bg-amber-950/40 p-4 text-sm text-amber-200">
-        Configurá <code>DATABASE_URL</code> para poder guardar cambios.
-      </div>
-    )
-  }
-
-  <form
-    id="contact-settings-form"
-    class="space-y-5 rounded-xl border border-cyan-400/30 bg-gray-900/40 p-4 backdrop-blur-md sm:p-6"
-  >
-    <div>
-      <label class={labelCls} for="contactToEmail">Mail donde recibís los mensajes</label>
-      <input
-        id="contactToEmail"
-        name="contactToEmail"
-        type="email"
-        value={profile?.contactToEmail ?? ''}
-        placeholder="tumail@gmail.com"
-        class={inputCls}
-      />
-      <p class="mt-1 text-xs text-gray-400">
-        Sin dominio propio en Resend, tiene que ser el mismo mail con el que
-        creaste tu cuenta de Resend.
-      </p>
-    </div>
-
-    <div>
-      <label class={labelCls} for="contactFromEmail">Remitente (opcional)</label>
-      <input
-        id="contactFromEmail"
-        name="contactFromEmail"
-        value={profile?.contactFromEmail ?? ''}
-        placeholder="Portfolio <contacto@tudominio.com>"
-        class={inputCls}
-      />
-      <p class="mt-1 text-xs text-gray-400">
-        Dejalo vacío si no tenés dominio propio: se usa el de prueba de Resend.
-      </p>
-    </div>
-
-    <p class="text-xs text-gray-400">
-      La clave de Resend (<code>RESEND_API_KEY</code>) se queda en las
-      variables de entorno, porque es un dato secreto.
-    </p>
-
-    <div class="flex items-center gap-3">
-      <button type="submit" class={primaryBtnCls}>Guardar</button>
-      <span id="contact-status" class="text-sm text-gray-400"></span>
-    </div>
-  </form>
+  <PageHeader
+    title="Contacto"
+    description="Configurá a qué mail te llegan los mensajes del formulario."
+  />
+  <DbWarning />
+  <ContactForm client:load settings={settings} />
 </AdminLayout>
-
-<script>
-  const form = document.getElementById('contact-settings-form') as HTMLFormElement;
-  const status = document.getElementById('contact-status') as HTMLElement;
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    status.textContent = 'Guardando…';
-    status.className = 'text-sm text-gray-400';
-    const get = (n: string) =>
-      (form.elements.namedItem(n) as HTMLInputElement).value;
-    try {
-      const res = await fetch('/api/admin/contact-settings', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contactToEmail: get('contactToEmail'),
-          contactFromEmail: get('contactFromEmail'),
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.ok) throw new Error(data.error || 'Error');
-      status.textContent = 'Guardado ✓';
-      status.className = 'text-sm text-green-400';
-    } catch (err) {
-      status.textContent = err instanceof Error ? err.message : 'Error';
-      status.className = 'text-sm text-red-400';
-    }
-  });
-</script>

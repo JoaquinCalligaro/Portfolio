@@ -1,0 +1,51 @@
+---
+import { cardClass } from '../ui/shadcn/card';
+import { ICON_PATHS, type IconName } from './react/icons';
+
+type Section = {
+  href: string;
+  title: string;
+  text: string;
+  meta: string;
+  icon: IconName;
+};
+
+const { sections } = Astro.props as { sections: Section[] };
+---
+
+<ul class="m-0 grid grid-cols-1 gap-4 p-0 sm:grid-cols-2">
+  {
+    sections.map((section, index) => (
+      <li
+        class="admin-enter admin-lift list-none"
+        style={`animation-delay:${index * 90}ms`}
+      >
+        <a
+          href={section.href}
+          class={`${cardClass} flex h-full flex-col gap-2 p-5 transition-colors duration-500 hover:border-cyan-400/50 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:outline-none`}
+        >
+          <span class="flex items-center gap-3 text-white">
+            <span class="flex size-10 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-300">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d={ICON_PATHS[section.icon]} />
+              </svg>
+            </span>
+            <h2 class="text-lg font-medium">{section.title}</h2>
+          </span>
+          <p class="text-sm text-gray-300">{section.text}</p>
+          <p class="mt-auto pt-2 text-xs text-cyan-300">{section.meta}</p>
+        </a>
+      </li>
+    ))
+  }
+</ul>

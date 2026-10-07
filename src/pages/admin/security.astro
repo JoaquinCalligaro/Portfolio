@@ -1,0 +1,17 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import PageHeader from '../../components/admin/PageHeader.astro';
+import DbWarning from '../../components/admin/DbWarning.astro';
+import SecurityPanel from '../../components/admin/react/SecurityPanel';
+
+export const prerender = false;
+---
+
+<AdminLayout title="Seguridad">
+  <PageHeader
+    title="Seguridad"
+    description="Dispositivos con acceso sin contraseña y sesiones abiertas."
+  />
+  <DbWarning />
+  <SecurityPanel client:load />
+</AdminLayout>

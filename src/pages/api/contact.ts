@@ -1,6 +1,7 @@
 // API endpoint para el formulario de contacto
 import { env } from '../../lib/env';
 import type { APIRoute } from 'astro';
+import { getClientIp } from '../../lib/admin-auth/client-ip';
 import { Resend } from 'resend';
 import { getProfile } from '../../db/queries';
 import {
@@ -27,10 +28,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     new Response(JSON.stringify({ ok: false, error }), { status });
 
   try {
-    const ip =
-      request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
-      clientAddress ||
-      'unknown';
+    const ip = getClientIp(request, clientAddress);
     if (isRateLimited(ip)) return fail('Too many requests', 429);
 
     const form = await request.formData();

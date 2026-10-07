@@ -6,6 +6,7 @@ import {
   integer,
   timestamp,
   uuid,
+  bigint,
 } from 'drizzle-orm/pg-core';
 
 export const projects = pgTable('projects', {
@@ -102,3 +103,43 @@ export type SocialLinkRow = typeof socialLinks.$inferSelect;
 export type TechCategoryRow = typeof techCategories.$inferSelect;
 export type TechRow = typeof techs.$inferSelect;
 export type EducationRow = typeof education.$inferSelect;
+
+export const adminPasskeys = pgTable('admin_passkeys', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  credentialId: text('credential_id').notNull().unique(),
+  publicKey: text('public_key').notNull(),
+  counter: bigint('counter', { mode: 'number' }).notNull().default(0),
+  deviceType: text('device_type').notNull(),
+  backedUp: boolean('backed_up').notNull().default(false),
+  transports: text('transports').array().notNull().default([]),
+  label: text('label').notNull().default(''),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  lastUsedAt: timestamp('last_used_at', { withTimezone: true }),
+});
+
+export const adminWebauthnChallenges = pgTable('admin_webauthn_challenges', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  flow: text('flow').notNull(),
+  challenge: text('challenge').notNull(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+});
+
+export const adminAuthAttempts = pgTable('admin_auth_attempts', {
+  key: text('key').primaryKey(),
+  failCount: integer('fail_count').notNull().default(0),
+  windowStart: timestamp('window_start', { withTimezone: true }).notNull(),
+  lockedUntil: timestamp('locked_until', { withTimezone: true }),
+  lockLevel: integer('lock_level').notNull().default(0),
+  version: integer('version').notNull().default(0),
+});
+
+export const adminSessions = pgTable('admin_sessions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  tokenHash: text('token_hash').notNull().unique(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  lastSeenAt: timestamp('last_seen_at', { withTimezone: true }).notNull().defaultNow(),
+  userAgent: text('user_agent').notNull().default(''),
+});
+
+export type AdminPasskeyRow = typeof adminPasskeys.$inferSelect;

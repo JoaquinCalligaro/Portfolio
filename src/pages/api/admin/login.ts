@@ -1,65 +1,75 @@
-// Endpoint de login del panel de administración
-import { env } from '../../../lib/env';
 import type { APIRoute } from 'astro';
+import { fail, json } from '../../../lib/admin-api';
+import { getClientIp } from '../../../lib/admin-auth/client-ip';
 import {
-  createSessionValue,
-  verifyPassword,
-  SESSION_COOKIE_NAME,
-  SESSION_COOKIE_MAX_AGE,
-} from '../../../lib/auth';
+  areLoginValid,
+  isAdminConfigured,
+} from '../../../lib/admin-auth/credentials';
+import {
+  GLOBAL_KEY,
+  ipKey,
+  lockedForMs,
+  registerAttempt,
+  resetAttempts,
+} from '../../../lib/admin-auth/rate-limit';
+import {
+  GLOBAL_FAILURES,
+  IP_FAILURES,
+} from '../../../lib/admin-auth/rate-limit-policy';
+import { logSecurityEvent } from '../../../lib/admin-auth/security-log';
+import { createSession } from '../../../lib/admin-auth/session';
+import { verifyAdminTurnstile } from '../../../lib/admin-auth/turnstile';
 
-export const POST: APIRoute = async ({ request, cookies }) => {
+const BAD_LOGIN = 'Usuario o contraseña incorrectos';
+
+export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
   try {
+    if (!isAdminConfigured()) {
+      return json({ ok: false, error: 'El panel de admin no está configurado' }, 500);
+    }
+
+    const ip = getClientIp(request, clientAddress);
+    let lockedMs = await lockedForMs([ipKey(ip), GLOBAL_KEY]);
+    if (lockedMs === 0) {
+      lockedMs = Math.max(
+        await registerAttempt(ipKey(ip), IP_FAILURES),
+        await registerAttempt(GLOBAL_KEY, GLOBAL_FAILURES)
+      );
+    }
+    if (lockedMs > 0) {
+      logSecurityEvent('login-blocked', { ip, lockedMs });
+      return json(
+        {
+          ok: false,
+          error: 'Demasiados intentos. Probá más tarde.',
+          retryAfterSeconds: Math.ceil(lockedMs / 1000),
+        },
+        429
+      );
+    }
+
     const form = await request.formData();
     const username = String(form.get('username') || '').trim();
     const password = String(form.get('password') || '').trim();
+    const captcha = String(form.get('cf-turnstile-response') || '');
 
-    const expectedUsername = env('ADMIN_USERNAME');
-    const expectedPasswordHash = env('ADMIN_PASSWORD_HASH');
-
-    if (!expectedUsername || !expectedPasswordHash) {
-      return new Response(
-        JSON.stringify({
-          ok: false,
-          error: 'El panel de admin no está configurado en el servidor',
-        }),
-        { status: 500 }
-      );
+    if (!(await verifyAdminTurnstile(captcha, ip))) {
+      logSecurityEvent('login-captcha-failed', { ip });
+      return json({ ok: false, error: 'No se pudo verificar el captcha' }, 400);
     }
 
-    if (!username || !password) {
-      return new Response(
-        JSON.stringify({ ok: false, error: 'Faltan usuario o contraseña' }),
-        { status: 400 }
-      );
+    if (!areLoginValid(username, password)) {
+      logSecurityEvent('login-failed', { ip });
+      return json({ ok: false, error: BAD_LOGIN }, 401);
     }
 
-    const validUsername = username === expectedUsername;
-    const validPassword = verifyPassword(password, expectedPasswordHash);
-
-    if (!validUsername || !validPassword) {
-      return new Response(
-        JSON.stringify({ ok: false, error: 'Usuario o contraseña incorrectos' }),
-        { status: 401 }
-      );
-    }
-
-    const sessionValue = createSessionValue(username);
-    cookies.set(SESSION_COOKIE_NAME, sessionValue, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
-      path: '/',
-      maxAge: SESSION_COOKIE_MAX_AGE,
-    });
-
-    return new Response(JSON.stringify({ ok: true }), { status: 200 });
+    await createSession(cookies, request.headers.get('user-agent') ?? '');
+    await resetAttempts(ipKey(ip));
+    await resetAttempts(GLOBAL_KEY);
+    logSecurityEvent('login-ok', { ip, method: 'password' });
+    return json({ ok: true });
   } catch (err) {
-    console.error(err);
-    return new Response(
-      JSON.stringify({ ok: false, error: 'Error interno del servidor' }),
-      { status: 500 }
-    );
+    return fail(err);
   }
 };
 

@@ -1,22 +1,16 @@
 ---
-// Layout del panel de administración: mismo estilo visual que el portfolio público
 import '../styles/base/global.css';
+import '../styles/admin.css';
+import AdminNav from '../components/admin/react/AdminNav';
+import AdminToaster from '../components/admin/react/AdminToaster';
 
 interface Props {
   title?: string;
-  showLogout?: boolean;
+  showNav?: boolean;
 }
 
-const { title = 'Admin', showLogout = true } = Astro.props as Props;
-
-const NAV = [
-  { href: '/admin/profile', label: 'Perfil' },
-  { href: '/admin/tech-stack', label: 'Tech Stack' },
-  { href: '/admin/education', label: 'Educación' },
-  { href: '/admin/projects', label: 'Proyectos' },
-  { href: '/admin/contact', label: 'Contacto' },
-];
-const path = Astro.url.pathname;
+const { title = 'Admin', showNav = true } = Astro.props as Props;
+const path = Astro.url.pathname.replace(/\/$/, '') || '/admin';
 ---
 
 <!doctype html>
@@ -27,71 +21,32 @@ const path = Astro.url.pathname;
     <meta name="robots" content="noindex, nofollow" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title} | Admin Portfolio</title>
-  </head>
-  <body
-    class="min-h-screen bg-gray-50 text-gray-900 dark:bg-[#071029] dark:text-gray-100"
-  >
-    <header
-      class="header-backdrop-blur sticky top-0 z-20 border-b border-white/10 bg-white/60 px-4 py-3 dark:bg-gray-900/60"
-    >
-      <div
-        class="mx-auto flex max-w-screen-lg flex-wrap items-center justify-between gap-x-4 gap-y-2"
-      >
-        <a
-          href="/admin"
-          class="text-sm font-semibold text-gray-900 dark:text-white"
-        >
-          Panel del portfolio
-        </a>
-        {
-          showLogout && (
-            <nav class="order-last flex w-full gap-1 overflow-x-auto sm:order-none sm:w-auto">
-              {NAV.map((item) => (
-                <a
-                  href={item.href}
-                  aria-current={path.startsWith(item.href) ? 'page' : undefined}
-                  class:list={[
-                    'rounded-md px-3 py-2 text-sm whitespace-nowrap transition-colors',
-                    path.startsWith(item.href)
-                      ? 'bg-cyan-500/20 text-cyan-300'
-                      : 'text-gray-700 hover:text-cyan-500 dark:text-gray-300 dark:hover:text-cyan-400',
-                  ]}
-                >
-                  {item.label}
-                </a>
-              ))}
-            </nav>
-          )
-        }
-        {
-          showLogout && (
-            <button
-              id="logout-btn"
-              class="rounded-md border border-white/20 px-3 py-1.5 text-sm text-gray-700 transition-colors hover:border-cyan-400/50 hover:text-cyan-500 dark:text-gray-300 dark:hover:text-cyan-400"
-            >
-              Cerrar sesión
-            </button>
-          )
-        }
-      </div>
-    </header>
-
-    <main class="mx-auto max-w-screen-lg px-4 py-8">
-      <p
-        id="admin-banner"
-        role="alert"
-        class="mb-6 hidden rounded-md border border-amber-500/40 bg-amber-950/40 p-4 text-sm text-amber-200"
-      >
-      </p>
-      <slot />
-    </main>
-
-    <script>
-      const logoutBtn = document.getElementById('logout-btn');
-      logoutBtn?.addEventListener('click', async () => {
-        await fetch('/api/admin/logout', { method: 'POST' });
-        window.location.href = '/admin/login';
-      });
+    <script is:inline>
+      try {
+        if (localStorage.getItem('admin-nav-collapsed') === '1')
+          document.documentElement.setAttribute('data-nav-collapsed', '');
+      } catch {}
     </script>
+  </head>
+  <body class="admin-root admin-bg min-h-screen text-gray-100 antialiased">
+    <a
+      href="#admin-main"
+      class="sr-only z-50 rounded-lg bg-cyan-500 px-4 py-2 text-gray-950 focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+    >
+      Saltar al contenido
+    </a>
+    {showNav && <AdminNav client:load path={path} />}
+    <div class:list={[showNav && 'admin-shell md:pl-64']}>
+      <main
+        id="admin-main"
+        class:list={[
+          'mx-auto px-4 pb-16',
+          showNav ? 'max-w-4xl pt-20 md:pt-10' : 'max-w-md pt-16',
+        ]}
+      >
+        <slot />
+      </main>
+    </div>
+    <AdminToaster client:load />
   </body>
 </html>
