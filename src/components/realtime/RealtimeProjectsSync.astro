@@ -1,0 +1,13 @@
+---
+// Si Pusher está configurado, sincroniza en vivo cualquier contenedor marcado
+// con data-realtime-sync="projects" (ver ProjectsGrid y /admin).
+const pusherKey = import.meta.env.PUBLIC_PUSHER_KEY;
+const pusherCluster = import.meta.env.PUBLIC_PUSHER_CLUSTER;
+const enabled = Boolean(pusherKey && pusherCluster);
+---
+
+{
+  enabled && (
+    <script type="module" src="/src/components/scripts/realtime/projectsSync.ts" />
+  )
+}

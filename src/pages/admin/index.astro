@@ -3,6 +3,7 @@
 import AdminLayout from '../../layouts/AdminLayout.astro';
 import { listProjects } from '../../db/queries';
 import { isDbConfigured } from '../../db/client';
+import RealtimeProjectsSync from '../../components/realtime/RealtimeProjectsSync.astro';
 
 export const prerender = false;
 
@@ -31,100 +32,110 @@ const projectsList = isDbConfigured ? await listProjects() : [];
     )
   }
 
-  {
-    isDbConfigured && projectsList.length === 0 && (
-      <p class="text-gray-400">Todavía no agregaste ningún proyecto.</p>
-    )
-  }
-
-  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+  <div data-realtime-sync="projects">
     {
-      projectsList.map((project) => (
-        <div
-          class="flex flex-col gap-3 rounded-xl border border-white/10 bg-gray-900/40 p-4 backdrop-blur-md"
-          data-project-id={project.id}
-        >
-          <div class="flex items-start justify-between gap-2">
-            <h2 class="font-medium text-white">{project.titleEs}</h2>
-            {project.featured && (
-              <span class="shrink-0 rounded-full bg-cyan-500/20 px-2 py-0.5 text-xs text-cyan-300">
-                Destacado
-              </span>
-            )}
-          </div>
-          <p class="line-clamp-2 text-sm text-gray-400">
-            {project.descriptionEs}
-          </p>
-          <div class="mt-auto flex flex-wrap gap-2 pt-2">
-            <a
-              href={`/admin/edit/${project.id}`}
-              class="rounded-md border border-white/20 px-3 py-1.5 text-xs text-gray-200 hover:border-cyan-400/50 hover:text-cyan-400"
-            >
-              Editar
-            </a>
-            <button
-              class="toggle-featured-btn rounded-md border border-white/20 px-3 py-1.5 text-xs text-gray-200 hover:border-cyan-400/50 hover:text-cyan-400"
-              data-featured={String(project.featured)}
-            >
-              {project.featured ? 'Quitar destacado' : 'Destacar'}
-            </button>
-            <button
-              class="toggle-hidden-btn rounded-md border border-white/20 px-3 py-1.5 text-xs text-gray-200 hover:border-cyan-400/50 hover:text-cyan-400"
-              data-hidden={String(project.hidden)}
-            >
-              {project.hidden ? 'Mostrar' : 'Ocultar'}
-            </button>
-            <button
-              class="delete-btn rounded-md border border-red-500/30 px-3 py-1.5 text-xs text-red-300 hover:bg-red-500/10"
-            >
-              Borrar
-            </button>
-          </div>
-        </div>
-      ))
+      isDbConfigured && projectsList.length === 0 && (
+        <p class="text-gray-400">Todavía no agregaste ningún proyecto.</p>
+      )
     }
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      {
+        projectsList.map((project) => (
+          <div
+            class="flex flex-col gap-3 rounded-xl border border-white/10 bg-gray-900/40 p-4 backdrop-blur-md"
+            data-project-id={project.id}
+          >
+            <div class="flex items-start justify-between gap-2">
+              <h2 class="font-medium text-white">{project.titleEs}</h2>
+              {project.featured && (
+                <span class="shrink-0 rounded-full bg-cyan-500/20 px-2 py-0.5 text-xs text-cyan-300">
+                  Destacado
+                </span>
+              )}
+            </div>
+            <p class="line-clamp-2 text-sm text-gray-400">
+              {project.descriptionEs}
+            </p>
+            <div class="mt-auto flex flex-wrap gap-2 pt-2">
+              <a
+                href={`/admin/edit/${project.id}`}
+                class="rounded-md border border-white/20 px-3 py-1.5 text-xs text-gray-200 hover:border-cyan-400/50 hover:text-cyan-400"
+              >
+                Editar
+              </a>
+              <button
+                class="toggle-featured-btn rounded-md border border-white/20 px-3 py-1.5 text-xs text-gray-200 hover:border-cyan-400/50 hover:text-cyan-400"
+                data-featured={String(project.featured)}
+              >
+                {project.featured ? 'Quitar destacado' : 'Destacar'}
+              </button>
+              <button
+                class="toggle-hidden-btn rounded-md border border-white/20 px-3 py-1.5 text-xs text-gray-200 hover:border-cyan-400/50 hover:text-cyan-400"
+                data-hidden={String(project.hidden)}
+              >
+                {project.hidden ? 'Mostrar' : 'Ocultar'}
+              </button>
+              <button class="delete-btn rounded-md border border-red-500/30 px-3 py-1.5 text-xs text-red-300 hover:bg-red-500/10">
+                Borrar
+              </button>
+            </div>
+          </div>
+        ))
+      }
+    </div>
   </div>
 
+  <RealtimeProjectsSync />
+
   <script>
-    document.querySelectorAll('[data-project-id]').forEach((card) => {
-      const id = card.getAttribute('data-project-id');
+    // Delegación de eventos en document: así los botones siguen funcionando
+    // incluso después de que la lista se actualice sola en tiempo real.
+    document.addEventListener('click', async (e) => {
+      const target = e.target as HTMLElement;
+      const card = target.closest('[data-project-id]');
+      const id = card?.getAttribute('data-project-id');
       if (!id) return;
 
-      card.querySelector('.toggle-featured-btn')?.addEventListener(
-        'click',
-        async (e) => {
-          const btn = e.currentTarget as HTMLButtonElement;
-          const current = btn.dataset.featured === 'true';
-          const res = await fetch(`/api/admin/projects/${id}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ featured: !current }),
-          });
-          if (res.ok) window.location.reload();
-        }
+      const isRealtimeEnabled = Boolean(
+        (window as unknown as Record<string, unknown>)
+          .__REALTIME_PROJECTS_ENABLED__
       );
+      const refresh = () => {
+        if (!isRealtimeEnabled) window.location.reload();
+      };
 
-      card.querySelector('.toggle-hidden-btn')?.addEventListener(
-        'click',
-        async (e) => {
-          const btn = e.currentTarget as HTMLButtonElement;
-          const current = btn.dataset.hidden === 'true';
-          const res = await fetch(`/api/admin/projects/${id}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ hidden: !current }),
-          });
-          if (res.ok) window.location.reload();
-        }
-      );
+      if (target.closest('.toggle-featured-btn')) {
+        const btn = target.closest('.toggle-featured-btn') as HTMLButtonElement;
+        const current = btn.dataset.featured === 'true';
+        const res = await fetch(`/api/admin/projects/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ featured: !current }),
+        });
+        if (res.ok) refresh();
+        return;
+      }
 
-      card.querySelector('.delete-btn')?.addEventListener('click', async () => {
+      if (target.closest('.toggle-hidden-btn')) {
+        const btn = target.closest('.toggle-hidden-btn') as HTMLButtonElement;
+        const current = btn.dataset.hidden === 'true';
+        const res = await fetch(`/api/admin/projects/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ hidden: !current }),
+        });
+        if (res.ok) refresh();
+        return;
+      }
+
+      if (target.closest('.delete-btn')) {
         if (!confirm('¿Borrar este proyecto? No se puede deshacer.')) return;
         const res = await fetch(`/api/admin/projects/${id}`, {
           method: 'DELETE',
         });
-        if (res.ok) window.location.reload();
-      });
+        if (res.ok) refresh();
+      }
     });
   </script>
 </AdminLayout>

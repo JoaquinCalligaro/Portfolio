@@ -4,6 +4,7 @@ import { projectsData } from './projectsData.ts';
 import ShowMoreBtn from './ShowMoreBtn.astro';
 import { listProjects } from '../../db/queries';
 import { isDbConfigured } from '../../db/client';
+import RealtimeProjectsSync from '../realtime/RealtimeProjectsSync.astro';
 
 // Proyectos fijos en el código (siempre se muestran)
 const staticProjects = projectsData.map((project) => ({
@@ -52,7 +53,7 @@ const hiddenProjects = allProjects.filter((project) => project.hidden);
 const hasMoreProjects = visibleProjects.length > 4 || hiddenProjects.length > 0;
 ---
 
-<div class="mt-12">
+<div class="mt-12" data-realtime-sync="projects">
   <!-- Grid principal con los primeros 4 proyectos visibles -->
   <div class="grid grid-cols-1 gap-15 sm:grid-cols-2 md:grid-cols-2">
     {
@@ -127,3 +128,5 @@ const hasMoreProjects = visibleProjects.length > 4 || hiddenProjects.length > 0;
     )
   }
 </div>
+
+<RealtimeProjectsSync />

@@ -2,6 +2,7 @@
 import type { APIRoute } from 'astro';
 import { listProjects, createProject } from '../../../../db/queries';
 import { isDbConfigured } from '../../../../db/client';
+import { notifyProjectsUpdated } from '../../../../lib/pusher-server';
 
 export const GET: APIRoute = async () => {
   if (!isDbConfigured) {
@@ -60,6 +61,8 @@ export const POST: APIRoute = async ({ request }) => {
       hidden: Boolean(hidden),
       position: typeof position === 'number' ? position : 0,
     });
+
+    await notifyProjectsUpdated();
 
     return new Response(JSON.stringify({ ok: true, project: created }), {
       status: 201,

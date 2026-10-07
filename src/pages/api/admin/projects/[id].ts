@@ -2,6 +2,7 @@
 import type { APIRoute } from 'astro';
 import { updateProject, deleteProject } from '../../../../db/queries';
 import { isDbConfigured } from '../../../../db/client';
+import { notifyProjectsUpdated } from '../../../../lib/pusher-server';
 
 export const PATCH: APIRoute = async ({ params, request }) => {
   if (!isDbConfigured) {
@@ -27,6 +28,8 @@ export const PATCH: APIRoute = async ({ params, request }) => {
         { status: 404 }
       );
     }
+    await notifyProjectsUpdated();
+
     return new Response(JSON.stringify({ ok: true, project: updated }), {
       status: 200,
     });
@@ -56,6 +59,7 @@ export const DELETE: APIRoute = async ({ params }) => {
 
   try {
     await deleteProject(id);
+    await notifyProjectsUpdated();
     return new Response(JSON.stringify({ ok: true }), { status: 200 });
   } catch (err) {
     console.error(err);
