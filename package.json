@@ -11,7 +11,8 @@
     "lint:css": "stylelint \"src/styles/**/*.css\" --config .stylelintrc.json",
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
-    "hash-password": "node scripts/hash-password.mjs"
+    "hash-password": "node scripts/hash-password.mjs",
+    "migrate-static-projects": "node --env-file=.env scripts/migrate-static-projects.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^4.3.0",

@@ -36,8 +36,13 @@ const dbProjects = dbRows.map((row) => ({
   hidden: row.hidden,
 }));
 
+// Una vez que los proyectos fijos se migran a la base de datos, se usa solo
+// la base de datos para no mostrarlos duplicados. Si todavía no hay nada en
+// la base de datos, se usan los proyectos fijos del código como respaldo.
+const combinedProjects = dbProjects.length > 0 ? dbProjects : staticProjects;
+
 // Los destacados van primero
-const allProjects = [...dbProjects, ...staticProjects].sort(
+const allProjects = combinedProjects.sort(
   (a, b) => Number(b.featured) - Number(a.featured)
 );
 
