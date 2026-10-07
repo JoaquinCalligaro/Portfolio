@@ -1,4 +1,5 @@
 // Endpoint de login del panel de administración
+import { env } from '../../../lib/env';
 import type { APIRoute } from 'astro';
 import {
   createSessionValue,
@@ -13,8 +14,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const username = String(form.get('username') || '').trim();
     const password = String(form.get('password') || '').trim();
 
-    const expectedUsername = process.env.ADMIN_USERNAME;
-    const expectedPasswordHash = process.env.ADMIN_PASSWORD_HASH;
+    const expectedUsername = env('ADMIN_USERNAME');
+    const expectedPasswordHash = env('ADMIN_PASSWORD_HASH');
 
     if (!expectedUsername || !expectedPasswordHash) {
       return new Response(

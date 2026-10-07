@@ -1,15 +1,16 @@
 // Notifica cambios en los proyectos vía Pusher para actualizar la web y el
 // panel admin en tiempo real, sin que nadie tenga que recargar la página.
 import Pusher from 'pusher';
+import { env } from './env';
 
 const clean = (value: string | undefined) =>
   value?.trim().replace(/^["']|["']$/g, '') ?? '';
 
 const config = {
-  PUSHER_APP_ID: clean(process.env.PUSHER_APP_ID),
-  PUSHER_KEY: clean(process.env.PUSHER_KEY),
-  PUSHER_SECRET: clean(process.env.PUSHER_SECRET),
-  PUSHER_CLUSTER: clean(process.env.PUSHER_CLUSTER),
+  PUSHER_APP_ID: clean(env('PUSHER_APP_ID')),
+  PUSHER_KEY: clean(env('PUSHER_KEY')),
+  PUSHER_SECRET: clean(env('PUSHER_SECRET')),
+  PUSHER_CLUSTER: clean(env('PUSHER_CLUSTER')),
 };
 
 const missing = Object.entries(config)
