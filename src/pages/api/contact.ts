@@ -15,6 +15,8 @@ import {
 // Variables de entorno para el servicio de email
 const RESEND_API_KEY = env('RESEND_API_KEY');
 const TO_EMAIL = env('CONTACT_TO_EMAIL');
+// Remitente: sin dominio propio verificado en Resend se usa el de prueba
+const FROM_EMAIL = env('CONTACT_FROM_EMAIL') || 'Portfolio <onboarding@resend.dev>';
 
 // Cliente de Resend para envío de emails
 const resendClient = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
@@ -88,13 +90,17 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       const subject = `Nuevo mensaje de ${name}`;
       const html = `<p><strong>Nombre:</strong> ${escapeHtml(name)}</p><p><strong>Email:</strong> ${escapeHtml(email)}</p><hr/><div style="white-space:pre-wrap">${escapeHtml(message)}</div>`;
 
-      await resendClient.emails.send({
-        from: TO_EMAIL,
+      const { error } = await resendClient.emails.send({
+        from: FROM_EMAIL,
         to: TO_EMAIL,
         replyTo: email,
         subject,
         html,
       });
+      if (error) {
+        console.error('[contact] Resend error:', error);
+        return fail('Email not sent', 502);
+      }
 
       return new Response(JSON.stringify({ ok: true }), { status: 200 });
     }
