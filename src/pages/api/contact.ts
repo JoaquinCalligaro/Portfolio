@@ -1,10 +1,11 @@
 // API endpoint para el formulario de contacto
+import { env } from '../../lib/env';
 import type { APIRoute } from 'astro';
 import { Resend } from 'resend';
 
 // Variables de entorno para el servicio de email
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const TO_EMAIL = process.env.CONTACT_TO_EMAIL;
+const RESEND_API_KEY = env('RESEND_API_KEY');
+const TO_EMAIL = env('CONTACT_TO_EMAIL');
 
 // Cliente de Resend para envío de emails
 const resendClient = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;

@@ -1,12 +1,13 @@
 // Autenticación simple para el panel de administración (sin tabla de usuarios).
 // El usuario y el hash de la contraseña viven en variables de entorno.
+import { env } from './env';
 import { createHmac, timingSafeEqual, scryptSync } from 'node:crypto';
 
 const SESSION_COOKIE = 'admin_session';
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7 días
 
 function getSessionSecret(): string {
-  const secret = process.env.SESSION_SECRET;
+  const secret = env('SESSION_SECRET');
   if (!secret) {
     throw new Error('SESSION_SECRET no está configurada');
   }

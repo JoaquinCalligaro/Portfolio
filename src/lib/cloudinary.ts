@@ -1,16 +1,17 @@
 // Subida de imágenes a Cloudinary (firmada desde el servidor, sin exponer el secreto)
+import { env } from './env';
 import { createHash } from 'node:crypto';
 
 export const isCloudinaryConfigured = Boolean(
-  process.env.CLOUDINARY_CLOUD_NAME &&
-    process.env.CLOUDINARY_API_KEY &&
-    process.env.CLOUDINARY_API_SECRET
+  env('CLOUDINARY_CLOUD_NAME') &&
+    env('CLOUDINARY_API_KEY') &&
+    env('CLOUDINARY_API_SECRET')
 );
 
 export async function uploadImageToCloudinary(file: File): Promise<string> {
-  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-  const apiKey = process.env.CLOUDINARY_API_KEY;
-  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+  const cloudName = env('CLOUDINARY_CLOUD_NAME');
+  const apiKey = env('CLOUDINARY_API_KEY');
+  const apiSecret = env('CLOUDINARY_API_SECRET');
 
   if (!cloudName || !apiKey || !apiSecret) {
     throw new Error('Cloudinary no está configurado');
