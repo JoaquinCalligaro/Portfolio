@@ -22,9 +22,15 @@ const pusher = isPusherConfigured
   : null;
 
 export async function notifyProjectsUpdated() {
-  if (!pusher) return;
+  if (!pusher) {
+    console.warn(
+      '[realtime] Pusher no está configurado en el servidor (faltan PUSHER_APP_ID, PUSHER_KEY, PUSHER_SECRET o PUSHER_CLUSTER en el .env)'
+    );
+    return;
+  }
   try {
     await pusher.trigger('projects', 'updated', {});
+    console.info('[realtime] aviso de cambio enviado a Pusher');
   } catch (err) {
     console.error('Error notificando el cambio en tiempo real', err);
   }

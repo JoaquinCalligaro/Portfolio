@@ -18,7 +18,9 @@ const staticProjects = projectsData.map((project) => ({
   technologies: project.technologies,
   images: project.images,
   featured: false,
-  hidden: Boolean(project.hidden),
+  // En el respaldo estático se conserva el aspecto original: los que antes
+  // estaban "ocultos" quedan en la sección "Ver todos".
+  hidden: false,
 }));
 
 // Proyectos agregados desde el panel de admin (si la base de datos está conectada)
@@ -47,19 +49,19 @@ const allProjects = combinedProjects.sort(
   (a, b) => Number(b.featured) - Number(a.featured)
 );
 
-// Separar proyectos visibles y ocultos
+// Los proyectos ocultos no se muestran en la web. Los primeros 4 van en la
+// grilla principal y el resto queda detrás del botón "Ver todos".
 const visibleProjects = allProjects.filter((project) => !project.hidden);
-const hiddenProjects = allProjects.filter((project) => project.hidden);
-const hasMoreProjects = visibleProjects.length > 4 || hiddenProjects.length > 0;
+const mainProjects = visibleProjects.slice(0, 4);
+const extraProjects = visibleProjects.slice(4);
+const hasMoreProjects = extraProjects.length > 0;
 ---
 
 <div class="mt-12" data-realtime-sync="projects">
   <!-- Grid principal con los primeros 4 proyectos visibles -->
   <div class="grid grid-cols-1 gap-15 sm:grid-cols-2 md:grid-cols-2">
     {
-      visibleProjects
-        .slice(0, 4)
-        .map((project) => (
+      mainProjects.map((project) => (
           <ProjectCard
             id={project.id}
             titleKey={project.titleKey}
@@ -81,22 +83,7 @@ const hasMoreProjects = visibleProjects.length > 4 || hiddenProjects.length > 0;
       <>
         <div id="extra-projects" class="mt-8 hidden">
           <div class="grid grid-cols-1 gap-15 sm:grid-cols-2 md:grid-cols-2">
-            {/* Primero los proyectos visibles restantes */}
-            {visibleProjects.slice(4).map((project) => (
-              <ProjectCard
-                id={project.id}
-                titleKey={project.titleKey}
-                descriptionKey={project.descriptionKey}
-                title={project.title}
-                description={project.description}
-                repo={project.repo}
-                live={project.live}
-                technologies={project.technologies}
-                images={project.images}
-              />
-            ))}
-            {/* Luego los proyectos ocultos */}
-            {hiddenProjects.map((project) => (
+            {extraProjects.map((project) => (
               <div class="hidden">
                 <ProjectCard
                   id={project.id}
@@ -117,11 +104,7 @@ const hasMoreProjects = visibleProjects.length > 4 || hiddenProjects.length > 0;
         <div class="flex justify-center">
           <ShowMoreBtn
             id="show-more-projects"
-            text={
-              hiddenProjects.length > 0
-                ? `Ver todos (${hiddenProjects.length})`
-                : 'Ver más'
-            }
+            text={`Ver todos (${extraProjects.length})`}
           />
         </div>
       </>

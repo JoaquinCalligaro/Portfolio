@@ -47,14 +47,29 @@ async function syncProjects() {
       }
     }
   } catch (err) {
-    console.error('No se pudo actualizar en tiempo real', err);
+    console.error('[realtime] No se pudo actualizar en vivo', err);
   }
 }
 
 if (KEY && CLUSTER) {
   // @ts-expect-error bandera global simple, no necesita tipado
   window.__REALTIME_PROJECTS_ENABLED__ = true;
+
+  // Cambios hechos desde esta misma pestaña: se actualiza al instante.
+  window.addEventListener('projects:changed', syncProjects);
+
+  // Cambios hechos desde otro dispositivo o pestaña: llegan por Pusher.
   const pusher = new Pusher(KEY, { cluster: CLUSTER });
+  pusher.connection.bind('state_change', (states: { current: string }) => {
+    console.info(`[realtime] conexión: ${states.current}`);
+  });
+  pusher.connection.bind('error', (err: unknown) => {
+    console.error('[realtime] error de conexión', err);
+  });
+
   const channel = pusher.subscribe('projects');
-  channel.bind('updated', syncProjects);
+  channel.bind('updated', () => {
+    console.info('[realtime] cambio recibido, actualizando...');
+    syncProjects();
+  });
 }

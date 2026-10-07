@@ -102,7 +102,11 @@ const projectsList = isDbConfigured ? await listProjects() : [];
           .__REALTIME_PROJECTS_ENABLED__
       );
       const refresh = () => {
-        if (!isRealtimeEnabled) window.location.reload();
+        if (isRealtimeEnabled) {
+          window.dispatchEvent(new Event('projects:changed'));
+        } else {
+          window.location.reload();
+        }
       };
 
       if (target.closest('.toggle-featured-btn')) {
