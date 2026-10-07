@@ -1,0 +1,79 @@
+---
+// Página de login del panel de administración
+import AdminLayout from '../../layouts/AdminLayout.astro';
+export const prerender = false;
+---
+
+<AdminLayout title="Iniciar sesión" showLogout={false}>
+  <div class="mx-auto max-w-sm">
+    <h1 class="mb-6 text-center text-xl font-semibold text-white">
+      Entrar al panel
+    </h1>
+
+    <form
+      id="login-form"
+      class="space-y-4 rounded-xl border border-cyan-400/30 bg-gray-900/40 p-6 backdrop-blur-md"
+    >
+      <div>
+        <label for="username" class="block text-sm font-medium text-gray-300"
+          >Usuario</label
+        >
+        <input
+          id="username"
+          name="username"
+          type="text"
+          required
+          autocomplete="username"
+          class="mt-1 block w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-gray-100 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+        />
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-300"
+          >Contraseña</label
+        >
+        <input
+          id="password"
+          name="password"
+          type="password"
+          required
+          autocomplete="current-password"
+          class="mt-1 block w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-gray-100 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+        />
+      </div>
+
+      <p id="login-error" class="hidden text-sm text-red-400"></p>
+
+      <button
+        type="submit"
+        class="w-full rounded-md bg-cyan-500 px-4 py-2 font-medium text-gray-950 transition-colors hover:bg-cyan-400"
+      >
+        Entrar
+      </button>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById('login-form') as HTMLFormElement;
+    const errorEl = document.getElementById('login-error') as HTMLElement;
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorEl.classList.add('hidden');
+
+      const formData = new FormData(form);
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+
+      if (data.ok) {
+        window.location.href = '/admin';
+      } else {
+        errorEl.textContent = data.error || 'Error al iniciar sesión';
+        errorEl.classList.remove('hidden');
+      }
+    });
+  </script>
+</AdminLayout>

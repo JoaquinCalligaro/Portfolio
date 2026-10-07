@@ -1,0 +1,60 @@
+---
+// Layout del panel de administración: mismo estilo visual que el portfolio público
+import '../styles/base/global.css';
+
+interface Props {
+  title?: string;
+  showLogout?: boolean;
+}
+
+const { title = 'Admin', showLogout = true } = Astro.props as Props;
+---
+
+<!doctype html>
+<html lang="es" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title} | Admin Portfolio</title>
+  </head>
+  <body
+    class="min-h-screen bg-gray-50 text-gray-900 dark:bg-[#071029] dark:text-gray-100"
+  >
+    <header
+      class="header-backdrop-blur sticky top-0 z-20 border-b border-white/10 bg-white/60 px-4 py-3 dark:bg-gray-900/60"
+    >
+      <div class="mx-auto flex max-w-screen-lg items-center justify-between">
+        <a
+          href="/admin"
+          class="text-sm font-semibold text-gray-900 dark:text-white"
+        >
+          Panel de proyectos
+        </a>
+        {
+          showLogout && (
+            <button
+              id="logout-btn"
+              class="rounded-md border border-white/20 px-3 py-1.5 text-sm text-gray-700 transition-colors hover:border-cyan-400/50 hover:text-cyan-500 dark:text-gray-300 dark:hover:text-cyan-400"
+            >
+              Cerrar sesión
+            </button>
+          )
+        }
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-screen-lg px-4 py-8">
+      <slot />
+    </main>
+
+    <script>
+      const logoutBtn = document.getElementById('logout-btn');
+      logoutBtn?.addEventListener('click', async () => {
+        await fetch('/api/admin/logout', { method: 'POST' });
+        window.location.href = '/admin/login';
+      });
+    </script>
+  </body>
+</html>

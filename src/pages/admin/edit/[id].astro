@@ -1,0 +1,21 @@
+---
+// Formulario para editar un proyecto existente
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import ProjectForm from '../../../components/admin/ProjectForm.astro';
+import { getProjectById } from '../../../db/queries';
+import { isDbConfigured } from '../../../db/client';
+
+export const prerender = false;
+
+const { id } = Astro.params;
+const project = id && isDbConfigured ? await getProjectById(id) : null;
+
+if (!project) {
+  return Astro.redirect('/admin');
+}
+---
+
+<AdminLayout title="Editar proyecto">
+  <h1 class="mb-6 text-xl font-semibold text-white">Editar proyecto</h1>
+  <ProjectForm mode="edit" project={project} />
+</AdminLayout>

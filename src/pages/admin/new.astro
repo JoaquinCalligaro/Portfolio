@@ -1,0 +1,12 @@
+---
+// Formulario para crear un proyecto nuevo
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ProjectForm from '../../components/admin/ProjectForm.astro';
+
+export const prerender = false;
+---
+
+<AdminLayout title="Nuevo proyecto">
+  <h1 class="mb-6 text-xl font-semibold text-white">Nuevo proyecto</h1>
+  <ProjectForm mode="create" />
+</AdminLayout>

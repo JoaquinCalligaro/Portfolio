@@ -2,10 +2,48 @@
 import ProjectCard from './ProjectCard.astro';
 import { projectsData } from './projectsData.ts';
 import ShowMoreBtn from './ShowMoreBtn.astro';
+import { listProjects } from '../../db/queries';
+import { isDbConfigured } from '../../db/client';
+
+// Proyectos fijos en el código (siempre se muestran)
+const staticProjects = projectsData.map((project) => ({
+  id: project.id,
+  titleKey: project.titleKey,
+  descriptionKey: project.descriptionKey,
+  title: undefined,
+  description: undefined,
+  repo: project.repo,
+  live: project.live,
+  technologies: project.technologies,
+  images: project.images,
+  featured: false,
+  hidden: Boolean(project.hidden),
+}));
+
+// Proyectos agregados desde el panel de admin (si la base de datos está conectada)
+const dbRows = isDbConfigured ? await listProjects() : [];
+const dbProjects = dbRows.map((row) => ({
+  id: row.id,
+  titleKey: undefined,
+  descriptionKey: undefined,
+  title: { es: row.titleEs, en: row.titleEn },
+  description: { es: row.descriptionEs, en: row.descriptionEn },
+  repo: row.repo,
+  live: row.live,
+  technologies: row.technologies,
+  images: row.images,
+  featured: row.featured,
+  hidden: row.hidden,
+}));
+
+// Los destacados van primero
+const allProjects = [...dbProjects, ...staticProjects].sort(
+  (a, b) => Number(b.featured) - Number(a.featured)
+);
 
 // Separar proyectos visibles y ocultos
-const visibleProjects = projectsData.filter((project) => !project.hidden);
-const hiddenProjects = projectsData.filter((project) => project.hidden);
+const visibleProjects = allProjects.filter((project) => !project.hidden);
+const hiddenProjects = allProjects.filter((project) => project.hidden);
 const hasMoreProjects = visibleProjects.length > 4 || hiddenProjects.length > 0;
 ---
 
@@ -20,6 +58,8 @@ const hasMoreProjects = visibleProjects.length > 4 || hiddenProjects.length > 0;
             id={project.id}
             titleKey={project.titleKey}
             descriptionKey={project.descriptionKey}
+            title={project.title}
+            description={project.description}
             repo={project.repo}
             live={project.live}
             technologies={project.technologies}
@@ -41,6 +81,8 @@ const hasMoreProjects = visibleProjects.length > 4 || hiddenProjects.length > 0;
                 id={project.id}
                 titleKey={project.titleKey}
                 descriptionKey={project.descriptionKey}
+                title={project.title}
+                description={project.description}
                 repo={project.repo}
                 live={project.live}
                 technologies={project.technologies}
@@ -54,6 +96,8 @@ const hasMoreProjects = visibleProjects.length > 4 || hiddenProjects.length > 0;
                   id={project.id}
                   titleKey={project.titleKey}
                   descriptionKey={project.descriptionKey}
+                  title={project.title}
+                  description={project.description}
                   repo={project.repo}
                   live={project.live}
                   technologies={project.technologies}
