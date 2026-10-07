@@ -15,6 +15,13 @@
       "when": 1791407318911,
       "tag": "0001_gigantic_carlie_cooper",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791409811110,
+      "tag": "0002_salty_taskmaster",
+      "breakpoints": true
     }
   ]
 }

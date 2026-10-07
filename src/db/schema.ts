@@ -36,6 +36,9 @@ export const siteProfile = pgTable('site_profile', {
   headlineEn: text('headline_en').notNull().default(''),
   photoUrl: text('photo_url').notNull().default(''),
   cvUrl: text('cv_url').notNull().default(''),
+  // Formulario de contacto: a dónde llegan los mensajes y desde qué remitente
+  contactToEmail: text('contact_to_email').notNull().default(''),
+  contactFromEmail: text('contact_from_email').notNull().default(''),
   bioEs: text('bio_es').array().notNull().default([]),
   bioEn: text('bio_en').array().notNull().default([]),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
