@@ -6,8 +6,7 @@ import SubmitBtn from './SubmitBtn.astro';
 import FormStatus from './FormStatus.astro';
 import CooldownDisplay from './CooldownDisplay.astro';
 import CharacterCounter from './CharacterCounter.astro';
-// Formspree action must be provided via env
-const FORMSPREE_ACTION = import.meta.env.PUBLIC_FORMSPREE_ACTION;
+const TURNSTILE_SITE_KEY = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 ---
 
 <div
@@ -16,7 +15,7 @@ const FORMSPREE_ACTION = import.meta.env.PUBLIC_FORMSPREE_ACTION;
   <div class="contact-card-inner p-6">
     <form
       id="contactForm"
-      action={FORMSPREE_ACTION}
+      action="/api/contact"
       method="post"
       class="contact-form w-full space-y-4 rounded-xl"
       novalidate
@@ -125,6 +124,17 @@ const FORMSPREE_ACTION = import.meta.env.PUBLIC_FORMSPREE_ACTION;
         tabindex="-1"
         class="sr-only"
       />
+
+      {
+        TURNSTILE_SITE_KEY && (
+          <div class="cf-turnstile flex justify-center" data-sitekey={TURNSTILE_SITE_KEY} />
+        )
+      }
+      {
+        TURNSTILE_SITE_KEY && (
+          <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
+        )
+      }
 
       <div class="w-full text-center">
         <!-- Cooldown display mejorado -->

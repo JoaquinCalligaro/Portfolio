@@ -2,6 +2,15 @@
 import { env } from '../../lib/env';
 import type { APIRoute } from 'astro';
 import { Resend } from 'resend';
+import {
+  LIMITS,
+  escapeHtml,
+  isRateLimited,
+  isValidEmail,
+  toPlainText,
+  toSingleLine,
+  verifyTurnstile,
+} from '../../lib/contact-security';
 
 // Variables de entorno para el servicio de email
 const RESEND_API_KEY = env('RESEND_API_KEY');
@@ -11,8 +20,17 @@ const TO_EMAIL = env('CONTACT_TO_EMAIL');
 const resendClient = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 
 // Maneja las peticiones POST del formulario de contacto
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, clientAddress }) => {
+  const fail = (error: string, status: number) =>
+    new Response(JSON.stringify({ ok: false, error }), { status });
+
   try {
+    const ip =
+      request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+      clientAddress ||
+      'unknown';
+    if (isRateLimited(ip)) return fail('Too many requests', 429);
+
     const form = await request.formData();
 
     // Campo honeypot para detectar spam (debe estar vacío)
@@ -24,9 +42,12 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    const name = String(form.get('name') || '').trim();
+    const captcha = String(form.get('cf-turnstile-response') || '');
+    if (!(await verifyTurnstile(captcha, ip))) return fail('Captcha failed', 400);
+
+    const name = toSingleLine(String(form.get('name') || ''));
     const email = String(form.get('email') || '').trim();
-    const message = String(form.get('message') || '').trim();
+    const message = toPlainText(String(form.get('message') || ''));
     const formToken = String(form.get('form_token') || '').trim();
     const timeSpent = Number(form.get('time_spent') || 0);
 
@@ -46,6 +67,14 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
+    if (
+      name.length > LIMITS.name ||
+      message.length > LIMITS.message ||
+      !isValidEmail(email)
+    ) {
+      return fail('Invalid fields', 400);
+    }
+
     // Verificación de token del formulario
     if (!formToken) {
       return new Response(
@@ -57,11 +86,12 @@ export const POST: APIRoute = async ({ request }) => {
     // Envía email si Resend está configurado
     if (resendClient && TO_EMAIL) {
       const subject = `Nuevo mensaje de ${name}`;
-      const html = `<p><strong>Nombre:</strong> ${name}</p><p><strong>Email:</strong> ${email}</p><hr/><div>${message}</div>`;
+      const html = `<p><strong>Nombre:</strong> ${escapeHtml(name)}</p><p><strong>Email:</strong> ${escapeHtml(email)}</p><hr/><div style="white-space:pre-wrap">${escapeHtml(message)}</div>`;
 
       await resendClient.emails.send({
         from: TO_EMAIL,
         to: TO_EMAIL,
+        replyTo: email,
         subject,
         html,
       });
