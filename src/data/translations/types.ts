@@ -6,7 +6,6 @@ export type AboutMe = {
   title: string;
   shortBio: {
     heading: string;
-    paragraphs: string[];
     cvHeading: string;
     cvDownload: string;
   };
@@ -15,16 +14,8 @@ export type AboutMe = {
   };
 };
 
-// Estructura para elementos de experiencia laboral
-export type ExperienceItem = {
-  dates: string;
-  company: string;
-  description: string;
-  iconKey?: string; // Clave opcional para el tipo de icono: 'university', 'work', 'certificate', etc.
-  svgIcon?: string;
-};
-
-// Estructura principal de todas las traducciones
+// Estructura principal de las traducciones: solo textos chicos de interfaz.
+// El contenido personal (nombre, bio, stack, educación, proyectos) vive en la base de datos.
 export interface TranslationStructure {
   navbar: {
     home: string;
@@ -32,46 +23,12 @@ export interface TranslationStructure {
     about: string;
     contact: string;
   };
-  personal: {
-    name: string;
-    description: string;
-  };
   aboutMe: AboutMe;
   techStack: {
     heading: string;
-    categories: {
-      frontend: string;
-      database: string;
-      tools: string;
-      designTools: string;
-    };
   };
   projects: {
     heading: string;
-    backgroundGenerator: {
-      title: string;
-      description: string;
-    };
-    organicStore: {
-      title: string;
-      description: string;
-    };
-    passwordGenerator: {
-      title: string;
-      description: string;
-    };
-    gifApp: {
-      title: string;
-      description: string;
-    };
-    jsCalculator: {
-      title: string;
-      description: string;
-    };
-    todolist: {
-      title: string;
-      description: string;
-    };
   };
   buttons: {
     repo: string;
@@ -100,5 +57,4 @@ export interface TranslationStructure {
     showAll: string;
     hide: string;
   };
-  experiences: ExperienceItem[];
 }
