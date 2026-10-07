@@ -3,6 +3,7 @@ import type { APIRoute } from 'astro';
 import { updateProject, deleteProject } from '../../../../db/queries';
 import { isDbConfigured } from '../../../../db/client';
 import { notifyProjectsUpdated } from '../../../../lib/pusher-server';
+import { translateSafe } from '../../../../lib/translate';
 
 export const PATCH: APIRoute = async ({ params, request }) => {
   if (!isDbConfigured) {
@@ -21,6 +22,22 @@ export const PATCH: APIRoute = async ({ params, request }) => {
 
   try {
     const body = await request.json();
+    let warning: string | undefined;
+
+    // El inglés siempre se genera desde el español; nunca se edita a mano.
+    delete body.titleEn;
+    delete body.descriptionEn;
+    if (typeof body.titleEs === 'string') {
+      const t = await translateSafe(body.titleEs);
+      body.titleEn = t.text;
+      warning = t.warning;
+    }
+    if (typeof body.descriptionEs === 'string') {
+      const d = await translateSafe(body.descriptionEs);
+      body.descriptionEn = d.text;
+      warning = warning ?? d.warning;
+    }
+
     const updated = await updateProject(id, body);
     if (!updated) {
       return new Response(
@@ -30,7 +47,7 @@ export const PATCH: APIRoute = async ({ params, request }) => {
     }
     const realtime = await notifyProjectsUpdated();
 
-    return new Response(JSON.stringify({ ok: true, project: updated, realtime }), {
+    return new Response(JSON.stringify({ ok: true, project: updated, realtime, warning }), {
       status: 200,
     });
   } catch (err) {

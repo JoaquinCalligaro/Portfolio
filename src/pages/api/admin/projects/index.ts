@@ -3,6 +3,7 @@ import type { APIRoute } from 'astro';
 import { listProjects, createProject } from '../../../../db/queries';
 import { isDbConfigured } from '../../../../db/client';
 import { notifyProjectsUpdated } from '../../../../lib/pusher-server';
+import { translateSafe } from '../../../../lib/translate';
 
 export const GET: APIRoute = async () => {
   if (!isDbConfigured) {
@@ -29,9 +30,7 @@ export const POST: APIRoute = async ({ request }) => {
     const body = await request.json();
     const {
       titleEs,
-      titleEn,
       descriptionEs,
-      descriptionEn,
       repo,
       live,
       technologies,
@@ -41,18 +40,24 @@ export const POST: APIRoute = async ({ request }) => {
       position,
     } = body;
 
-    if (!titleEs || !titleEn || !descriptionEs || !descriptionEn) {
+    if (!titleEs || !descriptionEs) {
       return new Response(
         JSON.stringify({ ok: false, error: 'Faltan campos obligatorios' }),
         { status: 400 }
       );
     }
 
+    const [title, description] = await Promise.all([
+      translateSafe(titleEs),
+      translateSafe(descriptionEs),
+    ]);
+    const warning = title.warning ?? description.warning;
+
     const created = await createProject({
       titleEs,
-      titleEn,
+      titleEn: title.text,
       descriptionEs,
-      descriptionEn,
+      descriptionEn: description.text,
       repo: repo ?? '',
       live: live ?? '',
       technologies: Array.isArray(technologies) ? technologies : [],
@@ -64,7 +69,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     const realtime = await notifyProjectsUpdated();
 
-    return new Response(JSON.stringify({ ok: true, project: created, realtime }), {
+    return new Response(JSON.stringify({ ok: true, project: created, realtime, warning }), {
       status: 201,
     });
   } catch (err) {

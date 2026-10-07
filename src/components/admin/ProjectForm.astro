@@ -25,56 +25,29 @@ const TECH_OPTIONS = [
   data-mode={mode}
   data-project-id={project?.id ?? ''}
 >
-  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-    <div>
-      <label class="block text-sm font-medium text-gray-300"
-        >Título (Español)</label
-      >
-      <input
-        name="titleEs"
-        required
-        value={project?.titleEs ?? ''}
-        class="mt-1 block w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-gray-100 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-      />
-    </div>
-    <div>
-      <label class="block text-sm font-medium text-gray-300"
-        >Título (Inglés)</label
-      >
-      <input
-        name="titleEn"
-        required
-        value={project?.titleEn ?? ''}
-        class="mt-1 block w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-gray-100 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-      />
-    </div>
+  <p class="text-xs text-gray-500">
+    Escribí solo en español: el inglés se traduce automáticamente al guardar.
+  </p>
+
+  <div>
+    <label class="block text-sm font-medium text-gray-300">Título</label>
+    <input
+      name="titleEs"
+      required
+      value={project?.titleEs ?? ''}
+      class="mt-1 block w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-gray-100 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+    />
   </div>
 
-  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-    <div>
-      <label class="block text-sm font-medium text-gray-300"
-        >Descripción (Español)</label
-      >
-      <textarea
-        name="descriptionEs"
-        required
-        rows="3"
-        class="mt-1 block w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-gray-100 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-        >{project?.descriptionEs ?? ''}</textarea
-      >
-    </div>
-    <div>
-      <label class="block text-sm font-medium text-gray-300"
-        >Descripción (Inglés)</label
-      >
-      <textarea
-        name="descriptionEn"
-        required
-        rows="3"
-        class="mt-1 block w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-gray-100 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-        >{project?.descriptionEn ?? ''}</textarea
-      >
-    </div>
+  <div>
+    <label class="block text-sm font-medium text-gray-300">Descripción</label>
+    <textarea
+      name="descriptionEs"
+      required
+      rows="4"
+      class="mt-1 block w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-gray-100 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+      >{project?.descriptionEs ?? ''}</textarea
+    >
   </div>
 
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -255,9 +228,7 @@ const TECH_OPTIONS = [
 
     const payload = {
       titleEs: formData.get('titleEs'),
-      titleEn: formData.get('titleEn'),
       descriptionEs: formData.get('descriptionEs'),
-      descriptionEn: formData.get('descriptionEn'),
       repo: formData.get('repo') || '',
       live: formData.get('live') || '',
       technologies,
@@ -281,6 +252,7 @@ const TECH_OPTIONS = [
     const data = await res.json();
 
     if (data.ok) {
+      if (data.warning) alert(data.warning);
       window.location.href = '/admin';
     } else {
       errorEl.textContent = data.error || 'Error al guardar el proyecto';
