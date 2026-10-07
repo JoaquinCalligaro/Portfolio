@@ -32,6 +32,12 @@ const projectsList = isDbConfigured ? await listProjects() : [];
     )
   }
 
+  <p
+    id="realtime-warning"
+    class="mb-6 hidden rounded-md border border-amber-500/40 bg-amber-950/40 p-4 text-sm text-amber-200"
+  >
+  </p>
+
   <div data-realtime-sync="projects">
     {
       isDbConfigured && projectsList.length === 0 && (
@@ -101,7 +107,15 @@ const projectsList = isDbConfigured ? await listProjects() : [];
         (window as unknown as Record<string, unknown>)
           .__REALTIME_PROJECTS_ENABLED__
       );
-      const refresh = () => {
+      const refresh = (data: { realtime?: { ok: boolean; error?: string } }) => {
+        const warning = document.getElementById('realtime-warning');
+        if (data.realtime && !data.realtime.ok && warning) {
+          warning.textContent = `El cambio se guardó, pero el aviso en vivo falló: ${data.realtime.error}`;
+          warning.classList.remove('hidden');
+        } else {
+          warning?.classList.add('hidden');
+        }
+
         if (isRealtimeEnabled) {
           window.dispatchEvent(new Event('projects:changed'));
         } else {
@@ -109,36 +123,30 @@ const projectsList = isDbConfigured ? await listProjects() : [];
         }
       };
 
-      if (target.closest('.toggle-featured-btn')) {
-        const btn = target.closest('.toggle-featured-btn') as HTMLButtonElement;
-        const current = btn.dataset.featured === 'true';
+      const send = async (method: string, body?: unknown) => {
         const res = await fetch(`/api/admin/projects/${id}`, {
-          method: 'PATCH',
+          method,
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ featured: !current }),
+          body: body ? JSON.stringify(body) : undefined,
         });
-        if (res.ok) refresh();
+        if (res.ok) refresh(await res.json());
+      };
+
+      const featuredBtn = target.closest('.toggle-featured-btn') as HTMLButtonElement | null;
+      if (featuredBtn) {
+        await send('PATCH', { featured: featuredBtn.dataset.featured !== 'true' });
         return;
       }
 
-      if (target.closest('.toggle-hidden-btn')) {
-        const btn = target.closest('.toggle-hidden-btn') as HTMLButtonElement;
-        const current = btn.dataset.hidden === 'true';
-        const res = await fetch(`/api/admin/projects/${id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ hidden: !current }),
-        });
-        if (res.ok) refresh();
+      const hiddenBtn = target.closest('.toggle-hidden-btn') as HTMLButtonElement | null;
+      if (hiddenBtn) {
+        await send('PATCH', { hidden: hiddenBtn.dataset.hidden !== 'true' });
         return;
       }
 
       if (target.closest('.delete-btn')) {
         if (!confirm('¿Borrar este proyecto? No se puede deshacer.')) return;
-        const res = await fetch(`/api/admin/projects/${id}`, {
-          method: 'DELETE',
-        });
-        if (res.ok) refresh();
+        await send('DELETE');
       }
     });
   </script>

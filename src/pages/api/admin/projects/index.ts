@@ -62,9 +62,9 @@ export const POST: APIRoute = async ({ request }) => {
       position: typeof position === 'number' ? position : 0,
     });
 
-    await notifyProjectsUpdated();
+    const realtime = await notifyProjectsUpdated();
 
-    return new Response(JSON.stringify({ ok: true, project: created }), {
+    return new Response(JSON.stringify({ ok: true, project: created, realtime }), {
       status: 201,
     });
   } catch (err) {

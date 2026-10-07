@@ -28,9 +28,9 @@ export const PATCH: APIRoute = async ({ params, request }) => {
         { status: 404 }
       );
     }
-    await notifyProjectsUpdated();
+    const realtime = await notifyProjectsUpdated();
 
-    return new Response(JSON.stringify({ ok: true, project: updated }), {
+    return new Response(JSON.stringify({ ok: true, project: updated, realtime }), {
       status: 200,
     });
   } catch (err) {
@@ -59,8 +59,8 @@ export const DELETE: APIRoute = async ({ params }) => {
 
   try {
     await deleteProject(id);
-    await notifyProjectsUpdated();
-    return new Response(JSON.stringify({ ok: true }), { status: 200 });
+    const realtime = await notifyProjectsUpdated();
+    return new Response(JSON.stringify({ ok: true, realtime }), { status: 200 });
   } catch (err) {
     console.error(err);
     return new Response(
