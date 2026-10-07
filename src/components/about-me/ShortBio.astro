@@ -1,47 +1,65 @@
 ---
-import GitHubBtn from './GitHubBtn.astro';
-import LinkedInBtn from './LinkedInBtn.astro';
+import SocialBtn from './SocialBtn.astro';
+import CvDownloadBtn from './CvDownloadBtn.astro';
+import DirectLocalizedText from '../language/DirectLocalizedText.astro';
 import { getAboutMe } from '../../data/translations';
-import CvDownloadBtn from '../about-me/CvDownloadBtn.astro';
+import type { ProfileRow, SocialLinkRow } from '../../db/schema';
 import '../../styles/about.css';
+
+interface Props {
+  profile: ProfileRow | null;
+  socialLinks: SocialLinkRow[];
+}
+
+const { profile, socialLinks } = Astro.props as Props;
 const t = getAboutMe('ES');
+
+const paragraphs = (profile?.bioEs ?? []).map((es, i) => ({
+  es,
+  en: profile?.bioEn?.[i] || es,
+}));
+const cvUrl = profile?.cvUrl ?? '';
+const hasContent = paragraphs.length > 0 || Boolean(cvUrl) || socialLinks.length > 0;
 ---
 
-<article class="flex flex-col gap-6 pt-5 md:flex-row">
-  <!-- Bio y CV -->
-  <div
-    class="about-card-root mb-5 flex-1 rounded-xl border-1 border-cyan-400/30 bg-gray-100/30 p-8 text-gray-950 transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/30 hover:shadow-lg dark:border-cyan-500/30 dark:bg-gray-900/30 dark:text-gray-100 dark:hover:border-cyan-400"
-  >
-    <div class="about-card-inner flex flex-col gap-6">
-      <div class="flex flex-col gap-4">
-        <h3
-          class="flex items-center gap-2 text-lg font-semibold text-gray-950 sm:text-xl dark:text-white"
-        >
-          <span data-i18n-key="aboutMe.shortBio.heading"
-            >{t.shortBio.heading}</span
-          >
-          <span class="text-2xl">🧬</span>
-        </h3>
-        <div class="space-y-4 text-sm text-black sm:text-base dark:text-white">
-          {
-            t.shortBio.paragraphs.map((p, i) => (
-              <p
-                class="leading-relaxed"
-                data-i18n-key={`aboutMe.shortBio.paragraphs.${i}`}
-              >
-                {p}
-              </p>
-            ))
-          }
-        </div>
-      </div>
+<div data-realtime-sync="about-bio">
+  {
+    hasContent && (
+      <article class="flex flex-col gap-6 pt-5 md:flex-row">
+        <!-- Bio y CV -->
+        <div class="about-card-root mb-5 flex-1 rounded-xl border-1 border-cyan-400/30 bg-gray-100/30 p-8 text-gray-950 transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/30 hover:shadow-lg dark:border-cyan-500/30 dark:bg-gray-900/30 dark:text-gray-100 dark:hover:border-cyan-400">
+          <div class="about-card-inner flex flex-col gap-6">
+            <div class="flex flex-col gap-4">
+              <h3 class="flex items-center gap-2 text-lg font-semibold text-gray-950 sm:text-xl dark:text-white">
+                <span data-i18n-key="aboutMe.shortBio.heading">
+                  {t.shortBio.heading}
+                </span>
+                <span class="text-2xl">🧬</span>
+              </h3>
+              <div class="space-y-4 text-sm text-black sm:text-base dark:text-white">
+                {paragraphs.map((p) => (
+                  <p class="leading-relaxed">
+                    <DirectLocalizedText es={p.es} en={p.en} />
+                  </p>
+                ))}
+              </div>
+            </div>
 
-      <!-- CV Download y Redes Sociales -->
-      <div class="flex flex-nowrap items-center gap-3">
-        <CvDownloadBtn />
-        <GitHubBtn />
-        <LinkedInBtn />
-      </div>
-    </div>
-  </div>
-</article>
+            <!-- CV Download y Redes Sociales -->
+            <div class="flex flex-wrap items-center gap-3">
+              <CvDownloadBtn href={cvUrl} />
+              {socialLinks.map((link) => (
+                <SocialBtn
+                  label={link.label}
+                  href={link.url}
+                  iconSlug={link.iconSlug}
+                  iconUrl={link.iconUrl}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </article>
+    )
+  }
+</div>

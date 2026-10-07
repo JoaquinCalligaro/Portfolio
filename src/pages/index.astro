@@ -8,25 +8,30 @@ import ProjectsGrid from '../components/my-projects/ProjectsGrid.astro';
 import AboutMeTitle from '../components/about-me/AboutMeTitle.astro';
 import ShortBio from '../components/about-me/ShortBio.astro';
 import '../styles/base/global.css';
+import { loadSiteData } from '../lib/site-data';
 import Experience from '../components/about-me/Experience.astro';
 import Contact from '../components/contact/Contact.astro';
 import ContactTitle from '../components/contact/ContactTitle.astro';
+
+// Todo el contenido viene de la base de datos (vacío si no está configurada)
+const { profile, socialLinks, techCategories, education, projects } =
+  await loadSiteData();
 ---
 
-<Layout>
+<Layout profile={profile} socialLinks={socialLinks}>
   <!-- Sección Hero -->
   <div id="home" class="pt-40">
-    <PersonalPresentation />
+    <PersonalPresentation profile={profile} />
   </div>
   <section class="flex flex-col">
     <article>
       <!-- Tech Stack  -->
       <div id="tech-stack">
-        <TechStack />
+        <TechStack categories={techCategories} />
       </div>
       <div id="projects">
         <ProjectTitle />
-        <ProjectsGrid />
+        <ProjectsGrid projects={projects} />
       </div>
 
       <!-- Sección Sobre Mí -->
@@ -37,10 +42,10 @@ import ContactTitle from '../components/contact/ContactTitle.astro';
             class="flex flex-col gap-8 md:flex-row md:items-start md:space-x-8"
           >
             <div class="md:w-1/2">
-              <ShortBio />
+              <ShortBio profile={profile} socialLinks={socialLinks} />
             </div>
             <div class="md:w-1/2">
-              <Experience />
+              <Experience items={education} />
             </div>
           </div>
         </div>
@@ -112,9 +117,8 @@ import ContactTitle from '../components/contact/ContactTitle.astro';
           }
 
           // Importar y usar el nuevo módulo TypeScript
-          const { initShowMore } = await import(
-            '../components/scripts/show-more/index.js'
-          );
+          const { initShowMore } =
+            await import('../components/scripts/show-more/index.js');
           if (typeof initShowMore === 'function') {
             initShowMore('show-more-projects', {
               targetId: 'extra-projects',

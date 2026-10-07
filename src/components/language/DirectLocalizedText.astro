@@ -1,7 +1,7 @@
 ---
 // Igual que LocalizedText, pero para texto que ya viene en ambos idiomas
-// (por ejemplo, proyectos creados desde el panel de admin), sin pasar por el
-// diccionario de traducciones.
+// (todo lo que se edita desde el panel), sin pasar por el diccionario de
+// traducciones. El cambio de idioma lo aplica un único script en Layout.astro.
 interface Props {
   es: string;
   en: string;
@@ -12,29 +12,3 @@ const { es, en, class: className = '' } = Astro.props as Props;
 ---
 
 <span class={className} data-i18n-es={es} data-i18n-en={en}>{es}</span>
-
-<script is:inline>
-  (function () {
-    const updateNode = (node, lang) => {
-      const value = lang === 'EN' ? node.dataset.i18nEn : node.dataset.i18nEs;
-      if (typeof value === 'string') {
-        node.textContent = value;
-      }
-    };
-
-    const applyAll = (lang) => {
-      document
-        .querySelectorAll('[data-i18n-es][data-i18n-en]')
-        .forEach((node) => updateNode(node, lang));
-    };
-
-    window.addEventListener('langChange', (e) => {
-      const lang = (e && e.detail) || document.documentElement.lang || 'ES';
-      applyAll(lang);
-    });
-
-    if (document.documentElement.lang) {
-      applyAll(document.documentElement.lang);
-    }
-  })();
-</script>

@@ -1,102 +1,60 @@
 ---
-// Render-only component for Tech Stack.
-// Imports `stacks` (data) from src/data/techs.ts — keep UI logic here only.
+// Render-only component for Tech Stack: las categorías y tecnologías vienen de la base.
 import TechStackSection from './TechStackSection.astro';
 import LocalizedText from '../language/LocalizedText.astro';
-import { stacks } from '../../data/techs';
-import { translations } from '../../data/translations';
+import type { TechCategoryRow, TechRow } from '../../db/schema';
 import '../../styles/techstack.css';
 
 interface Props {
   className?: string;
+  categories: (TechCategoryRow & { techs: TechRow[] })[];
 }
 
-const { className = '' } = Astro.props as Props;
-
-// Use ES as default for server-side rendering, then update with JavaScript
-const serverLang = 'ES';
-const serverTranslations = translations[serverLang];
+const { className = '', categories } = Astro.props as Props;
 
 const splitClasses = className.split(' ');
 ---
 
-<div
-  class="tech-stack-card mt-20 w-full rounded-4xl border-1 border-cyan-400/30 bg-gray-100/10 p-6 shadow-sm hover:border-cyan-400/30 dark:border-cyan-500/30 dark:bg-gray-900/20 dark:hover:border-cyan-400"
-  class:list={splitClasses}
->
-  <div class="flex flex-col gap-4 pb-10">
-    <div class="mb-2 flex items-center gap-3">
+<div data-realtime-sync="tech">
+  {
+    categories.length > 0 && (
       <div
-        class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500"
+        class="tech-stack-card mt-20 w-full rounded-4xl border-1 border-cyan-400/30 bg-gray-100/10 p-6 shadow-sm hover:border-cyan-400/30 dark:border-cyan-500/30 dark:bg-gray-900/20 dark:hover:border-cyan-400"
+        class:list={splitClasses}
       >
-        <svg
-          class="h-5 w-5 text-white"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-          ></path>
-        </svg>
+        <div class="flex flex-col gap-4 pb-10">
+          <div class="mb-2 flex items-center gap-3">
+            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500">
+              <svg
+                class="h-5 w-5 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                />
+              </svg>
+            </div>
+            <h3 class="text-lg font-bold text-gray-950 sm:text-xl dark:text-white">
+              <LocalizedText key="techStack.heading" />
+            </h3>
+          </div>
+
+          <div class="mt-4 flex flex-col gap-4">
+            {categories.map((category) => (
+              <TechStackSection
+                nameEs={category.nameEs}
+                nameEn={category.nameEn}
+                techs={category.techs}
+              />
+            ))}
+          </div>
+        </div>
       </div>
-      <h3 class="text-lg font-bold text-gray-950 sm:text-xl dark:text-white">
-        <LocalizedText key="techStack.heading" />
-      </h3>
-    </div>
-
-    <div class="mt-4 flex flex-col gap-4">
-      {
-        stacks.map((stack) => (
-          <TechStackSection
-            title={serverTranslations.techStack.categories[stack.categoryKey]}
-            items={stack.items}
-            data-tech-category={stack.categoryKey}
-          />
-        ))
-      }
-    </div>
-  </div>
+    )
+  }
 </div>
-
-<script is:inline>
-  (function () {
-    const updateTechCategories = (lang) => {
-      // Update tech category titles based on current language
-      document.querySelectorAll('[data-tech-category]').forEach((node) => {
-        const categoryKey = node.dataset.techCategory;
-        if (
-          !categoryKey ||
-          !window.TRANSLATIONS ||
-          !window.TRANSLATIONS[lang]
-        ) {
-          return;
-        }
-
-        try {
-          const categoryTitle =
-            window.TRANSLATIONS[lang].techStack?.categories?.[categoryKey];
-          if (categoryTitle) {
-            node.textContent = categoryTitle;
-          }
-        } catch (e) {
-          console.warn('Error updating tech category:', categoryKey, e);
-        }
-      });
-    };
-
-    // Listen for language changes
-    window.addEventListener('langChange', (e) => {
-      const lang = (e && e.detail) || document.documentElement.lang || 'ES';
-      updateTechCategories(lang);
-    });
-
-    // Apply initial translations if already available
-    if (window.TRANSLATIONS && document.documentElement.lang) {
-      updateTechCategories(document.documentElement.lang);
-    }
-  })();
-</script>

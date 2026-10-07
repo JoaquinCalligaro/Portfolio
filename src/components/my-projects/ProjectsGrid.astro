@@ -1,51 +1,18 @@
 ---
 import ProjectCard from './ProjectCard.astro';
-import { projectsData } from './projectsData.ts';
 import ShowMoreBtn from './ShowMoreBtn.astro';
-import { listProjects } from '../../db/queries';
-import { isDbConfigured } from '../../db/client';
-import RealtimeProjectsSync from '../realtime/RealtimeProjectsSync.astro';
+import RealtimeSiteSync from '../realtime/RealtimeSiteSync.astro';
+import { translations } from '../../data/translations';
+import type { ProjectRow } from '../../db/schema';
 
-// Proyectos fijos en el código (siempre se muestran)
-const staticProjects = projectsData.map((project) => ({
-  id: project.id,
-  titleKey: project.titleKey,
-  descriptionKey: project.descriptionKey,
-  title: undefined,
-  description: undefined,
-  repo: project.repo,
-  live: project.live,
-  technologies: project.technologies,
-  images: project.images,
-  featured: false,
-  // En el respaldo estático se conserva el aspecto original: los que antes
-  // estaban "ocultos" quedan en la sección "Ver todos".
-  hidden: false,
-}));
+interface Props {
+  projects: ProjectRow[];
+}
 
-// Proyectos agregados desde el panel de admin (si la base de datos está conectada)
-const dbRows = isDbConfigured ? await listProjects() : [];
-const dbProjects = dbRows.map((row) => ({
-  id: row.id,
-  titleKey: undefined,
-  descriptionKey: undefined,
-  title: { es: row.titleEs, en: row.titleEn },
-  description: { es: row.descriptionEs, en: row.descriptionEn },
-  repo: row.repo,
-  live: row.live,
-  technologies: row.technologies,
-  images: row.images,
-  featured: row.featured,
-  hidden: row.hidden,
-}));
+const { projects } = Astro.props as Props;
 
-// Una vez que los proyectos fijos se migran a la base de datos, se usa solo
-// la base de datos para no mostrarlos duplicados. Si todavía no hay nada en
-// la base de datos, se usan los proyectos fijos del código como respaldo.
-const combinedProjects = dbProjects.length > 0 ? dbProjects : staticProjects;
-
-// Los destacados van primero
-const allProjects = combinedProjects.sort(
+// Los destacados van primero (el orden dentro de cada grupo es el del panel).
+const allProjects = [...projects].sort(
   (a, b) => Number(b.featured) - Number(a.featured)
 );
 
@@ -55,29 +22,33 @@ const visibleProjects = allProjects.filter((project) => !project.hidden);
 const mainProjects = visibleProjects.slice(0, 4);
 const extraProjects = visibleProjects.slice(4);
 const hasMoreProjects = extraProjects.length > 0;
+
+const showAllText = translations.ES.showMore.showAll.replace(
+  '${total}',
+  String(extraProjects.length)
+);
+
+const toCard = (project: ProjectRow) => ({
+  id: project.id,
+  title: { es: project.titleEs, en: project.titleEn || project.titleEs },
+  description: {
+    es: project.descriptionEs,
+    en: project.descriptionEn || project.descriptionEs,
+  },
+  repo: project.repo,
+  live: project.live,
+  technologies: project.technologies,
+  images: project.images,
+});
 ---
 
 <div class="mt-12" data-realtime-sync="projects">
   <!-- Grid principal con los primeros 4 proyectos visibles -->
   <div class="grid grid-cols-1 gap-15 sm:grid-cols-2 md:grid-cols-2">
-    {
-      mainProjects.map((project) => (
-          <ProjectCard
-            id={project.id}
-            titleKey={project.titleKey}
-            descriptionKey={project.descriptionKey}
-            title={project.title}
-            description={project.description}
-            repo={project.repo}
-            live={project.live}
-            technologies={project.technologies}
-            images={project.images}
-          />
-        ))
-    }
+    {mainProjects.map((project) => <ProjectCard {...toCard(project)} />)}
   </div>
 
-  <!-- Contenedor oculto con TODOS los proyectos adicionales (resto de visibles + ocultos) -->
+  <!-- Contenedor oculto con TODOS los proyectos adicionales (resto de visibles) -->
   {
     hasMoreProjects && (
       <>
@@ -85,31 +56,18 @@ const hasMoreProjects = extraProjects.length > 0;
           <div class="grid grid-cols-1 gap-15 sm:grid-cols-2 md:grid-cols-2">
             {extraProjects.map((project) => (
               <div class="hidden">
-                <ProjectCard
-                  id={project.id}
-                  titleKey={project.titleKey}
-                  descriptionKey={project.descriptionKey}
-                  title={project.title}
-                  description={project.description}
-                  repo={project.repo}
-                  live={project.live}
-                  technologies={project.technologies}
-                  images={project.images}
-                />
+                <ProjectCard {...toCard(project)} />
               </div>
             ))}
           </div>
         </div>
 
         <div class="flex justify-center">
-          <ShowMoreBtn
-            id="show-more-projects"
-            text={`Ver todos (${extraProjects.length})`}
-          />
+          <ShowMoreBtn id="show-more-projects" text={showAllText} />
         </div>
       </>
     )
   }
 </div>
 
-<RealtimeProjectsSync />
+<RealtimeSiteSync />

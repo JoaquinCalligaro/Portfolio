@@ -1,65 +1,32 @@
 ---
 // TechCard - Refactorizado usando principalmente Tailwind
-import { Image } from 'astro:assets';
-import type { ImageMetadata } from 'astro';
-
-// Imports de todos los SVGs
-import htmlSvg from '../../assets/svg/html.svg';
-import cssSvg from '../../assets/svg/css.svg';
-import sassSvg from '../../assets/svg/sass.svg';
-import tailwindSvg from '../../assets/svg/tailwindcss.svg';
-import javascriptSvg from '../../assets/svg/javascript.svg';
-import typescriptSvg from '../../assets/svg/typescript.svg';
-import reactSvg from '../../assets/svg/react.svg';
-import astroSvg from '../../assets/svg/astro-logo.svg';
-import mysqlSvg from '../../assets/svg/mysql.svg';
-import githubSvg from '../../assets/svg/github.svg';
-import vscodeSvg from '../../assets/svg/vscode.svg';
-import postmanSvg from '../../assets/svg/postman.svg';
-import figmaSvg from '../../assets/svg/figma.svg';
-import photohopSvg from '../../assets/svg/photohop.svg';
-import canvaSvg from '../../assets/svg/canva.svg';
-
 interface Props {
   name: string;
   hex: string;
-  hexAlpha: string;
-  icon: string;
-  color?: string;
+  iconUrl?: string;
+  iconSlug?: string;
   rounded?: string;
   loading?: 'eager' | 'lazy';
 }
 
 const {
   name,
-  hex,
-  hexAlpha,
-  icon,
-  color = '',
+  hex: rawHex,
+  iconUrl = '',
+  iconSlug = '',
   rounded = 'rounded-2xl',
-  loading,
+  loading = 'eager',
 } = Astro.props as Props;
 
-// Mapear nombres de archivos a imports
-const iconMap: Record<string, ImageMetadata> = {
-  'html.svg': htmlSvg,
-  'css.svg': cssSvg,
-  'sass.svg': sassSvg,
-  'tailwindcss.svg': tailwindSvg,
-  'javascript.svg': javascriptSvg,
-  'typescript.svg': typescriptSvg,
-  'react.svg': reactSvg,
-  'astro-logo.svg': astroSvg,
-  'mysql.svg': mysqlSvg,
-  'github.svg': githubSvg,
-  'vscode.svg': vscodeSvg,
-  'postman.svg': postmanSvg,
-  'figma.svg': figmaSvg,
-  'photohop.svg': photohopSvg,
-  'canva.svg': canvaSvg,
-};
+const hex = /^#[0-9a-f]{6}$/i.test(rawHex) ? rawHex : '#06B6D4';
+const hexAlpha = `${hex}33`;
 
-const iconSrc = iconMap[icon] || null;
+// Imagen subida > ícono de Simple Icons (con el color elegido) > "?"
+const iconSrc =
+  iconUrl ||
+  (iconSlug
+    ? `https://cdn.simpleicons.org/${encodeURIComponent(iconSlug)}/${hex.slice(1)}`
+    : '');
 ---
 
 <div
@@ -74,11 +41,11 @@ const iconSrc = iconMap[icon] || null;
 >
   <!-- Icono -->
   <div
-    class={`${color} flex-shrink-0 w-8 h-8 flex items-center justify-center transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-105`}
+    class="flex h-8 w-8 flex-shrink-0 items-center justify-center transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-105"
   >
     {
       iconSrc ? (
-        <Image
+        <img
           src={iconSrc}
           alt={name}
           loading={loading}

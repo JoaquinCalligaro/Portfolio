@@ -1,0 +1,30 @@
+---
+// Botón de una red social (estilo glassmorphism). Reemplaza a GitHubBtn/LinkedInBtn.
+import SocialIcon from '../ui/SocialIcon.astro';
+
+interface Props {
+  label: string;
+  href: string;
+  iconSlug?: string;
+  iconUrl?: string;
+  className?: string;
+}
+
+const {
+  label,
+  href,
+  iconSlug = '',
+  iconUrl = '',
+  className = '',
+} = Astro.props as Props;
+---
+
+<a
+  href={href}
+  class={`inline-flex items-center gap-2 glassmorph-effect rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 transition-all hover:border-slate-800 hover:bg-slate-500/70 hover:text-white dark:border-gray-600 dark:bg-gray-400/10 dark:text-slate-100 dark:hover:bg-gray-600 ${className}`}
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  <SocialIcon label={label} iconSlug={iconSlug} iconUrl={iconUrl} />
+  <span class="text-center">{label}</span>
+</a>

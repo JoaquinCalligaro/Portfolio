@@ -1,9 +1,6 @@
 ---
-import { Image } from 'astro:assets';
-import type { ImageMetadata } from 'astro';
-
 export interface Props {
-  src: ImageMetadata;
+  src: string;
   alt?: string;
   className?: string;
   sizes?: string;
@@ -21,11 +18,12 @@ const {
 } = Astro.props;
 ---
 
-<Image
+<img
   src={src}
   alt={alt}
   loading={loading}
   fetchpriority={fetchpriority}
-  class={`h-60 w-60 rounded-full object-cover shadow-lg ring-4 ring-cyan-600/70 transition-all duration-300 hover:scale-105 hover:shadow-xl sm:h-40 sm:w-40 md:h-56 md:w-56 dark:ring-cyan-400 ${className}`}
+  decoding="async"
+  class={`h-60 w-60 shrink-0 rounded-full object-cover shadow-lg ring-4 ring-cyan-600/70 transition-all duration-300 hover:scale-105 hover:shadow-xl sm:h-40 sm:w-40 md:h-56 md:w-56 dark:ring-cyan-400 ${className}`}
   sizes={sizes}
 />

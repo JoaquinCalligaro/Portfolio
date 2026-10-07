@@ -1,27 +1,29 @@
 ---
-// CV Download Button Component with Glassmorphism Effect
+// Botón de descarga del CV (la URL viene del perfil; si está vacía no se muestra)
 import LocalizedText from '../language/LocalizedText.astro';
-const { href = '/docs/cv.pdf', label = null, className = '' } = Astro.props;
+const { href = '', label = null, className = '' } = Astro.props;
 ---
 
-<a
-  href={href}
-  class={`inline-flex items-center glassmorph-effect rounded-lg border border-slate-300 bg-white px-2 py-2 text-sm font-medium text-slate-800 transition-all hover:border-slate-800 hover:bg-slate-500/70 hover:text-white dark:border-gray-600 dark:bg-gray-400/10 dark:text-slate-100 dark:hover:bg-gray-600 ${className}`}
-  target="_blank"
-  rel="noopener noreferrer"
->
-  <!-- Inline SVG icon (document) to match GitHub/LinkedIn icon style -->
-  <svg
-    class="h-4 w-4"
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM13 3.5L18.5 9H13V3.5zM8 12h8v1H8v-1zm0 3h8v1H8v-1z"
-    ></path>
-  </svg>
-  <span class="xl:25 inline-block w-22 text-center sm:w-22 md:w-24">
-    {label ? label : <LocalizedText key="aboutMe.shortBio.cvDownload" />}
-  </span>
-</a>
+{
+  href && (
+    <a
+      href={href}
+      class={`inline-flex items-center gap-2 glassmorph-effect rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 transition-all hover:border-slate-800 hover:bg-slate-500/70 hover:text-white dark:border-gray-600 dark:bg-gray-400/10 dark:text-slate-100 dark:hover:bg-gray-600 ${className}`}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <!-- Inline SVG icon (document) to match the social icons style -->
+      <svg
+        class="h-4 w-4"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM13 3.5L18.5 9H13V3.5zM8 12h8v1H8v-1zm0 3h8v1H8v-1z" />
+      </svg>
+      <span class="text-center">
+        {label ? label : <LocalizedText key="aboutMe.shortBio.cvDownload" />}
+      </span>
+    </a>
+  )
+}
