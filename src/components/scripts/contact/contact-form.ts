@@ -218,6 +218,7 @@ interface WindowWithTranslations extends Window {
       );
     }
 
+    const formOpenedAt = Date.now();
     const statusElements: StatusElements = {
       cooldownDisplay: qs('#cooldown-display'),
       formStatus: qs('#form-status'),
@@ -647,6 +648,9 @@ interface WindowWithTranslations extends Window {
 
       try {
         const fd = new FormData(elements.form);
+        // Campos anti-bot que el servidor verifica
+        fd.set('form_token', crypto.randomUUID());
+        fd.set('time_spent', String(Date.now() - formOpenedAt));
         const res = await fetch('/api/contact', {
           method: (elements.form.method || 'POST').toUpperCase(),
           body: fd,
