@@ -260,5 +260,40 @@ export function useListEditor(config: Config) {
     [adapter, patch]
   );
 
-  return { items, add, setField, save, move, toggleHidden, remove };
+  // Vuelve a cargar cambios sin guardar: pisa valores por id y re-agrega los
+  // elementos nuevos que quedaron a medio escribir.
+  const restore = useCallback(
+    (
+      drafts: { id: string; values: Values; hidden?: boolean }[]
+    ) => {
+      if (drafts.length === 0) return;
+      setItems((current) => {
+        const next = current.map((item) => {
+          const draft = item.id && drafts.find((d) => d.id === item.id);
+          return draft
+            ? {
+                ...item,
+                values: { ...item.values, ...draft.values },
+                hidden: draft.hidden ?? item.hidden,
+              }
+            : item;
+        });
+        const fresh = drafts
+          .filter((d) => !d.id)
+          .map<EditorItem>((d) => ({
+            ...toItem(
+              { id: '', values: { ...configRef.current.blank, ...d.values } },
+              nextKey()
+            ),
+            saved: '',
+            fresh: true,
+            hidden: d.hidden ?? false,
+          }));
+        return [...next, ...fresh];
+      });
+    },
+    []
+  );
+
+  return { items, add, setField, save, move, toggleHidden, remove, restore };
 }

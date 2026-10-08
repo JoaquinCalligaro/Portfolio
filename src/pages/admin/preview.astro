@@ -6,7 +6,7 @@ import SiteContent from '../../components/site/SiteContent.astro';
 import '../../styles/base/global.css';
 import { loadSiteData } from '../../lib/site-data';
 import { applyDraft } from '../../lib/preview/apply-draft';
-import { parseDraft, MAX_DRAFT_BYTES } from '../../lib/preview/parse-draft';
+import { parseDrafts, MAX_DRAFT_BYTES } from '../../lib/preview/parse-draft';
 import { DraftError } from '../../lib/preview/types';
 
 Astro.response.headers.set('Cache-Control', 'no-store');
@@ -22,8 +22,8 @@ try {
   if (declared > MAX_DRAFT_BYTES * 2)
     throw new DraftError('El borrador es demasiado grande', 413);
   const form = await Astro.request.formData();
-  const draft = parseDraft(form.get('draft'));
-  data = applyDraft(await loadSiteData(), draft);
+  const drafts = parseDrafts(form.get('draft'));
+  data = drafts.reduce(applyDraft, await loadSiteData());
 } catch (err) {
   if (err instanceof DraftError) {
     message = err.message;

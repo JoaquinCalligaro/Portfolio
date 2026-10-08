@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/shadcn/button';
 import { Card, CardContent } from '@/components/ui/shadcn/card';
@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/shadcn/label';
 import { MotionRoot } from './MotionRoot';
 import { TextAreaField, TextField } from './fields';
 import { MorphGlyph } from './MorphGlyph';
-import { openPreview } from './preview';
+import { openPreview, readDrafts, syncDrafts } from './preview';
 import { announceChange, request, uploadFile } from './api';
 
 type ProfileValues = {
@@ -22,6 +22,17 @@ export default function ProfileForm({ profile }: { profile: ProfileValues }) {
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState<'photo' | 'cv' | null>(null);
   const dirty = JSON.stringify(values) !== saved;
+
+  // Recupera lo que quedó sin guardar al salir de la sección.
+  useEffect(() => {
+    const draft = readDrafts('profile:')['form'];
+    if (draft) setValues((current) => ({ ...current, ...(draft.values as Partial<ProfileValues>) }));
+  }, []);
+
+  // Mantiene el borrador para la vista previa mientras haya cambios sin guardar.
+  useEffect(() => {
+    syncDrafts('profile:', dirty ? { form: { section: 'profile', values } } : {});
+  }, [dirty, values]);
 
   const set = (field: keyof ProfileValues) => (value: string) =>
     setValues((current) => ({ ...current, [field]: value }));

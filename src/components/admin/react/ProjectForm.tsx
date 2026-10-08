@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AnimatePresence, m } from 'framer-motion';
 import { toast } from 'sonner';
 import { Button, ButtonLink } from '@/components/ui/shadcn/button';
@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 import { MotionRoot } from './MotionRoot';
 import { Fieldset, TextAreaField, TextField } from './fields';
 import { MorphGlyph } from './MorphGlyph';
-import { openPreview } from './preview';
+import { openPreview, readDrafts, syncDrafts } from './preview';
 import { announceChange, request, uploadFile } from './api';
 import { SPRING, statusTransition } from './motion';
 
@@ -50,9 +50,37 @@ type ProjectFormProps = { mode: 'create' | 'edit'; project?: ProjectValues };
 
 export default function ProjectForm({ mode, project }: ProjectFormProps) {
   const [values, setValues] = useState<ProjectValues>(project ?? EMPTY);
+  const [baseline, setBaseline] = useState(JSON.stringify(project ?? EMPTY));
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+
+  const draftKey = `projects:${mode === 'edit' ? (project?.id ?? '') : 'new'}:`;
+  const dirty = JSON.stringify(values) !== baseline;
+
+  // Recupera lo que quedó sin guardar al salir de la sección.
+  useEffect(() => {
+    const draft = readDrafts(draftKey)['form'];
+    if (draft) setValues((current) => ({ ...current, ...(draft.values as Partial<ProjectValues>) }));
+  }, [draftKey]);
+
+  // Mantiene el borrador para la vista previa mientras haya cambios sin guardar.
+  useEffect(() => {
+    const { id, ...rest } = values;
+    syncDrafts(
+      draftKey,
+      dirty
+        ? {
+            form: {
+              section: 'projects',
+              id: mode === 'edit' ? id : undefined,
+              values: rest,
+              hidden: values.hidden,
+            },
+          }
+        : {}
+    );
+  }, [dirty, values, draftKey, mode]);
 
   const patch = (changes: Partial<ProjectValues>) =>
     setValues((current) => ({ ...current, ...changes }));
@@ -100,6 +128,7 @@ export default function ProjectForm({ mode, project }: ProjectFormProps) {
       setError(result.error ?? 'Error al guardar el proyecto');
       return;
     }
+    setBaseline(JSON.stringify(values));
     toast.success(mode === 'create' ? 'Proyecto creado' : 'Cambios guardados');
     announceChange(result);
     window.setTimeout(

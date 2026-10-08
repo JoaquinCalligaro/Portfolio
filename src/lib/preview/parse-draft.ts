@@ -153,6 +153,24 @@ const parsers: Record<DraftSection, (b: Body, isNew: boolean) => Body> = {
   },
 };
 
+export function parseDrafts(raw: unknown): Draft[] {
+  if (typeof raw !== 'string' || !raw) throw new DraftError('Falta el borrador');
+  if (new TextEncoder().encode(raw).length > MAX_DRAFT_BYTES) {
+    throw new DraftError('El borrador es demasiado grande', 413);
+  }
+  let input: unknown;
+  try {
+    input = JSON.parse(raw);
+  } catch {
+    throw new DraftError('El borrador no es válido');
+  }
+  const list = Array.isArray(input) ? input : [input];
+  if (list.length === 0 || list.length > 100) {
+    throw new DraftError('El borrador no es válido');
+  }
+  return list.map((item) => parseDraft(JSON.stringify(item)));
+}
+
 export function parseDraft(raw: unknown): Draft {
   if (typeof raw !== 'string' || !raw) throw new DraftError('Falta el borrador');
   if (new TextEncoder().encode(raw).length > MAX_DRAFT_BYTES) {

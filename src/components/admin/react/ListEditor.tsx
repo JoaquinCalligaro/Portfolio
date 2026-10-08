@@ -1,11 +1,12 @@
-import type { ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { AnimatePresence, m } from 'framer-motion';
 import { Button } from '@/components/ui/shadcn/button';
 import { ItemCard } from './ItemCard';
 import { MorphGlyph } from './MorphGlyph';
 import { statusTransition } from './motion';
-import { openPreview, type PreviewDraft } from './preview';
+import { openPreview, readDrafts, syncDrafts, type PreviewDraft } from './preview';
 import {
+  isDirty,
   useListEditor,
   type Adapter,
   type EditorItem,
@@ -65,6 +66,53 @@ export function ListEditor({
     blank,
     initial,
   });
+
+  const toDraft = (item: EditorItem, items: EditorItem[]): PreviewDraft | null =>
+    buildPreview
+      ? buildPreview(item, items)
+      : previewSection
+        ? {
+            section: previewSection,
+            id: item.id || undefined,
+            parentId: parentId || undefined,
+            values: item.values,
+            hidden: item.hidden,
+          }
+        : null;
+
+  // Cambios sin guardar de este editor (compartidos con la vista previa).
+  const prefix = `${previewSection ?? 'bio'}:${parentId ?? ''}:`;
+  const restored = useRef(false);
+
+  useEffect(() => {
+    // Con borrador armado a mano (biografía) no hay valores por tarjeta que restaurar.
+    const drafts = buildPreview ? [] : Object.values(readDrafts(prefix));
+    restored.current = true;
+    editor.restore(
+      drafts.map((d) => ({
+        id: d.id ?? '',
+        values: d.values as Values,
+        hidden: d.hidden,
+      }))
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefix]);
+
+  useEffect(() => {
+    if (!restored.current) return;
+    const pending: Record<string, PreviewDraft> = {};
+    const blankKey = JSON.stringify(blank);
+    for (const item of editor.items) {
+      const touched = item.fresh
+        ? JSON.stringify(item.values) !== blankKey
+        : isDirty(item);
+      if (!touched) continue;
+      const draft = toDraft(item, editor.items);
+      if (draft) pending[item.id || item.key] = draft;
+    }
+    syncDrafts(prefix, pending);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editor.items, prefix]);
 
   return (
     <div>
