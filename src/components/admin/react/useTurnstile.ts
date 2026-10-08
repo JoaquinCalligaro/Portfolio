@@ -39,16 +39,18 @@ function whenReady(callback: () => void) {
 }
 
 export function useTurnstile(siteKey: string | undefined) {
-  const container = useRef<HTMLDivElement>(null);
+  // Callback ref: el contenedor se desmonta en el paso del código 2FA y al
+  // volver hay que dibujar el widget de nuevo en el div nuevo.
+  const [container, setContainer] = useState<HTMLDivElement | null>(null);
   const widgetId = useRef<string | undefined>(undefined);
   const [token, setToken] = useState('');
 
   useEffect(() => {
-    if (!siteKey) return;
+    if (!siteKey || !container) return;
     let cancelled = false;
     whenReady(() => {
-      if (cancelled || !container.current || !window.turnstile) return;
-      widgetId.current = window.turnstile.render(container.current, {
+      if (cancelled || !window.turnstile) return;
+      widgetId.current = window.turnstile.render(container, {
         sitekey: siteKey,
         theme: 'dark',
         callback: setToken,
@@ -59,13 +61,15 @@ export function useTurnstile(siteKey: string | undefined) {
     return () => {
       cancelled = true;
       if (widgetId.current) window.turnstile?.remove(widgetId.current);
+      widgetId.current = undefined;
+      setToken('');
     };
-  }, [siteKey]);
+  }, [siteKey, container]);
 
   const reset = useCallback(() => {
     setToken('');
     if (widgetId.current) window.turnstile?.reset(widgetId.current);
   }, []);
 
-  return { container, token, reset };
+  return { container: setContainer, token, reset };
 }
