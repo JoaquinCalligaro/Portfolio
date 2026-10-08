@@ -39,6 +39,8 @@ export const siteProfile = pgTable('site_profile', {
   cvUrl: text('cv_url').notNull().default(''),
   // Formulario de contacto: a dónde llegan los mensajes y desde qué remitente
   contactToEmail: text('contact_to_email').notNull().default(''),
+  // true solo si se confirmó con el código enviado por mail
+  contactToEmailVerified: boolean('contact_to_email_verified').notNull().default(false),
   contactFromEmail: text('contact_from_email').notNull().default(''),
   bioEs: text('bio_es').array().notNull().default([]),
   bioEn: text('bio_en').array().notNull().default([]),

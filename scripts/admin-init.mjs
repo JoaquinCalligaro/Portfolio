@@ -23,9 +23,9 @@ const DATABASE_URL = process.env.DATABASE_URL;
 if (!DATABASE_URL) fail('Falta DATABASE_URL en tu .env');
 
 const { user, password, email, force } = values;
-if (!user || !/^[a-zA-Z0-9._-]{3,32}$/.test(user.trim())) {
+if (!user || !/^[a-zA-Z0-9._ -]{3,32}$/.test(user.trim())) {
   fail(
-    'Usuario inválido: 3 a 32 caracteres (letras, números, punto, guion o guion bajo)'
+    'Usuario inválido: 3 a 32 caracteres (letras, números, espacios, punto, guion o guion bajo)'
   );
 }
 if (!password || password.length < 12) {
@@ -38,7 +38,7 @@ if (email && !/^[^\s@<>,;"']+@[^\s@<>,;"']+\.[^\s@<>,;"']{2,}$/.test(email)) {
 // Mismo formato que hashPassword de src/lib/auth.ts: "salt:hash" en hex (scrypt)
 const salt = randomBytes(16).toString('hex');
 const passwordHash = `${salt}:${scryptSync(password, salt, 64).toString('hex')}`;
-const username = user.trim();
+const username = user.trim().replace(/ {2,}/g, ' ');
 
 const sql = neon(DATABASE_URL);
 
@@ -74,8 +74,8 @@ if (values['reset-2fa']) {
 
 if (email) {
   await sql`
-    INSERT INTO site_profile (id, contact_to_email) VALUES (1, ${email.trim().toLowerCase()})
-    ON CONFLICT (id) DO UPDATE SET contact_to_email = EXCLUDED.contact_to_email
+    INSERT INTO site_profile (id, contact_to_email, contact_to_email_verified) VALUES (1, ${email.trim().toLowerCase()}, false)
+    ON CONFLICT (id) DO UPDATE SET contact_to_email = EXCLUDED.contact_to_email, contact_to_email_verified = false
   `;
-  console.log('Mail de contacto guardado.');
+  console.log('Mail de contacto guardado (sin verificar: confirmalo desde Seguridad → Cuenta).');
 }

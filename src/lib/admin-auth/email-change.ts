@@ -33,6 +33,10 @@ export async function getCurrentContactEmail(): Promise<string> {
   return (await getProfile())?.contactToEmail ?? '';
 }
 
+export async function isContactEmailVerified(): Promise<boolean> {
+  return (await getProfile())?.contactToEmailVerified ?? false;
+}
+
 async function deletePending() {
   await requireDb().delete(adminEmailChange).where(eq(adminEmailChange.id, ID));
 }
@@ -119,7 +123,10 @@ export async function confirmEmailChange(input: string): Promise<string> {
   }
 
   const old = await getCurrentContactEmail();
-  await upsertProfile({ contactToEmail: row.newEmail });
+  await upsertProfile({
+    contactToEmail: row.newEmail,
+    contactToEmailVerified: true,
+  });
   await deletePending();
   logSecurityEvent('email-changed');
 

@@ -3,6 +3,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 import PageHeader from '../../components/admin/PageHeader.astro';
 import DbWarning from '../../components/admin/DbWarning.astro';
 import DashboardCards from '../../components/admin/DashboardCards.astro';
+import { maskEmail } from '../../lib/admin-auth/email-change-policy';
 import {
   getProfile,
   listEducation,
@@ -56,7 +57,9 @@ const sections = [
     icon: 'mail',
     title: 'Contacto',
     text: 'A qué mail te llegan los mensajes del formulario.',
-    meta: profile?.contactToEmail || 'Sin configurar',
+    meta: profile?.contactToEmail
+      ? maskEmail(profile.contactToEmail)
+      : 'Sin configurar',
   },
   {
     href: '/admin/security',

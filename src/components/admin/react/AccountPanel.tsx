@@ -4,10 +4,12 @@ import { Button } from '@/components/ui/shadcn/button';
 import { Skeleton } from '@/components/ui/shadcn/skeleton';
 import { TextField } from './fields';
 import { needsReauth, request, type ApiResult } from './api';
+import { MaskedEmail } from './MaskedEmail';
 import { usePasswordPrompt } from './usePasswordPrompt';
 
 type EmailState = {
   current: string;
+  verified: boolean;
   mailerConfigured: boolean;
   pending: { email: string; expiresAt: string } | null;
 };
@@ -27,11 +29,17 @@ export function AccountPanel({ username }: { username: string }) {
     const result = await request('/api/admin/email', 'GET');
     if (!result.ok) {
       toast.error(result.error ?? 'No se pudo cargar el mail de contacto');
-      setEmail({ current: '', mailerConfigured: false, pending: null });
+      setEmail({
+        current: '',
+        verified: false,
+        mailerConfigured: false,
+        pending: null,
+      });
       return;
     }
     setEmail({
       current: String(result.current ?? ''),
+      verified: Boolean(result.verified),
       mailerConfigured: Boolean(result.mailerConfigured),
       pending: (result.pending as EmailState['pending']) ?? null,
     });
@@ -121,7 +129,7 @@ export function AccountPanel({ username }: { username: string }) {
           value={newUser}
           onValueChange={setNewUser}
           autoComplete="username"
-          hint="3 a 32 caracteres: letras, números, punto, guion o guion bajo."
+          hint="3 a 32 caracteres: letras, números, espacios, punto, guion o guion bajo."
         />
         <Button type="submit" disabled={!newUser.trim() || busy}>
           Cambiar usuario
@@ -145,13 +153,20 @@ export function AccountPanel({ username }: { username: string }) {
               </p>
             )}
             <p className="text-sm text-gray-300">
-              Mail actual: <strong>{email.current || 'Sin configurar'}</strong>
+              Mail actual: <MaskedEmail email={email.current} />
+              {email.current && (
+                <span
+                  className={`ml-2 rounded-full px-2 py-0.5 text-xs ${email.verified ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}`}
+                >
+                  {email.verified ? 'Verificado' : 'Sin verificar'}
+                </span>
+              )}
             </p>
             {pending ? (
               <form onSubmit={confirm} className="space-y-4" noValidate>
                 <p className="text-sm text-gray-300">
                   Ingresá el código que enviamos a{' '}
-                  <strong>{pending.email}</strong> (vence a las{' '}
+                  <MaskedEmail email={pending.email} /> (vence a las{' '}
                   {timeFormat.format(new Date(pending.expiresAt))}).
                 </p>
                 <TextField

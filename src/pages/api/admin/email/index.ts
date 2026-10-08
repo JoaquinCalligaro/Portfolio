@@ -4,6 +4,7 @@ import { fail, json } from '../../../../lib/admin-api';
 import {
   cancelEmailChange,
   getCurrentContactEmail,
+  isContactEmailVerified,
   getPendingEmailChange,
 } from '../../../../lib/admin-auth/email-change';
 import { isMailerConfigured } from '../../../../lib/mailer';
@@ -18,6 +19,7 @@ export const GET: APIRoute = async () => {
     return json({
       ok: true,
       current: await getCurrentContactEmail(),
+      verified: await isContactEmailVerified(),
       mailerConfigured: isMailerConfigured(),
       pending: pending
         ? { email: pending.newEmail, expiresAt: pending.expiresAt.toISOString() }

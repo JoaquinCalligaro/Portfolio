@@ -1,0 +1,1 @@
+ALTER TABLE "site_profile" ADD COLUMN "contact_to_email_verified" boolean DEFAULT false NOT NULL;

@@ -60,6 +60,7 @@ test('maskEmail', () => {
 
 test('normalizeUsername', () => {
   assert.equal(normalizeUsername('admin'), 'admin');
-  for (const bad of ['ab', 'a b', 'x'.repeat(33)])
+  assert.equal(normalizeUsername('  Joaquin   Calligaro '), 'Joaquin Calligaro');
+  for (const bad of ['ab', 'a<b', 'x'.repeat(33)])
     assert.equal(normalizeUsername(bad), null);
 });

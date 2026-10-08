@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/shadcn/button';
 import { Card, CardContent } from '@/components/ui/shadcn/card';
+import { MaskedEmail } from './MaskedEmail';
 import { MotionRoot } from './MotionRoot';
 import { TextField } from './fields';
 import { announceChange, request } from './api';
@@ -38,7 +39,7 @@ export default function ContactForm({ settings }: { settings: ContactValues }) {
           <form onSubmit={submit} className="space-y-5" noValidate>
             <p className="text-sm text-gray-300">
               Los mensajes llegan a{' '}
-              <strong>{settings.contactToEmail || 'sin configurar'}</strong>.
+              <MaskedEmail email={settings.contactToEmail} />.
               Para cambiarlo andá a{' '}
               <a href="/admin/security#account" className="text-cyan-300 underline">
                 Seguridad → Cuenta

@@ -21,7 +21,7 @@ export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
     const username = normalizeUsername(String(body.username ?? ''));
     if (!username) {
       throw new UserError(
-        'El usuario tiene que tener entre 3 y 32 caracteres: letras, números, punto, guion o guion bajo'
+        'El usuario tiene que tener entre 3 y 32 caracteres: letras, números, espacios, punto, guion o guion bajo'
       );
     }
     if (username === (await getAdminUsername())) {
