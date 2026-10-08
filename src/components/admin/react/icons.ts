@@ -19,11 +19,14 @@ export const ICON_PATHS = {
   user: 'M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM4 21a8 8 0 0 1 16 0',
   layers: 'm12 3 9 5-9 5-9-5 9-5ZM3 13l9 5 9-5',
   book: 'M4 4h12a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4V4ZM8 8h8',
-  folder: 'M3 6a2 2 0 0 1 2-2h4l2 3h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6Z',
+  folder:
+    'M3 6a2 2 0 0 1 2-2h4l2 3h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6Z',
   mail: 'M3 5h18v14H3zM3 7l9 6 9-6',
   chevron: 'm9 6 6 6-6 6',
   pencil: 'M4 20h4L19 9l-4-4L4 16v4ZM13.5 6.5l4 4',
   upload: 'M12 16V4M7 9l5-5 5 5M4 20h16',
+  globe:
+    'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3Z',
 } as const;
 
 export type IconName = keyof typeof ICON_PATHS;

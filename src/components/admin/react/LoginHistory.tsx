@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/shadcn/button';
+import { MorphGlyph } from './MorphGlyph';
 import { request } from './api';
 
 type LoginEntry = {
@@ -73,37 +74,113 @@ function place(entry: LoginEntry): string {
   return parts.join(', ');
 }
 
-function Location({ entry }: { entry: LoginEntry }) {
-  const code = /^[A-Z]{2}$/.test(entry.country) ? entry.country : '';
-  const detail = place(entry);
-  if (!code && !detail) {
-    return <p className="font-medium text-gray-100">Ubicación desconocida</p>;
+const dateFormat = new Intl.DateTimeFormat('es-AR', {
+  day: 'numeric',
+  month: 'short',
+});
+const yearDateFormat = new Intl.DateTimeFormat('es-AR', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+});
+const timeFormat = new Intl.DateTimeFormat('es-AR', {
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+});
+const relativeFormat = new Intl.RelativeTimeFormat('es', { numeric: 'auto' });
+
+// "8 oct · 14:05" (con el año solo si no es el actual).
+function when(date: Date): string {
+  const format =
+    date.getFullYear() === new Date().getFullYear()
+      ? dateFormat
+      : yearDateFormat;
+  return `${format.format(date)} · ${timeFormat.format(date)}`;
+}
+
+// "hace 5 minutos", "ayer"… hasta una semana; después nada.
+function ago(date: Date): string {
+  const minutes = Math.round((date.getTime() - Date.now()) / 60000);
+  if (minutes > -1) return 'recién';
+  if (minutes > -60) return relativeFormat.format(minutes, 'minute');
+  const hours = Math.round(minutes / 60);
+  if (hours > -24) return relativeFormat.format(hours, 'hour');
+  const days = Math.round(hours / 24);
+  if (days > -7) return relativeFormat.format(days, 'day');
+  return '';
+}
+
+function Flag({ code, country }: { code: string; country: string }) {
+  const [failed, setFailed] = useState(false);
+  if (!code || failed) {
+    return <MorphGlyph name="globe" className="text-gray-400" />;
   }
   return (
-    <>
-      {code && (
-        <p className="flex items-center gap-2 font-medium text-gray-100">
-          <img
-            src={`https://flagcdn.com/${code.toLowerCase()}.svg`}
-            alt=""
-            width={20}
-            height={15}
-            loading="lazy"
-            className="h-[15px] w-5 shrink-0 rounded-[2px] object-cover ring-1 ring-white/15"
-          />
-          {countryName(code)}
-        </p>
-      )}
-      {detail && <p className="text-gray-300">{detail}</p>}
-    </>
+    <img
+      src={`https://flagcdn.com/${code.toLowerCase()}.svg`}
+      alt={`Bandera de ${country}`}
+      width={28}
+      height={21}
+      loading="lazy"
+      onError={() => setFailed(true)}
+      className="h-[21px] w-7 rounded-[3px] object-cover shadow-sm ring-1 ring-black/20"
+    />
   );
 }
 
-function when(iso: string): string {
-  return new Date(iso).toLocaleString('es-AR', {
-    dateStyle: 'short',
-    timeStyle: 'short',
-  });
+function LoginRow({ entry }: { entry: LoginEntry }) {
+  const code = /^[A-Z]{2}$/.test(entry.country) ? entry.country : '';
+  const country = code ? countryName(code) : '';
+  const detail = place(entry);
+  const date = new Date(entry.createdAt);
+  const relative = ago(date);
+
+  return (
+    <li className="flex list-none items-start gap-3 p-4">
+      <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10">
+        <Flag code={code} country={country} />
+      </span>
+
+      <div className="min-w-0 flex-1 space-y-2.5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-base font-medium break-words text-white">
+              {detail || country || 'Ubicación desconocida'}
+            </p>
+            {detail && country && (
+              <p className="text-sm text-gray-300">{country}</p>
+            )}
+          </div>
+          <div className="shrink-0 text-right">
+            <time
+              dateTime={entry.createdAt}
+              className="block text-sm whitespace-nowrap text-gray-200"
+            >
+              {when(date)}
+            </time>
+            {relative && (
+              <span className="text-xs text-gray-400">{relative}</span>
+            )}
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="inline-flex max-w-full items-baseline gap-1.5 rounded-md bg-white/5 px-2 py-1 ring-1 ring-white/10">
+            <span className="shrink-0 text-xs font-medium text-gray-400 select-none">
+              IP
+            </span>
+            <span className="min-w-0 font-mono text-sm break-all text-gray-100 select-all">
+              {entry.ip}
+            </span>
+          </span>
+          <span className="rounded-full bg-cyan-500/10 px-2.5 py-1 text-xs text-cyan-300 ring-1 ring-cyan-400/20">
+            {METHODS[entry.method] ?? entry.method}
+          </span>
+        </div>
+      </div>
+    </li>
+  );
 }
 
 // Últimos 10 ingresos: muestra 3 y el resto se despliega.
@@ -127,7 +204,7 @@ export function LoginHistory() {
     return <p className="text-sm text-gray-400">Cargando historial…</p>;
   if (items.length === 0) {
     return (
-      <p className="text-sm text-gray-400">
+      <p className="rounded-xl border border-dashed border-white/15 p-4 text-center text-sm text-gray-300">
         Todavía no hay ingresos registrados.
       </p>
     );
@@ -137,25 +214,9 @@ export function LoginHistory() {
 
   return (
     <div className="space-y-3">
-      <ul className="divide-y divide-white/10 rounded-md border border-white/10">
+      <ul className="m-0 divide-y divide-white/10 overflow-hidden rounded-xl border border-white/10 bg-white/[0.02] p-0">
         {shown.map((entry) => (
-          <li
-            key={entry.id}
-            className="flex flex-col gap-1 p-3 text-sm sm:flex-row sm:items-center sm:justify-between"
-          >
-            <div className="min-w-0 space-y-0.5">
-              <Location entry={entry} />
-              <p className="font-mono text-xs break-all text-gray-500">
-                {entry.ip}
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-2 text-gray-400 sm:flex-col sm:items-end sm:gap-1">
-              <p>{when(entry.createdAt)}</p>
-              <span className="rounded-full bg-cyan-500/10 px-2 py-0.5 text-xs text-cyan-300">
-                {METHODS[entry.method] ?? entry.method}
-              </span>
-            </div>
-          </li>
+          <LoginRow key={entry.id} entry={entry} />
         ))}
       </ul>
       {items.length > VISIBLE && (
