@@ -12,7 +12,7 @@ export const TabsList = forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      'inline-flex max-w-full overflow-x-auto rounded-xl border border-white/10 bg-gray-900/40 p-1',
+      'inline-flex max-w-full [scrollbar-width:none] overflow-x-auto rounded-xl border border-white/10 bg-gray-900/40 p-1 [&::-webkit-scrollbar]:hidden',
       className
     )}
     {...props}
