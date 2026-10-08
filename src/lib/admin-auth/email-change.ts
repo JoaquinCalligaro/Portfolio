@@ -69,7 +69,10 @@ export async function requestEmailChange(input: string, ip: string) {
   const email = normalizeEmail(input);
   if (!email) throw new UserError('El mail no es válido');
   const current = (await getCurrentContactEmail()).toLowerCase();
-  if (email === current) throw new UserError('Ese ya es el mail actual');
+  // Si el actual todavía no está verificado, se puede pedir código para el mismo mail.
+  if (email === current && (await isContactEmailVerified())) {
+    throw new UserError('Ese mail ya está verificado');
+  }
 
   const now = Date.now();
   const pending = await getPendingEmailChange();
