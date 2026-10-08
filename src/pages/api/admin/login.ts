@@ -24,7 +24,7 @@ const BAD_LOGIN = 'Usuario o contraseña incorrectos';
 
 export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
   try {
-    if (!isAdminConfigured()) {
+    if (!(await isAdminConfigured())) {
       return json({ ok: false, error: 'El panel de admin no está configurado' }, 500);
     }
 
@@ -58,7 +58,7 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
       return json({ ok: false, error: 'No se pudo verificar el captcha' }, 400);
     }
 
-    if (!areLoginValid(username, password)) {
+    if (!(await areLoginValid(username, password))) {
       logSecurityEvent('login-failed', { ip });
       return json({ ok: false, error: BAD_LOGIN }, 401);
     }

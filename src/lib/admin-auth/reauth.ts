@@ -15,7 +15,7 @@ export async function requireRecentAuth(
   if ((await registerAttempt(ipKey(ip), IP_FAILURES)) > 0) {
     throw new UserError('Demasiados intentos. Probá más tarde.', 429);
   }
-  if (typeof password === 'string' && isPasswordValid(password)) {
+  if (typeof password === 'string' && (await isPasswordValid(password))) {
     await resetAttempts(ipKey(ip));
     return;
   }

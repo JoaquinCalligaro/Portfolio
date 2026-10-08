@@ -29,6 +29,13 @@
       "when": 1791414177876,
       "tag": "0003_dark_zarek",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791422941326,
+      "tag": "0004_open_thanos",
+      "breakpoints": true
     }
   ]
 }

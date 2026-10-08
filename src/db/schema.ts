@@ -142,4 +142,12 @@ export const adminSessions = pgTable('admin_sessions', {
   userAgent: text('user_agent').notNull().default(''),
 });
 
+// Contraseña del admin cambiada desde el panel (una sola fila). Si no hay fila,
+// se usa el hash inicial de la variable de entorno ADMIN_PASSWORD_HASH.
+export const adminCredentials = pgTable('admin_credentials', {
+  id: text('id').primaryKey().default('admin'),
+  passwordHash: text('password_hash').notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
 export type AdminPasskeyRow = typeof adminPasskeys.$inferSelect;
