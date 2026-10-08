@@ -7,11 +7,7 @@ import {
   adminTrustedDevices,
 } from '../../db/schema';
 import { UserError } from '../admin-api';
-import {
-  generateTotpSecret,
-  matchTotp,
-  otpauthUri,
-} from './totp';
+import { generateTotpSecret, matchTotp, otpauthUri } from './totp';
 import { env } from '../env';
 import { decryptSecret, encryptSecret } from './twofa-crypto';
 import {
@@ -33,6 +29,20 @@ function getEncryptionSecret(): string {
     );
   }
   return secret;
+}
+
+// AES-GCM falla si el secreto se cifró con otra SESSION_SECRET (por ejemplo,
+// el 2FA se activó desde local con un .env distinto al de producción).
+function openSecret(secretEnc: string): string {
+  try {
+    return decryptSecret(secretEnc, getEncryptionSecret());
+  } catch (err) {
+    if (err instanceof UserError) throw err;
+    throw new UserError(
+      'El 2FA se activó con otra SESSION_SECRET. Entrá con un código de recuperación y volvé a activarlo.',
+      500
+    );
+  }
 }
 
 function requireDb() {
@@ -73,7 +83,12 @@ export async function beginSetup(account: string, issuer: string) {
     .values({ id: ID, secretEnc, enabled: false, lastUsedStep: 0 })
     .onConflictDoUpdate({
       target: adminTotp.id,
-      set: { secretEnc, enabled: false, lastUsedStep: 0, createdAt: new Date() },
+      set: {
+        secretEnc,
+        enabled: false,
+        lastUsedStep: 0,
+        createdAt: new Date(),
+      },
     });
   return { secret, uri: otpauthUri(secret, account, issuer) };
 }
@@ -84,7 +99,7 @@ export async function confirmSetup(code: string): Promise<string[] | null> {
   const database = requireDb();
   const row = await getRow();
   if (!row || row.enabled) return null;
-  const secret = decryptSecret(row.secretEnc, getEncryptionSecret());
+  const secret = openSecret(row.secretEnc);
   const step = matchTotp(secret, code, Date.now());
   if (step === null) return null;
   const [updated] = await database
@@ -138,7 +153,7 @@ export async function verifySecondFactor(
     return used ? 'recovery' : null;
   }
 
-  const secret = decryptSecret(row.secretEnc, getEncryptionSecret());
+  const secret = openSecret(row.secretEnc);
   const step = matchTotp(secret, input, Date.now(), row.lastUsedStep);
   if (step === null) return null;
   const [claimed] = await database
