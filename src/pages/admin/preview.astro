@@ -15,6 +15,7 @@ if (Astro.request.method !== 'POST') return Astro.redirect('/admin');
 
 const declared = Number(Astro.request.headers.get('content-length') ?? 0);
 let data = null;
+let rawDrafts: unknown[] = [];
 let message = '';
 let status = 200;
 
@@ -22,7 +23,10 @@ try {
   if (declared > MAX_DRAFT_BYTES * 2)
     throw new DraftError('El borrador es demasiado grande', 413);
   const form = await Astro.request.formData();
-  const drafts = parseDrafts(form.get('draft'));
+  const rawField = form.get('draft');
+  const drafts = parseDrafts(rawField);
+  const parsedRaw = JSON.parse(String(rawField));
+  rawDrafts = Array.isArray(parsedRaw) ? parsedRaw : [parsedRaw];
   data = drafts.reduce(applyDraft, await loadSiteData());
 } catch (err) {
   if (err instanceof DraftError) {
@@ -40,7 +44,12 @@ if (status !== 200) Astro.response.status = status;
 
 {
   data ? (
-    <Layout preview profile={data.profile} socialLinks={data.socialLinks}>
+    <Layout
+      preview
+      previewDrafts={rawDrafts}
+      profile={data.profile}
+      socialLinks={data.socialLinks}
+    >
       <SiteContent data={data} preview />
     </Layout>
   ) : (

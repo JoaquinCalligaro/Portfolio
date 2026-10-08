@@ -14,9 +14,16 @@ interface Props {
   socialLinks?: SocialLinkRow[];
   // Vista previa del admin: borrador sin publicar
   preview?: boolean;
+  // Borradores crudos que el botón "Guardar cambios" de la barra aplica.
+  previewDrafts?: unknown[];
 }
 
-const { profile = null, socialLinks = [], preview = false } = Astro.props as Props;
+const {
+  profile = null,
+  socialLinks = [],
+  preview = false,
+  previewDrafts = [],
+} = Astro.props as Props;
 if (preview) Astro.response.headers.set('Cache-Control', 'no-store');
 const siteName = profile?.name?.trim() ?? '';
 const pageTitle = siteName ? `Portfolio | ${siteName}` : 'Portfolio';
@@ -70,7 +77,7 @@ const description =
     <!-- Turnstile script is injected only on pages that need it (Contact.astro) -->
   </head>
   <body class:list={['page-root min-h-screen', { 'is-preview': preview }]}>
-    {preview && <PreviewBanner client:load />}
+    {preview && <PreviewBanner client:load drafts={previewDrafts as never} />}
     <!-- Background dinámico dark/light con transición suave -->
     <SmoothBackgroundSwitcher
       client:only="react"

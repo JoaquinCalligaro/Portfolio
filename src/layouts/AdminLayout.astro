@@ -48,5 +48,18 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/admin';
       </main>
     </div>
     <AdminToaster client:load />
+    <script>
+      // La vista previa guardó los borradores: se descartan acá y se recarga
+      // para ver lo publicado (si no, un "Guardar" duplicaría lo nuevo).
+      try {
+        const channel = new BroadcastChannel('admin-preview');
+        channel.onmessage = () => {
+          sessionStorage.removeItem('admin-preview-drafts');
+          window.location.reload();
+        };
+      } catch {
+        // Navegador sin BroadcastChannel.
+      }
+    </script>
   </body>
 </html>
