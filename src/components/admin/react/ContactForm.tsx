@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/shadcn/button';
 import { Card, CardContent } from '@/components/ui/shadcn/card';
@@ -9,6 +9,8 @@ import { announceChange, request } from './api';
 
 type ContactValues = { contactToEmail: string; contactFromEmail: string };
 
+const DRAFT_KEY = 'admin-contact-draft';
+
 export default function ContactForm({ settings }: { settings: ContactValues }) {
   const initial = { contactFromEmail: settings.contactFromEmail };
   const [values, setValues] = useState(initial);
@@ -17,11 +19,34 @@ export default function ContactForm({ settings }: { settings: ContactValues }) {
   const [error, setError] = useState('');
   const dirty = JSON.stringify(values) !== saved;
 
+  // Recupera lo que quedó sin guardar (recarga o pestaña cerrada).
+  useEffect(() => {
+    try {
+      const draft = localStorage.getItem(DRAFT_KEY);
+      if (draft !== null) setValues({ contactFromEmail: draft });
+    } catch {
+      // Storage bloqueado: se arranca con lo guardado.
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      if (dirty) localStorage.setItem(DRAFT_KEY, values.contactFromEmail);
+      else localStorage.removeItem(DRAFT_KEY);
+    } catch {
+      // Sin storage no se recuerda el borrador.
+    }
+  }, [dirty, values]);
+
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     setBusy(true);
     setError('');
-    const result = await request('/api/admin/contact-settings', 'PATCH', values);
+    const result = await request(
+      '/api/admin/contact-settings',
+      'PATCH',
+      values
+    );
     setBusy(false);
     if (!result.ok) {
       setError(result.error ?? 'No se pudo guardar');
@@ -39,9 +64,12 @@ export default function ContactForm({ settings }: { settings: ContactValues }) {
           <form onSubmit={submit} className="space-y-5" noValidate>
             <p className="text-sm text-gray-300">
               Los mensajes llegan a{' '}
-              <MaskedEmail email={settings.contactToEmail} />.
-              Para cambiarlo andá a{' '}
-              <a href="/admin/security#account" className="text-cyan-300 underline">
+              <MaskedEmail email={settings.contactToEmail} />. Para cambiarlo
+              andá a{' '}
+              <a
+                href="/admin/security#account"
+                className="text-cyan-300 underline"
+              >
                 Seguridad → Cuenta
               </a>
               .

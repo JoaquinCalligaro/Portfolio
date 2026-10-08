@@ -54,7 +54,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/admin';
       try {
         const channel = new BroadcastChannel('admin-preview');
         channel.onmessage = () => {
-          sessionStorage.removeItem('admin-preview-drafts');
+          localStorage.removeItem('admin-preview-drafts');
           window.location.reload();
         };
       } catch {
