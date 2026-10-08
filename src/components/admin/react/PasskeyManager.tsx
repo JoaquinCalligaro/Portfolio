@@ -127,8 +127,8 @@ export function PasskeyManager() {
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="min-w-0 flex-1 space-y-1">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0 space-y-1 sm:flex-1">
           <p className="text-sm text-gray-300">
             Entrá con tu huella, Face ID o la llave del dispositivo, sin
             escribir la contraseña.
@@ -142,7 +142,7 @@ export function PasskeyManager() {
         <Button
           disabled={!supported || full || passkeys === null}
           onClick={() => setNaming(true)}
-          className="shrink-0"
+          className="w-full shrink-0 sm:w-auto"
         >
           <MorphGlyph name="plus" />
           Registrar este dispositivo
