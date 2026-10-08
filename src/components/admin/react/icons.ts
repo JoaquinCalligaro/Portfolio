@@ -22,6 +22,7 @@ export const ICON_PATHS = {
   folder: 'M3 6a2 2 0 0 1 2-2h4l2 3h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6Z',
   mail: 'M3 5h18v14H3zM3 7l9 6 9-6',
   chevron: 'm9 6 6 6-6 6',
+  pencil: 'M4 20h4L19 9l-4-4L4 16v4ZM13.5 6.5l4 4',
   upload: 'M12 16V4M7 9l5-5 5 5M4 20h16',
 } as const;
 

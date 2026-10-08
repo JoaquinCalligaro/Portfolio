@@ -83,6 +83,15 @@ export async function updateCounter(
     .where(eq(adminPasskeys.id, id));
 }
 
+export async function renamePasskey(id: string, label: string): Promise<boolean> {
+  const rows = await requireDb()
+    .update(adminPasskeys)
+    .set({ label })
+    .where(eq(adminPasskeys.id, id))
+    .returning({ id: adminPasskeys.id });
+  return rows.length > 0;
+}
+
 export async function deletePasskey(id: string): Promise<boolean> {
   const rows = await requireDb()
     .delete(adminPasskeys)

@@ -106,14 +106,59 @@ export function PasskeyManager() {
     setPasskeys((current) => current?.filter((p) => p.id !== id) ?? null);
   };
 
-  const full = (passkeys?.length ?? 0) >= MAX_PASSKEYS;
+  const rename = async (id: string, next: string) => {
+    const result = await request(`/api/admin/passkeys/${id}`, 'PATCH', {
+      label: next,
+    });
+    if (!result.ok) {
+      toast.error(result.error ?? 'No se pudo renombrar el dispositivo');
+      return false;
+    }
+    setPasskeys(
+      (current) =>
+        current?.map((p) => (p.id === id ? { ...p, label: next } : p)) ?? null
+    );
+    toast.success('Nombre actualizado');
+    return true;
+  };
+
+  const count = passkeys?.length ?? 0;
+  const full = count >= MAX_PASSKEYS;
 
   return (
-    <div className="space-y-4">
-      <p className="text-sm text-gray-300">
-        Entrá con tu huella, Face ID o la llave del dispositivo, sin escribir la
-        contraseña. Podés registrar hasta {MAX_PASSKEYS} dispositivos.
-      </p>
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="min-w-0 flex-1 space-y-1">
+          <p className="text-sm text-gray-300">
+            Entrá con tu huella, Face ID o la llave del dispositivo, sin
+            escribir la contraseña.
+          </p>
+          {passkeys !== null && (
+            <p className="text-xs text-gray-400">
+              {count} de {MAX_PASSKEYS} dispositivos
+            </p>
+          )}
+        </div>
+        <Button
+          disabled={!supported || full || passkeys === null}
+          onClick={() => setNaming(true)}
+          className="shrink-0"
+        >
+          <MorphGlyph name="plus" />
+          Registrar este dispositivo
+        </Button>
+      </div>
+
+      {!supported && (
+        <p role="alert" className="text-sm text-amber-200">
+          Este navegador no permite registrar dispositivos de acceso.
+        </p>
+      )}
+      {full && (
+        <p className="text-xs text-amber-200">
+          Llegaste al máximo. Eliminá un dispositivo para registrar otro.
+        </p>
+      )}
 
       {passkeys === null ? (
         <div className="space-y-3" role="status" aria-label="Cargando dispositivos">
@@ -130,9 +175,14 @@ export function PasskeyManager() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={statusTransition}
-                className="list-none rounded-xl border border-dashed border-white/15 p-6 text-center text-sm text-gray-300"
+                className="flex list-none flex-col items-center gap-3 rounded-xl border border-dashed border-white/15 px-6 py-10 text-center"
               >
-                Todavía no registraste ningún dispositivo.
+                <span className="flex size-12 items-center justify-center rounded-full bg-cyan-500/10 text-cyan-300">
+                  <MorphGlyph name="fingerprint" size={26} />
+                </span>
+                <p className="text-sm text-gray-300">
+                  Todavía no registraste ningún dispositivo.
+                </p>
               </m.li>
             )}
             {passkeys.map((passkey, index) => (
@@ -147,70 +197,17 @@ export function PasskeyManager() {
                   delay: index * 0.07,
                   layout: SPRING,
                 }}
-                className={`${cardClass} flex list-none flex-wrap items-center gap-3 p-4`}
+                className="list-none"
               >
-                <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-300">
-                  <MorphGlyph name="fingerprint" size={24} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium text-white">
-                    {passkey.label}
-                  </p>
-                  <p className="text-xs text-gray-300">
-                    Agregado {formatDate(passkey.createdAt)} · Último uso{' '}
-                    {formatDate(passkey.lastUsedAt)}
-                    {passkey.backedUp ? ' · Con copia en la nube' : ''}
-                  </p>
-                </div>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      aria-label={`Eliminar ${passkey.label}`}
-                    >
-                      <MorphGlyph name="trash" />
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Eliminar dispositivo</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        ¿Eliminar “{passkey.label}”? Ya no vas a poder entrar
-                        con ese dispositivo.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => void remove(passkey.id)}>
-                        Eliminar
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                <PasskeyRow
+                  passkey={passkey}
+                  onRename={(next) => rename(passkey.id, next)}
+                  onRemove={() => void remove(passkey.id)}
+                />
               </m.li>
             ))}
           </AnimatePresence>
         </ul>
-      )}
-
-      {!supported && (
-        <p role="alert" className="text-sm text-amber-200">
-          Este navegador no permite registrar dispositivos de acceso.
-        </p>
-      )}
-
-      <Button
-        disabled={!supported || full || passkeys === null}
-        onClick={() => setNaming(true)}
-      >
-        <MorphGlyph name="plus" />
-        Registrar este dispositivo
-      </Button>
-      {full && (
-        <p className="text-xs text-gray-300">
-          Llegaste al máximo. Eliminá un dispositivo para registrar otro.
-        </p>
       )}
 
       <Dialog open={naming} onOpenChange={(open) => !busy && setNaming(open)}>
@@ -243,6 +240,124 @@ export function PasskeyManager() {
         </DialogContent>
       </Dialog>
       {prompt.dialog}
+    </div>
+  );
+}
+
+type PasskeyRowProps = {
+  passkey: Passkey;
+  onRename: (label: string) => Promise<boolean>;
+  onRemove: () => void;
+};
+
+function PasskeyRow({ passkey, onRename, onRemove }: PasskeyRowProps) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(passkey.label);
+  const [saving, setSaving] = useState(false);
+
+  const start = () => {
+    setDraft(passkey.label);
+    setEditing(true);
+  };
+
+  const save = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const next = draft.trim();
+    if (!next || next === passkey.label) {
+      setEditing(false);
+      return;
+    }
+    setSaving(true);
+    const ok = await onRename(next);
+    setSaving(false);
+    if (ok) setEditing(false);
+  };
+
+  return (
+    <div
+      className={`${cardClass} group flex flex-wrap items-center gap-4 p-4 transition-colors hover:border-cyan-400/30`}
+    >
+      <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500/20 to-cyan-500/5 text-cyan-300 ring-1 ring-cyan-400/20">
+        <MorphGlyph name="fingerprint" size={24} />
+      </span>
+
+      <div className="min-w-0 flex-1 space-y-1.5">
+        {editing ? (
+          <form onSubmit={save} className="flex items-center gap-2">
+            <input
+              autoFocus
+              maxLength={60}
+              value={draft}
+              disabled={saving}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => e.key === 'Escape' && setEditing(false)}
+              aria-label="Nuevo nombre del dispositivo"
+              className="h-9 min-w-0 flex-1 rounded-lg border border-white/15 bg-black/30 px-3 text-sm text-white outline-none focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20"
+            />
+            <Button type="submit" size="icon" disabled={saving} aria-label="Guardar nombre">
+              <MorphGlyph name="check" />
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              disabled={saving}
+              onClick={() => setEditing(false)}
+              aria-label="Cancelar"
+            >
+              <MorphGlyph name="x" />
+            </Button>
+          </form>
+        ) : (
+          <p className="truncate font-medium text-white">{passkey.label}</p>
+        )}
+        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-400">
+          <span>Agregado {formatDate(passkey.createdAt)}</span>
+          <span>Último uso {formatDate(passkey.lastUsedAt)}</span>
+          {passkey.backedUp && (
+            <span className="rounded-full bg-cyan-500/10 px-2 text-cyan-300">
+              Sincronizado
+            </span>
+          )}
+        </div>
+      </div>
+
+      {!editing && (
+        <div className="flex shrink-0 gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={start}
+            aria-label={`Renombrar ${passkey.label}`}
+          >
+            <MorphGlyph name="pencil" />
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="destructive"
+                size="icon"
+                aria-label={`Eliminar ${passkey.label}`}
+              >
+                <MorphGlyph name="trash" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Eliminar dispositivo</AlertDialogTitle>
+                <AlertDialogDescription>
+                  ¿Eliminar “{passkey.label}”? Ya no vas a poder entrar con ese
+                  dispositivo.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={onRemove}>Eliminar</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      )}
     </div>
   );
 }

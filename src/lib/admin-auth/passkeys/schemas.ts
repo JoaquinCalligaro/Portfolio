@@ -16,3 +16,7 @@ export const registerVerifySchema = z.object({
 });
 
 export const idSchema = z.string().uuid();
+
+export const renameSchema = z.object({
+  label: z.string().trim().min(1).max(60),
+});
