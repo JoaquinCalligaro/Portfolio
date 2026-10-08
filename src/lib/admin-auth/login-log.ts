@@ -41,11 +41,23 @@ export async function recordLogin(
   }
 }
 
+// Postgres "undefined_table": la migración todavía no se aplicó.
+function isMissingTable(err: unknown): boolean {
+  const e = err as { code?: string; cause?: { code?: string } };
+  return e?.code === '42P01' || e?.cause?.code === '42P01';
+}
+
 export async function listLogins() {
   if (!db) return [];
-  return db
-    .select()
-    .from(adminLoginLog)
-    .orderBy(desc(adminLoginLog.createdAt))
-    .limit(LOGIN_LOG_LIMIT);
+  try {
+    return await db
+      .select()
+      .from(adminLoginLog)
+      .orderBy(desc(adminLoginLog.createdAt))
+      .limit(LOGIN_LOG_LIMIT);
+  } catch (err) {
+    if (!isMissingTable(err)) throw err;
+    console.error('login-log: falta la tabla admin_login_log (pnpm db:push)');
+    return [];
+  }
 }
