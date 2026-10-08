@@ -8,6 +8,7 @@ import {
   resetAttempts,
 } from '../../../../../lib/admin-auth/rate-limit';
 import { IP_FAILURES } from '../../../../../lib/admin-auth/rate-limit-policy';
+import { recordLogin } from '../../../../../lib/admin-auth/login-log';
 import { logSecurityEvent } from '../../../../../lib/admin-auth/security-log';
 import { createSession } from '../../../../../lib/admin-auth/session';
 import { verifyAssertion } from '../../../../../lib/admin-auth/passkeys/authentication';
@@ -58,6 +59,7 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
     await updateCounter(stored.id, info.newCounter);
     await createSession(cookies, request.headers.get('user-agent') ?? '');
     await resetAttempts(ipKey(ip));
+    await recordLogin(request, ip, 'passkey');
     logSecurityEvent('login-ok', { ip, method: 'passkey' });
     return new Response(JSON.stringify({ ok: true }), {
       headers: { 'Content-Type': 'application/json' },

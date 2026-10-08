@@ -16,6 +16,7 @@ import {
   GLOBAL_FAILURES,
   IP_FAILURES,
 } from '../../../lib/admin-auth/rate-limit-policy';
+import { recordLogin } from '../../../lib/admin-auth/login-log';
 import { logSecurityEvent } from '../../../lib/admin-auth/security-log';
 import { createSession } from '../../../lib/admin-auth/session';
 import { isTrustedDevice } from '../../../lib/admin-auth/trusted-device';
@@ -85,7 +86,9 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
     }
 
     await createSession(cookies, request.headers.get('user-agent') ?? '');
-    logSecurityEvent('login-ok', { ip, method: trusted ? 'password+trusted' : 'password' });
+    const method = trusted ? 'password+trusted' : 'password';
+    await recordLogin(request, ip, method);
+    logSecurityEvent('login-ok', { ip, method });
     return json({ ok: true });
   } catch (err) {
     return fail(err);

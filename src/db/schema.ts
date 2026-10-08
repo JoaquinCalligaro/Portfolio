@@ -203,3 +203,14 @@ export const adminEmailChange = pgTable('admin_email_change', {
   expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
+
+// Últimos ingresos al panel (se guardan los 10 más recientes).
+export const adminLoginLog = pgTable('admin_login_log', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  ip: text('ip').notNull().default(''),
+  city: text('city').notNull().default(''),
+  region: text('region').notNull().default(''),
+  country: text('country').notNull().default(''),
+  method: text('method').notNull().default(''),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
