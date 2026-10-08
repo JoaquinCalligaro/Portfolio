@@ -16,6 +16,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
   const isAdminApi = pathname.startsWith('/api/admin');
 
+  if (pathname === '/api/contact') {
+    if (hasValidOrigin(context.request, context.url)) return next();
+    logSecurityEvent('origin-rejected', { path: pathname });
+    return json({ ok: false, error: 'Origen no permitido' }, 403);
+  }
+
   if (!pathname.startsWith('/admin') && !isAdminApi) return next();
 
   // La vista previa recibe un POST desde el panel: mismo chequeo de origen.
