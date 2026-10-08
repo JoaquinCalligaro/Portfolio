@@ -36,6 +36,13 @@
       "when": 1791422941326,
       "tag": "0004_open_thanos",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791424119787,
+      "tag": "0005_conscious_tattoo",
+      "breakpoints": true
     }
   ]
 }

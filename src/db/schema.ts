@@ -150,4 +150,41 @@ export const adminCredentials = pgTable('admin_credentials', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
+// 2FA (TOTP) del admin: una sola fila. El secreto se guarda cifrado (AES-GCM).
+// lastUsedStep evita reutilizar el mismo código dentro de su ventana.
+export const adminTotp = pgTable('admin_totp', {
+  id: text('id').primaryKey().default('admin'),
+  secretEnc: text('secret_enc').notNull(),
+  enabled: boolean('enabled').notNull().default(false),
+  lastUsedStep: bigint('last_used_step', { mode: 'number' }).notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+// Códigos de recuperación de un solo uso (solo se guarda el hash).
+export const adminRecoveryCodes = pgTable('admin_recovery_codes', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  codeHash: text('code_hash').notNull().unique(),
+  usedAt: timestamp('used_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+// Dispositivos que ya pasaron el 2FA: no vuelven a pedirlo hasta que expiren.
+export const adminTrustedDevices = pgTable('admin_trusted_devices', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  tokenHash: text('token_hash').notNull().unique(),
+  userAgent: text('user_agent').notNull().default(''),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  lastUsedAt: timestamp('last_used_at', { withTimezone: true }).notNull().defaultNow(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+});
+
+// Login a medias: contraseña correcta pero falta el código 2FA (vive 5 min).
+export const admin2faPending = pgTable('admin_2fa_pending', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  tokenHash: text('token_hash').notNull().unique(),
+  failCount: integer('fail_count').notNull().default(0),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+});
+
 export type AdminPasskeyRow = typeof adminPasskeys.$inferSelect;
+export type AdminTrustedDeviceRow = typeof adminTrustedDevices.$inferSelect;
