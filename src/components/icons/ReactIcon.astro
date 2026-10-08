@@ -1,5 +1,4 @@
 ---
-import { Image } from 'astro:assets';
 import reactSvg from '../../assets/svg/react.svg';
 
 export interface Props {
@@ -24,5 +23,13 @@ const wrapper =
 
 <!-- ReactIcon: usa el SVG estático desde assets y permite clases Tailwind -->
 <span class={wrapper} aria-hidden="true">
-  <Image src={reactSvg} class={cls} alt={title} loading="lazy" />
+  <img
+    src={reactSvg.src}
+    width={reactSvg.width}
+    height={reactSvg.height}
+    decoding="async"
+    class={cls}
+    alt={title}
+    loading="lazy"
+  />
 </span>

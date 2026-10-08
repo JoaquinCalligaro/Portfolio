@@ -1,5 +1,4 @@
 ---
-import { Image } from 'astro:assets';
 import typescriptSvg from '../../assets/svg/typescript.svg';
 
 export interface Props {
@@ -24,5 +23,13 @@ const wrapper =
 ---
 
 <span class={wrapper} aria-hidden="true">
-  <Image src={typescriptSvg} class={cls} alt={title} loading="lazy" />
+  <img
+    src={typescriptSvg.src}
+    width={typescriptSvg.width}
+    height={typescriptSvg.height}
+    decoding="async"
+    class={cls}
+    alt={title}
+    loading="lazy"
+  />
 </span>
