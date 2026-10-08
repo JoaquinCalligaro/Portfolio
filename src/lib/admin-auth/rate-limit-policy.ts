@@ -35,6 +35,15 @@ export const PASSKEY_OPTIONS_HITS: AttemptConfig = {
   maxLockMs: MINUTE,
 };
 
+// Generar secretos o códigos de recuperación cuenta cada pedido (no solo los
+// fallidos) para que un bot no pueda generar códigos sin límite.
+export const TWOFA_GENERATE_HITS: AttemptConfig = {
+  max: 5,
+  windowMs: 15 * MINUTE,
+  baseLockMs: 15 * MINUTE,
+  maxLockMs: 24 * HOUR,
+};
+
 export function applyFailure(
   state: AttemptState | null,
   now: number,

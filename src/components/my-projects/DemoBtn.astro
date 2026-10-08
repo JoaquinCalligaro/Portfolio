@@ -1,5 +1,4 @@
 ---
-import { Image } from 'astro:assets';
 import LocalizedText from '../language/LocalizedText.astro';
 const { href = '#', label = null, className = '' } = Astro.props;
 import demoSvg from '../../assets/svg/demo.svg';
@@ -11,7 +10,15 @@ import demoSvg from '../../assets/svg/demo.svg';
   target="_blank"
   rel="noopener noreferrer"
 >
-  <Image src={demoSvg} alt="Demo" class="h-5 w-5" loading="lazy" />
+  <img
+    src={demoSvg.src}
+    width={demoSvg.width}
+    height={demoSvg.height}
+    decoding="async"
+    alt="Demo"
+    class="h-5 w-5"
+    loading="lazy"
+  />
   <span class="xl:20 inline-block w-18 text-center sm:w-18 md:w-20"
     >{label ?? <LocalizedText key="buttons.demo" />}</span
   >

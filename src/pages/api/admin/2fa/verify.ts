@@ -12,6 +12,7 @@ import {
   GLOBAL_FAILURES,
   IP_FAILURES,
 } from '../../../../lib/admin-auth/rate-limit-policy';
+import { recordLogin } from '../../../../lib/admin-auth/login-log';
 import { logSecurityEvent } from '../../../../lib/admin-auth/security-log';
 import { createSession } from '../../../../lib/admin-auth/session';
 import { createTrustedDevice } from '../../../../lib/admin-auth/trusted-device';
@@ -80,6 +81,7 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
     await resetAttempts(GLOBAL_KEY);
     await resetAttempts(twofaIpKey(ip));
     await resetAttempts(TWOFA_GLOBAL_KEY);
+    await recordLogin(request, ip, `password+${method}`);
     logSecurityEvent('login-ok', { ip, method: `password+${method}`, trust });
     return json({ ok: true });
   } catch (err) {

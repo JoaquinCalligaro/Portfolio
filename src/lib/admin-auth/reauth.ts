@@ -1,4 +1,4 @@
-import { UserError } from '../admin-api';
+import { UserError, tooManyAttempts } from '../admin-api';
 import { isPasswordValid } from './credentials';
 import { ipKey, registerAttempt, resetAttempts } from './rate-limit';
 import { IP_FAILURES } from './rate-limit-policy';
@@ -12,9 +12,8 @@ export async function requireRecentAuth(
   ip: string
 ): Promise<void> {
   if (isRecentAuth(session.createdAt, Date.now())) return;
-  if ((await registerAttempt(ipKey(ip), IP_FAILURES)) > 0) {
-    throw new UserError('Demasiados intentos. Probá más tarde.', 429);
-  }
+  const lockedMs = await registerAttempt(ipKey(ip), IP_FAILURES);
+  if (lockedMs > 0) throw tooManyAttempts(lockedMs);
   if (typeof password === 'string' && (await isPasswordValid(password))) {
     await resetAttempts(ipKey(ip));
     return;

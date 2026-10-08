@@ -1,5 +1,4 @@
 ---
-import { Image } from 'astro:assets';
 import tailwindSvg from '../../assets/svg/tailwindcss.svg';
 
 export interface Props {
@@ -24,5 +23,13 @@ const wrapper =
 
 <!-- TailwindIcon: usa el SVG estático desde assets y permite clases Tailwind -->
 <span class={wrapper} aria-hidden="true">
-  <Image src={tailwindSvg} class={cls} alt={title} loading="lazy" />
+  <img
+    src={tailwindSvg.src}
+    width={tailwindSvg.width}
+    height={tailwindSvg.height}
+    decoding="async"
+    class={cls}
+    alt={title}
+    loading="lazy"
+  />
 </span>

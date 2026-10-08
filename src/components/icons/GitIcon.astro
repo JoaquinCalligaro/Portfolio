@@ -1,5 +1,4 @@
 ---
-import { Image } from 'astro:assets';
 import githubSvg from '../../assets/svg/github.svg';
 
 export interface Props {
@@ -23,5 +22,13 @@ const wrapper =
 ---
 
 <span class={wrapper} aria-hidden="true">
-  <Image src={githubSvg} class={cls} alt={title} loading="lazy" />
+  <img
+    src={githubSvg.src}
+    width={githubSvg.width}
+    height={githubSvg.height}
+    decoding="async"
+    class={cls}
+    alt={title}
+    loading="lazy"
+  />
 </span>

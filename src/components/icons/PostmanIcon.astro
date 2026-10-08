@@ -1,5 +1,4 @@
 ---
-import { Image } from 'astro:assets';
 import postmanSvg from '../../assets/svg/postman.svg';
 
 export interface Props {
@@ -23,5 +22,13 @@ const wrapper =
 ---
 
 <span class={wrapper} aria-hidden="true">
-  <Image src={postmanSvg} class={cls} alt={title} loading="lazy" />
+  <img
+    src={postmanSvg.src}
+    width={postmanSvg.width}
+    height={postmanSvg.height}
+    decoding="async"
+    class={cls}
+    alt={title}
+    loading="lazy"
+  />
 </span>

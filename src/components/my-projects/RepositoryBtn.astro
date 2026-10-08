@@ -1,5 +1,4 @@
 ---
-import { Image } from 'astro:assets';
 import LocalizedText from '../language/LocalizedText.astro';
 const { href = '#', label = null, className = '' } = Astro.props;
 import gitSvg from '../../assets/svg/github.svg';
@@ -11,7 +10,15 @@ import gitSvg from '../../assets/svg/github.svg';
   target="_blank"
   rel="noopener noreferrer"
 >
-  <Image src={gitSvg} alt="GitHub" class="h-4 w-4" loading="lazy" />
+  <img
+    src={gitSvg.src}
+    width={gitSvg.width}
+    height={gitSvg.height}
+    decoding="async"
+    alt="GitHub"
+    class="h-4 w-4"
+    loading="lazy"
+  />
   <span class="xl:25 inline-block w-22 text-center sm:w-22 md:w-24"
     >{label ?? <LocalizedText key="buttons.repo" />}</span
   >

@@ -12,6 +12,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/shadcn/alert-dialog';
+import { LoginHistory } from './LoginHistory';
 import { MorphGlyph } from './MorphGlyph';
 import { request } from './api';
 
@@ -58,6 +59,10 @@ export function SessionsPanel() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <div className="space-y-2 border-t border-white/10 pt-4">
+        <h3 className="text-sm font-medium text-gray-100">Últimos ingresos</h3>
+        <LoginHistory />
+      </div>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import {
   applyFailure,
   lockRemainingMs,
   IP_FAILURES,
+  TWOFA_GENERATE_HITS,
 } from '../src/lib/admin-auth/rate-limit-policy.ts';
 import {
   evaluateSession,
@@ -66,4 +67,12 @@ test('session expires, renews on use and has an absolute cap', () => {
 test('recent auth lasts 10 minutes', () => {
   assert.equal(isRecentAuth(0, 9 * MIN), true);
   assert.equal(isRecentAuth(0, 10 * MIN), false);
+});
+
+test('2FA code generation freezes after 5 requests', () => {
+  let state = null;
+  for (let i = 0; i < 4; i++) state = applyFailure(state, 0, TWOFA_GENERATE_HITS);
+  assert.equal(lockRemainingMs(state, 0), 0);
+  state = applyFailure(state, 0, TWOFA_GENERATE_HITS);
+  assert.equal(lockRemainingMs(state, 0), 15 * MIN);
 });

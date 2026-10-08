@@ -27,6 +27,7 @@ import { TextField } from './fields';
 import { MorphGlyph } from './MorphGlyph';
 import { needsReauth, request, type ApiResult } from './api';
 import { usePasswordPrompt } from './usePasswordPrompt';
+import { formatWait, useCooldown } from './useCooldown';
 
 type Device = {
   id: string;
@@ -46,19 +47,26 @@ const formatDate = (value: string) => dateFormat.format(new Date(value));
 
 // "Mozilla/5.0 (Windows NT 10.0…) Chrome/120" -> "Chrome en Windows"
 function describeDevice(userAgent: string) {
-  const browser =
-    /Edg\//.test(userAgent) ? 'Edge'
-    : /Firefox\//.test(userAgent) ? 'Firefox'
-    : /Chrome\//.test(userAgent) ? 'Chrome'
-    : /Safari\//.test(userAgent) ? 'Safari'
-    : 'Navegador';
-  const system =
-    /Android/.test(userAgent) ? 'Android'
-    : /iPhone|iPad/.test(userAgent) ? 'iOS'
-    : /Windows/.test(userAgent) ? 'Windows'
-    : /Mac OS/.test(userAgent) ? 'macOS'
-    : /Linux/.test(userAgent) ? 'Linux'
-    : '';
+  const browser = /Edg\//.test(userAgent)
+    ? 'Edge'
+    : /Firefox\//.test(userAgent)
+      ? 'Firefox'
+      : /Chrome\//.test(userAgent)
+        ? 'Chrome'
+        : /Safari\//.test(userAgent)
+          ? 'Safari'
+          : 'Navegador';
+  const system = /Android/.test(userAgent)
+    ? 'Android'
+    : /iPhone|iPad/.test(userAgent)
+      ? 'iOS'
+      : /Windows/.test(userAgent)
+        ? 'Windows'
+        : /Mac OS/.test(userAgent)
+          ? 'macOS'
+          : /Linux/.test(userAgent)
+            ? 'Linux'
+            : '';
   return system ? `${browser} en ${system}` : browser;
 }
 
@@ -69,6 +77,7 @@ export function TwoFactorPanel() {
   const [busy, setBusy] = useState(false);
   const [recoveryCodes, setRecoveryCodes] = useState<string[] | null>(null);
   const prompt = usePasswordPrompt();
+  const enableLock = useCooldown('admin-2fa-enable-lock');
 
   const load = useCallback(async () => {
     const result = await request('/api/admin/2fa', 'GET');
@@ -108,17 +117,29 @@ export function TwoFactorPanel() {
       toast.error(result.error ?? 'No se pudo iniciar la configuración');
       return;
     }
-    const qr = await QRCode.toDataURL(result.uri as string, { margin: 1, width: 224 });
+    const qr = await QRCode.toDataURL(result.uri as string, {
+      margin: 1,
+      width: 224,
+    });
     setCode('');
-    setSetup({ secret: result.secret as string, uri: result.uri as string, qr });
+    setSetup({
+      secret: result.secret as string,
+      uri: result.uri as string,
+      qr,
+    });
   };
 
   const confirm = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (enableLock.locked) return;
     setBusy(true);
     const result = await request('/api/admin/2fa/enable', 'POST', { code });
     setBusy(false);
     if (!result.ok) {
+      if (result.status === 429) {
+        enableLock.start(result.retryAfterSeconds);
+        setCode('');
+      }
       toast.error(result.error ?? 'No se pudo activar el 2FA');
       return;
     }
@@ -197,35 +218,43 @@ export function TwoFactorPanel() {
             <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-300">
               <MorphGlyph name="shield" size={24} />
             </span>
-            <div className="min-w-0 flex-1">
+            <div className="min-w-0 flex-1 basis-40">
               <p className="font-medium text-white">2FA activado</p>
               <p className="text-xs text-gray-300">
                 Te quedan {status.recoveryLeft} códigos de recuperación.
               </p>
             </div>
-            <Button variant="outline" onClick={() => void regenerate()}>
-              Generar códigos nuevos
-            </Button>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive">Desactivar</Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Desactivar 2FA</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    El login volverá a pedir solo la contraseña y se olvidan
-                    todos los dispositivos de confianza.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => void disable()}>
+            <div className="flex w-full flex-wrap gap-2 sm:w-auto">
+              <Button
+                variant="outline"
+                className="flex-1 sm:flex-none"
+                onClick={() => void regenerate()}
+              >
+                Generar códigos nuevos
+              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" className="flex-1 sm:flex-none">
                     Desactivar
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Desactivar 2FA</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      El login volverá a pedir solo la contraseña y se olvidan
+                      todos los dispositivos de confianza.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => void disable()}>
+                      Desactivar
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
           </div>
 
           <div className="space-y-3">
@@ -255,7 +284,7 @@ export function TwoFactorPanel() {
                     key={device.id}
                     className={`${cardClass} flex list-none flex-wrap items-center gap-3 p-4`}
                   >
-                    <div className="min-w-0 flex-1">
+                    <div className="min-w-0 flex-1 basis-40">
                       <p className="truncate font-medium text-white">
                         {describeDevice(device.userAgent)}
                         {device.current ? ' (este dispositivo)' : ''}
@@ -282,7 +311,10 @@ export function TwoFactorPanel() {
         </>
       )}
 
-      <Dialog open={setup !== null} onOpenChange={(open) => !busy && !open && setSetup(null)}>
+      <Dialog
+        open={setup !== null}
+        onOpenChange={(open) => !busy && !open && setSetup(null)}
+      >
         <DialogContent>
           <form onSubmit={confirm}>
             <DialogHeader>
@@ -304,7 +336,7 @@ export function TwoFactorPanel() {
                 <p className="text-center text-xs text-gray-300">
                   ¿No podés escanear? Cargá esta clave a mano:
                 </p>
-                <code className="block break-all rounded-lg bg-black/40 p-2 text-center text-sm text-cyan-200">
+                <code className="block rounded-lg bg-black/40 p-2 text-center text-sm break-all text-cyan-200">
                   {setup.secret}
                 </code>
                 <TextField
@@ -313,6 +345,7 @@ export function TwoFactorPanel() {
                   autoComplete="one-time-code"
                   maxLength={7}
                   autoFocus
+                  disabled={enableLock.locked}
                   value={code}
                   onValueChange={setCode}
                   placeholder="123456"
@@ -320,11 +353,22 @@ export function TwoFactorPanel() {
               </div>
             )}
             <DialogFooter>
-              <Button variant="outline" disabled={busy} onClick={() => setSetup(null)}>
+              <Button
+                variant="outline"
+                disabled={busy}
+                onClick={() => setSetup(null)}
+              >
                 Cancelar
               </Button>
-              <Button type="submit" disabled={busy || code.trim().length < 6}>
-                {busy ? 'Verificando…' : 'Activar'}
+              <Button
+                type="submit"
+                disabled={busy || enableLock.locked || code.trim().length < 6}
+              >
+                {busy
+                  ? 'Verificando…'
+                  : enableLock.locked
+                    ? `Bloqueado ${formatWait(enableLock.seconds)}`
+                    : 'Activar'}
               </Button>
             </DialogFooter>
           </form>
@@ -357,7 +401,9 @@ export function TwoFactorPanel() {
             <Button variant="outline" onClick={() => void copyCodes()}>
               Copiar
             </Button>
-            <Button onClick={() => setRecoveryCodes(null)}>Ya los guardé</Button>
+            <Button onClick={() => setRecoveryCodes(null)}>
+              Ya los guardé
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

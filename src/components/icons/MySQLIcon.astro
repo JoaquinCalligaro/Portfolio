@@ -1,5 +1,4 @@
 ---
-import { Image } from 'astro:assets';
 import mysqlSvg from '../../assets/svg/mysql.svg';
 
 export interface Props {
@@ -23,5 +22,13 @@ const wrapper =
 ---
 
 <span class={wrapper} aria-hidden="true">
-  <Image src={mysqlSvg} class={cls} alt={title} loading="lazy" />
+  <img
+    src={mysqlSvg.src}
+    width={mysqlSvg.width}
+    height={mysqlSvg.height}
+    decoding="async"
+    class={cls}
+    alt={title}
+    loading="lazy"
+  />
 </span>

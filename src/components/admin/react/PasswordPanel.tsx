@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from 'react';
+import { useId, useState } from 'react';
 import type { InputHTMLAttributes } from 'react';
 import { AnimatePresence, m } from 'framer-motion';
 import { toast } from 'sonner';
@@ -10,6 +10,7 @@ import { MorphGlyph } from './MorphGlyph';
 import { PasswordStrengthMeter } from './PasswordStrengthMeter';
 import { request } from './api';
 import { statusTransition } from './motion';
+import { formatWait, useCooldown } from './useCooldown';
 
 type PasswordFieldProps = Omit<
   InputHTMLAttributes<HTMLInputElement>,
@@ -84,11 +85,6 @@ function PasswordField({
   );
 }
 
-const formatWait = (seconds: number) => {
-  const minutes = Math.floor(seconds / 60);
-  const rest = String(seconds % 60).padStart(2, '0');
-  return `${minutes}:${rest}`;
-};
 
 export function PasswordPanel({ username }: { username?: string }) {
   const [current, setCurrent] = useState('');
@@ -96,7 +92,8 @@ export function PasswordPanel({ username }: { username?: string }) {
   const [confirm, setConfirm] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [waitSeconds, setWaitSeconds] = useState(0);
+  const cooldown = useCooldown('admin-password-lock');
+  const waitSeconds = cooldown.seconds;
 
   const strength = evaluatePassword(next, { username });
   const mismatch = confirm.length > 0 && confirm !== next;
@@ -111,12 +108,6 @@ export function PasswordPanel({ username }: { username?: string }) {
     matches &&
     !sameAsCurrent;
 
-  useEffect(() => {
-    if (waitSeconds <= 0) return;
-    const timer = window.setTimeout(() => setWaitSeconds((s) => s - 1), 1000);
-    return () => window.clearTimeout(timer);
-  }, [waitSeconds]);
-
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!canSubmit) return;
@@ -129,7 +120,7 @@ export function PasswordPanel({ username }: { username?: string }) {
     });
     setBusy(false);
     if (!result.ok) {
-      if (result.retryAfterSeconds) setWaitSeconds(result.retryAfterSeconds);
+      cooldown.start(result.retryAfterSeconds);
       setError(result.error ?? 'No se pudo cambiar la contraseña');
       return;
     }

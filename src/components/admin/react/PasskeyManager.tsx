@@ -161,7 +161,11 @@ export function PasskeyManager() {
       )}
 
       {passkeys === null ? (
-        <div className="space-y-3" role="status" aria-label="Cargando dispositivos">
+        <div
+          className="space-y-3"
+          role="status"
+          aria-label="Cargando dispositivos"
+        >
           <Skeleton className="h-20" />
           <Skeleton className="h-20" />
         </div>
@@ -229,7 +233,11 @@ export function PasskeyManager() {
               placeholder="Ej. Celular, Notebook"
             />
             <DialogFooter>
-              <Button variant="outline" disabled={busy} onClick={() => setNaming(false)}>
+              <Button
+                variant="outline"
+                disabled={busy}
+                onClick={() => setNaming(false)}
+              >
                 Cancelar
               </Button>
               <Button type="submit" disabled={busy}>
@@ -281,7 +289,7 @@ function PasskeyRow({ passkey, onRename, onRemove }: PasskeyRowProps) {
         <MorphGlyph name="fingerprint" size={24} />
       </span>
 
-      <div className="min-w-0 flex-1 space-y-1.5">
+      <div className="min-w-0 flex-1 basis-40 space-y-1.5">
         {editing ? (
           <form onSubmit={save} className="flex items-center gap-2">
             <input
@@ -294,7 +302,12 @@ function PasskeyRow({ passkey, onRename, onRemove }: PasskeyRowProps) {
               aria-label="Nuevo nombre del dispositivo"
               className="h-9 min-w-0 flex-1 rounded-lg border border-white/15 bg-black/30 px-3 text-sm text-white outline-none focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20"
             />
-            <Button type="submit" size="icon" disabled={saving} aria-label="Guardar nombre">
+            <Button
+              type="submit"
+              size="icon"
+              disabled={saving}
+              aria-label="Guardar nombre"
+            >
               <MorphGlyph name="check" />
             </Button>
             <Button
@@ -323,7 +336,7 @@ function PasskeyRow({ passkey, onRename, onRemove }: PasskeyRowProps) {
       </div>
 
       {!editing && (
-        <div className="flex shrink-0 gap-2">
+        <div className="ml-auto flex shrink-0 gap-2">
           <Button
             variant="outline"
             size="icon"
@@ -352,7 +365,9 @@ function PasskeyRow({ passkey, onRename, onRemove }: PasskeyRowProps) {
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                <AlertDialogAction onClick={onRemove}>Eliminar</AlertDialogAction>
+                <AlertDialogAction onClick={onRemove}>
+                  Eliminar
+                </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
