@@ -9,9 +9,4 @@ export const translations = {
 } as const;
 
 // Exporta los tipos para usar en otros archivos
-export type {
-  Lang,
-  TranslationStructure,
-  AboutMe,
-  ExperienceItem,
-} from './types';
+export type { Lang, TranslationStructure, AboutMe } from './types';

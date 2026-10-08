@@ -1,0 +1,62 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import PageHeader from '../../components/admin/PageHeader.astro';
+import DbWarning from '../../components/admin/DbWarning.astro';
+import ProfileForm from '../../components/admin/react/ProfileForm';
+import BioEditor from '../../components/admin/react/BioEditor';
+import SocialEditor from '../../components/admin/react/SocialEditor';
+import { getProfile, listSocialLinks } from '../../db/queries';
+
+export const prerender = false;
+
+const [profile, socials] = await Promise.all([getProfile(), listSocialLinks()]);
+
+const values = {
+  name: profile?.name ?? '',
+  headlineEs: profile?.headlineEs ?? '',
+  photoUrl: profile?.photoUrl ?? '',
+  cvUrl: profile?.cvUrl ?? '',
+};
+const paragraphs = profile?.bioEs ?? [];
+const socialItems = socials.map((item) => ({
+  id: item.id,
+  label: item.label ?? '',
+  url: item.url ?? '',
+  iconSlug: item.iconSlug ?? '',
+  iconUrl: item.iconUrl ?? '',
+  hidden: item.hidden ?? false,
+}));
+---
+
+<AdminLayout title="Perfil">
+  <PageHeader
+    title="Perfil"
+    description="Escribí solo en español: el inglés se traduce solo al guardar."
+  />
+  <DbWarning />
+
+  <section class="mb-10" aria-labelledby="profile-intro">
+    <h2 id="profile-intro" class="mb-3 text-lg font-medium text-white">
+      Presentación
+    </h2>
+    <ProfileForm client:load profile={values} />
+  </section>
+
+  <section class="mb-10" aria-labelledby="profile-bio">
+    <h2 id="profile-bio" class="mb-1 text-lg font-medium text-white">
+      Sobre mí (biografía)
+    </h2>
+    <p class="mb-3 text-sm text-gray-300">Cada párrafo es una tarjeta.</p>
+    <BioEditor client:load paragraphs={paragraphs} />
+  </section>
+
+  <section aria-labelledby="profile-social">
+    <h2 id="profile-social" class="mb-1 text-lg font-medium text-white">
+      Redes sociales
+    </h2>
+    <p class="mb-3 text-sm text-gray-300">
+      Links que se muestran en tu portfolio.
+    </p>
+    <SocialEditor client:load items={socialItems} />
+  </section>
+</AdminLayout>

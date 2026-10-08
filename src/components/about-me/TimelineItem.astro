@@ -1,45 +1,65 @@
 ---
-// TimelineItem.astro
-// Entrada reutilizable para la línea de tiempo (Experiencia).
-// - Icono por defecto: `Education.astro`. Sobrescribible con el slot `icon`.
-// - Props: title, date, description, badgeText, iconClass?, iconLabel?.
-// - Accesibilidad: por defecto el icono es decorativo (aria-hidden). Si se
-//   pasa `iconLabel` se añade role="img" y aria-label.
-
-import Education from '../icons/Education.astro';
+// Entrada de la línea de tiempo de Educación (se dibuja en el servidor).
+import DirectLocalizedText from '../language/DirectLocalizedText.astro';
+import { timelineIcons } from './timelineIcons';
 
 interface Props {
-  title: string; // headline/company
-  date: string; // dates string
-  description: string; // short description for the item
-  badgeText?: string; // optional pill next to the title
-  // class to apply to the icon component (keeps presentation customizable)
-  iconClass?: string;
-  // when provided, the icon becomes semantic: role="img" + aria-label
-  iconLabel?: string;
+  title: string; // institución
+  date: { es: string; en: string };
+  description: { es: string; en: string };
+  iconKey?: string; // university | work | certificate
+  certificateUrl?: string;
 }
 
-const { title, date, description, badgeText, iconClass, iconLabel } =
-  Astro.props as Props;
+const { title, date, description, iconKey = 'default', certificateUrl } = Astro.props as Props;
+const icon = timelineIcons[iconKey] ?? timelineIcons.default;
 ---
 
-<li>
-  <span>
-    <Education
-      class={`${iconClass}`}
-      {...iconLabel
-        ? { role: 'img', 'aria-label': iconLabel }
-        : { 'aria-hidden': 'true' }}
-    />
-    <slot name="icon" />
-  </span>
-  <h3>
+<li class="ms-8 mb-10">
+  <span
+    class="absolute -start-3 flex size-6 items-center justify-center rounded-full bg-blue-300 ring-8 ring-blue-100 dark:bg-blue-800 dark:ring-blue-950/60"
+    set:html={icon}
+  />
+  <h3
+    class="mb-1 flex items-center text-lg font-semibold text-gray-950 dark:text-white"
+  >
     {title}
-    {badgeText && <span>{badgeText}</span>}
   </h3>
-  <time>{date}</time>
-  <p>
-    {description}
+  <time
+    class="mb-2 block text-sm leading-none font-semibold text-cyan-700 dark:text-cyan-400"
+  >
+    <DirectLocalizedText es={date.es} en={date.en || date.es} />
+  </time>
+  <p class="mb-4 text-sm font-normal text-black sm:text-base dark:text-white">
+    <DirectLocalizedText
+      es={description.es}
+      en={description.en || description.es}
+    />
   </p>
-  <slot name="extra-content" />
+  {
+    certificateUrl && (
+      <a
+        href={certificateUrl.startsWith('data:') ? '#' : certificateUrl}
+        data-data-url={certificateUrl.startsWith('data:') ? certificateUrl : undefined}
+        target="_blank"
+        rel="noopener"
+        class="inline-flex items-center gap-1 text-sm font-semibold text-cyan-700 underline-offset-4 hover:underline dark:text-cyan-400"
+      >
+        <DirectLocalizedText es="Ver certificado" en="View certificate" />
+      </a>
+    )
+  }
 </li>
+
+<script>
+  // Vista previa: el navegador bloquea abrir data: URLs, así que se abre como blob.
+  document.addEventListener('click', (event) => {
+    const link = (event.target as Element).closest<HTMLAnchorElement>('a[data-data-url]');
+    if (!link) return;
+    event.preventDefault();
+    const [head, body] = (link.dataset.dataUrl ?? '').split(',');
+    const mime = head.slice(5, head.indexOf(';'));
+    const bytes = Uint8Array.from(atob(body), (c) => c.charCodeAt(0));
+    window.open(URL.createObjectURL(new Blob([bytes], { type: mime })), '_blank');
+  });
+</script>

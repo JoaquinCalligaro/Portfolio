@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "gray-on-color",
+        "value": "*",
+        "files": [
+          "src/components/ui/shadcn/button.tsx"
+        ],
+        "createdAt": "2026-10-07T23:12:27.259Z",
+        "reason": "model: text-gray-950 on bg-cyan-500 is dark-on-bright, AA contrast; detector false positive"
+      },
+      {
+        "rule": "gray-on-color",
+        "value": "*",
+        "files": [
+          "src/layouts/AdminLayout.astro"
+        ],
+        "createdAt": "2026-10-07T23:19:22.870Z",
+        "reason": "model: skip link text-gray-950 on bg-cyan-500 is dark-on-bright AA; detector false positive"
+      }
+    ]
+  }
+}

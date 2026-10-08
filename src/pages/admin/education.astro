@@ -1,0 +1,28 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import PageHeader from '../../components/admin/PageHeader.astro';
+import DbWarning from '../../components/admin/DbWarning.astro';
+import EducationEditor from '../../components/admin/react/EducationEditor';
+import { listEducation } from '../../db/queries';
+
+export const prerender = false;
+
+const items = (await listEducation()).map((item) => ({
+  id: item.id,
+  institution: item.institution ?? '',
+  datesEs: item.datesEs ?? '',
+  descriptionEs: item.descriptionEs ?? '',
+  iconKey: item.iconKey ?? 'university',
+  certificateMime: item.certificateMime ?? '',
+  hidden: item.hidden ?? false,
+}));
+---
+
+<AdminLayout title="Educación">
+  <PageHeader
+    title="Educación"
+    description="Escribí solo en español: el inglés se traduce solo al guardar."
+  />
+  <DbWarning />
+  <EducationEditor client:load items={items} />
+</AdminLayout>

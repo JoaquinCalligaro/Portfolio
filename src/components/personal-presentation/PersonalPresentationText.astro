@@ -1,28 +1,19 @@
 ---
-import LocalizedText from '../language/LocalizedText.astro';
+import DirectLocalizedText from '../language/DirectLocalizedText.astro';
 
 export interface Props {
   name?: string;
-  description?: string;
-  nameKey?: string;
-  descriptionKey?: string;
+  descriptionEs?: string;
+  descriptionEn?: string;
   className?: string;
 }
 
 const {
   name = '',
-  description = '',
-  nameKey = 'personal.name',
-  descriptionKey = 'personal.description',
+  descriptionEs = '',
+  descriptionEn = '',
   className = '',
 } = Astro.props;
-
-const nameFallback = name || 'Joaquin Calligaro';
-const descriptionFallback =
-  description ||
-  'Hola, soy un desarrollador frontend que disfruta transformar ideas en interfaces claras y funcionales. ' +
-    'Actualmente exploro proyectos web y móviles con un estilo moderno y enfocado en la experiencia del usuario. ' +
-    'Te invito a ver mi trabajo.';
 ---
 
 <div
@@ -31,11 +22,14 @@ const descriptionFallback =
   <h1
     class="text-4xl font-bold text-gray-950 md:mb-5 md:pl-5 md:text-6xl xl:mx-4 xl:mb-5 dark:text-gray-100"
   >
-    <LocalizedText key={nameKey} fallback={nameFallback} />
+    {name}
   </h1>
   <p
     class="max-w-3xl px-8 py-4 text-lg leading-10 text-gray-950 sm:px-8 md:mr-25 xl:mr-8 xl:mb-10 dark:text-gray-100"
   >
-    <LocalizedText key={descriptionKey} fallback={descriptionFallback} />
+    <DirectLocalizedText
+      es={descriptionEs}
+      en={descriptionEn || descriptionEs}
+    />
   </p>
 </div>

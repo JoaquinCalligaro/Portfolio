@@ -218,6 +218,7 @@ interface WindowWithTranslations extends Window {
       );
     }
 
+    const formOpenedAt = Date.now();
     const statusElements: StatusElements = {
       cooldownDisplay: qs('#cooldown-display'),
       formStatus: qs('#form-status'),
@@ -647,10 +648,10 @@ interface WindowWithTranslations extends Window {
 
       try {
         const fd = new FormData(elements.form);
-        if (fd.has && fd.has('cf-turnstile-response')) {
-          fd.delete('cf-turnstile-response');
-        }
-        const res = await fetch(elements.form.action || '/api/contact', {
+        // Campos anti-bot que el servidor verifica
+        fd.set('form_token', crypto.randomUUID());
+        fd.set('time_spent', String(Date.now() - formOpenedAt));
+        const res = await fetch('/api/contact', {
           method: (elements.form.method || 'POST').toUpperCase(),
           body: fd,
           headers: { Accept: 'application/json' },
@@ -688,6 +689,11 @@ interface WindowWithTranslations extends Window {
 
         markSend();
         elements.form.reset();
+        try {
+          (window as any).turnstile?.reset();
+        } catch {
+          // noop
+        }
         // Ocultar errores de validación cuando el formulario se resetea exitosamente
         hideAllValidationErrors();
         // Resetear la bandera para que no aparezcan errores en el próximo uso

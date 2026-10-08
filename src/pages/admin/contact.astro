@@ -1,0 +1,24 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import PageHeader from '../../components/admin/PageHeader.astro';
+import DbWarning from '../../components/admin/DbWarning.astro';
+import ContactForm from '../../components/admin/react/ContactForm';
+import { getProfile } from '../../db/queries';
+
+export const prerender = false;
+
+const profile = await getProfile();
+const settings = {
+  contactToEmail: profile?.contactToEmail ?? '',
+  contactFromEmail: profile?.contactFromEmail ?? '',
+};
+---
+
+<AdminLayout title="Contacto">
+  <PageHeader
+    title="Contacto"
+    description="Configurá el remitente de los mensajes del formulario."
+  />
+  <DbWarning />
+  <ContactForm client:load settings={settings} />
+</AdminLayout>

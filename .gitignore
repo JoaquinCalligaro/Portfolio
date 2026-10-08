@@ -65,3 +65,4 @@ Thumbs.db
 # Tests
 coverage/
 /.vercel
+/.github/copilot-instructions.md

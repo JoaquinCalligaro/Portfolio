@@ -1,0 +1,26 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import PageHeader from '../../../components/admin/PageHeader.astro';
+import DbWarning from '../../../components/admin/DbWarning.astro';
+import ProjectsList from '../../../components/admin/react/ProjectsList';
+import { listProjects } from '../../../db/queries';
+import { isDbConfigured } from '../../../db/client';
+
+export const prerender = false;
+
+const projects = isDbConfigured
+  ? (await listProjects()).map((project) => ({
+      id: project.id,
+      titleEs: project.titleEs ?? '',
+      descriptionEs: project.descriptionEs ?? '',
+      featured: project.featured ?? false,
+      hidden: project.hidden ?? false,
+    }))
+  : [];
+---
+
+<AdminLayout title="Proyectos">
+  <PageHeader title="Tus proyectos" />
+  <DbWarning />
+  <ProjectsList client:load projects={projects} />
+</AdminLayout>

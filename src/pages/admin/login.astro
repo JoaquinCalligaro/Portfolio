@@ -1,0 +1,11 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import LoginCard from '../../components/admin/react/LoginCard';
+
+export const prerender = false;
+const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
+---
+
+<AdminLayout title="Iniciar sesión" showNav={false}>
+  <LoginCard client:load siteKey={siteKey} />
+</AdminLayout>

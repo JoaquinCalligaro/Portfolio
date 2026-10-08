@@ -6,8 +6,9 @@ import SubmitBtn from './SubmitBtn.astro';
 import FormStatus from './FormStatus.astro';
 import CooldownDisplay from './CooldownDisplay.astro';
 import CharacterCounter from './CharacterCounter.astro';
-// Formspree action must be provided via env
-const FORMSPREE_ACTION = import.meta.env.PUBLIC_FORMSPREE_ACTION;
+const TURNSTILE_SITE_KEY = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
+// En la vista previa del admin el formulario no envía mails reales.
+const { preview = false } = Astro.props as { preview?: boolean };
 ---
 
 <div
@@ -16,7 +17,7 @@ const FORMSPREE_ACTION = import.meta.env.PUBLIC_FORMSPREE_ACTION;
   <div class="contact-card-inner p-6">
     <form
       id="contactForm"
-      action={FORMSPREE_ACTION}
+      action="/api/contact"
       method="post"
       class="contact-form w-full space-y-4 rounded-xl"
       novalidate
@@ -126,6 +127,17 @@ const FORMSPREE_ACTION = import.meta.env.PUBLIC_FORMSPREE_ACTION;
         class="sr-only"
       />
 
+      {
+        TURNSTILE_SITE_KEY && (
+          <div class="cf-turnstile flex justify-center" data-sitekey={TURNSTILE_SITE_KEY} />
+        )
+      }
+      {
+        TURNSTILE_SITE_KEY && (
+          <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
+        )
+      }
+
       <div class="w-full text-center">
         <!-- Cooldown display mejorado -->
         <CooldownDisplay id="cooldown-display" />
@@ -134,11 +146,33 @@ const FORMSPREE_ACTION = import.meta.env.PUBLIC_FORMSPREE_ACTION;
       </div>
 
       <div class="flex items-center justify-start gap-3">
-        <SubmitBtn id="submit-btn" translationKey="contact.send" />
+        {
+          preview ? (
+            <SubmitBtn
+              id="submit-btn"
+              text="Desactivado en vista previa"
+              disabled
+            />
+          ) : (
+            <SubmitBtn id="submit-btn" translationKey="contact.send" />
+          )
+        }
       </div>
     </form>
 
-    <script type="module" src="/src/components/scripts/contact/contact-form.ts"
-    ></script>
+    {
+      preview ? (
+        <script is:inline>
+          document
+            .getElementById('contactForm')
+            ?.addEventListener('submit', (e) => e.preventDefault(), true);
+        </script>
+      ) : (
+        <script
+          type="module"
+          src="/src/components/scripts/contact/contact-form.ts"
+        />
+      )
+    }
   </div>
 </div>

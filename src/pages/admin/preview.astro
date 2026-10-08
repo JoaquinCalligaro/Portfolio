@@ -1,0 +1,74 @@
+---
+// Vista previa: el portfolio completo con un borrador aplicado, sin guardar
+// nada. Solo acepta POST desde el panel (sesión y origen los valida el middleware).
+import Layout from '../../layouts/Layout.astro';
+import SiteContent from '../../components/site/SiteContent.astro';
+import '../../styles/base/global.css';
+import { loadSiteData } from '../../lib/site-data';
+import { applyDraft } from '../../lib/preview/apply-draft';
+import { parseDrafts, MAX_DRAFT_BYTES } from '../../lib/preview/parse-draft';
+import { DraftError } from '../../lib/preview/types';
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+
+if (Astro.request.method !== 'POST') return Astro.redirect('/admin');
+
+const declared = Number(Astro.request.headers.get('content-length') ?? 0);
+let data = null;
+let rawDrafts: unknown[] = [];
+let message = '';
+let status = 200;
+
+try {
+  if (declared > MAX_DRAFT_BYTES * 2)
+    throw new DraftError('El borrador es demasiado grande', 413);
+  const form = await Astro.request.formData();
+  const rawField = form.get('draft');
+  const drafts = parseDrafts(rawField);
+  const parsedRaw = JSON.parse(String(rawField));
+  rawDrafts = Array.isArray(parsedRaw) ? parsedRaw : [parsedRaw];
+  data = drafts.reduce(applyDraft, await loadSiteData());
+} catch (err) {
+  if (err instanceof DraftError) {
+    message = err.message;
+    status = err.status;
+  } else {
+    console.error('[preview] no se pudo armar la vista previa:', err);
+    message =
+      'No se pudo armar la vista previa. Volvé al panel e intentá de nuevo.';
+    status = 500;
+  }
+}
+if (status !== 200) Astro.response.status = status;
+---
+
+{
+  data ? (
+    <Layout
+      preview
+      previewDrafts={rawDrafts}
+      profile={data.profile}
+      socialLinks={data.socialLinks}
+    >
+      <SiteContent data={data} preview />
+    </Layout>
+  ) : (
+    <html lang="es">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <meta name="robots" content="noindex, nofollow" />
+        <title>Vista previa</title>
+      </head>
+      <body style="font-family:system-ui;background:#030712;color:#e5e7eb;display:grid;place-items:center;min-height:100vh;margin:0;padding:1.5rem;text-align:center">
+        <main>
+          <h1 style="font-size:1.25rem">No se pudo mostrar la vista previa</h1>
+          <p>{message}</p>
+          <a href="/admin" style="color:#67e8f9">
+            Volver al panel
+          </a>
+        </main>
+      </body>
+    </html>
+  )
+}

@@ -1,17 +1,31 @@
 ---
-import meImage from '../../assets/images/me.webp';
 import PersonalPresentationImage from './PersonalPresentationImage.astro';
 import PersonalPresentationText from './PersonalPresentationText.astro';
+import type { ProfileRow } from '../../db/schema';
 
 export interface Props {
   className?: string;
+  profile?: ProfileRow | null;
 }
 
-const { className = '' } = Astro.props;
+const { className = '', profile = null } = Astro.props;
 ---
 
-<!-- Presentación personal -->
-<div class={`flex flex-col items-center gap-15 md:flex-row ${className}`}>
-  <PersonalPresentationImage src={meImage} alt="Joaquin Calligaro" />
-  <PersonalPresentationText />
+<!-- Presentación personal (nombre, foto y descripción vienen de la base) -->
+<div data-realtime-sync="hero">
+  <div class={`flex flex-col items-center gap-15 md:flex-row ${className}`}>
+    {
+      profile?.photoUrl && (
+        <PersonalPresentationImage
+          src={profile.photoUrl}
+          alt={profile.name || 'Foto de perfil'}
+        />
+      )
+    }
+    <PersonalPresentationText
+      name={profile?.name ?? ''}
+      descriptionEs={profile?.headlineEs ?? ''}
+      descriptionEn={profile?.headlineEn ?? ''}
+    />
+  </div>
 </div>

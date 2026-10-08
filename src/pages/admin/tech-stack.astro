@@ -1,0 +1,31 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import PageHeader from '../../components/admin/PageHeader.astro';
+import DbWarning from '../../components/admin/DbWarning.astro';
+import TechEditor from '../../components/admin/react/TechEditor';
+import { listTechCategoriesWithTechs } from '../../db/queries';
+
+export const prerender = false;
+
+const categories = (await listTechCategoriesWithTechs()).map((category) => ({
+  id: category.id,
+  nameEs: category.nameEs ?? '',
+  techs: category.techs.map((tech) => ({
+    id: tech.id,
+    name: tech.name ?? '',
+    color: tech.color ?? '',
+    iconSlug: tech.iconSlug ?? '',
+    iconUrl: tech.iconUrl ?? '',
+    hidden: tech.hidden ?? false,
+  })),
+}));
+---
+
+<AdminLayout title="Tech Stack">
+  <PageHeader
+    title="Tech Stack"
+    description="Escribí el nombre del ícono (por ejemplo docker) o subí una imagen. Si subís una imagen, se usa la imagen."
+  />
+  <DbWarning />
+  <TechEditor client:load categories={categories} />
+</AdminLayout>

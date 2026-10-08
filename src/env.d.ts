@@ -1,5 +1,11 @@
 /// <reference types="astro/client" />
 
+declare namespace App {
+  interface Locals {
+    adminSession?: import('./lib/admin-auth/session').AdminSession;
+  }
+}
+
 declare module '*.webp' {
   const src: string;
   export default src;

@@ -1,45 +1,34 @@
 ---
-// Sección de una categoría (p.ej. Front-end). No tocar la lógica, solo el diseño si hace falta.
+// Sección de una categoría (p.ej. Front-end): título ES/EN y sus tecnologías.
 import TechCard from './TechCard.astro';
-import type { TechItem } from '../../data/techs';
+import DirectLocalizedText from '../language/DirectLocalizedText.astro';
+import type { TechRow } from '../../db/schema';
 
 interface Props {
-  title: string;
-  items: TechItem[];
-  'data-tech-category'?: string;
+  nameEs: string;
+  nameEn: string;
+  techs: TechRow[];
 }
 
-const {
-  title,
-  items,
-  'data-tech-category': categoryKey,
-} = Astro.props as Props;
+const { nameEs, nameEn, techs } = Astro.props as Props;
 ---
 
 <div>
-  <h4
-    class="mb-5 text-sm font-semibold text-gray-800 dark:text-gray-200"
-    data-tech-category={categoryKey}
-  >
-    {title}
+  <h4 class="mb-5 text-sm font-semibold text-gray-800 dark:text-gray-200">
+    <DirectLocalizedText es={nameEs} en={nameEn || nameEs} />
   </h4>
   <div
     class="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-6"
   >
     {
-      items.map((tech) => {
-        const loading = tech.loading ?? 'eager';
-        return (
-          <TechCard
-            name={tech.name}
-            hex={tech.hex}
-            hexAlpha={tech.hexAlpha}
-            icon={tech.icon}
-            color={tech.color}
-            loading={loading}
-          />
-        );
-      })
+      techs.map((tech) => (
+        <TechCard
+          name={tech.name}
+          hex={tech.color}
+          iconUrl={tech.iconUrl}
+          iconSlug={tech.iconSlug}
+        />
+      ))
     }
   </div>
 </div>

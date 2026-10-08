@@ -1,17 +1,34 @@
 // API endpoint para el formulario de contacto
+import { env } from '../../lib/env';
 import type { APIRoute } from 'astro';
+import { getClientIp } from '../../lib/admin-auth/client-ip';
 import { Resend } from 'resend';
+import { getProfile } from '../../db/queries';
+import {
+  LIMITS,
+  escapeHtml,
+  isRateLimited,
+  isValidEmail,
+  toPlainText,
+  toSingleLine,
+  verifyTurnstile,
+} from '../../lib/contact-security';
 
 // Variables de entorno para el servicio de email
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const TO_EMAIL = process.env.CONTACT_TO_EMAIL;
+const RESEND_API_KEY = env('RESEND_API_KEY');
 
 // Cliente de Resend para envío de emails
 const resendClient = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 
 // Maneja las peticiones POST del formulario de contacto
-export const post: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, clientAddress }) => {
+  const fail = (error: string, status: number) =>
+    new Response(JSON.stringify({ ok: false, error }), { status });
+
   try {
+    const ip = getClientIp(request, clientAddress);
+    if (isRateLimited(ip)) return fail('Too many requests', 429);
+
     const form = await request.formData();
 
     // Campo honeypot para detectar spam (debe estar vacío)
@@ -23,9 +40,12 @@ export const post: APIRoute = async ({ request }) => {
       );
     }
 
-    const name = String(form.get('name') || '').trim();
+    const captcha = String(form.get('cf-turnstile-response') || '');
+    if (!(await verifyTurnstile(captcha, ip))) return fail('Captcha failed', 400);
+
+    const name = toSingleLine(String(form.get('name') || ''));
     const email = String(form.get('email') || '').trim();
-    const message = String(form.get('message') || '').trim();
+    const message = toPlainText(String(form.get('message') || ''));
     const formToken = String(form.get('form_token') || '').trim();
     const timeSpent = Number(form.get('time_spent') || 0);
 
@@ -45,6 +65,14 @@ export const post: APIRoute = async ({ request }) => {
       );
     }
 
+    if (
+      name.length > LIMITS.name ||
+      message.length > LIMITS.message ||
+      !isValidEmail(email)
+    ) {
+      return fail('Invalid fields', 400);
+    }
+
     // Verificación de token del formulario
     if (!formToken) {
       return new Response(
@@ -53,17 +81,34 @@ export const post: APIRoute = async ({ request }) => {
       );
     }
 
+    // Destino y remitente salen solo del panel (base de datos)
+    let profile = null;
+    try {
+      profile = await getProfile();
+    } catch {
+      // sin base de datos no hay mail configurado
+    }
+    const TO_EMAIL = profile?.contactToEmail || '';
+    // Sin dominio propio verificado en Resend se usa el remitente de prueba
+    const FROM_EMAIL =
+      profile?.contactFromEmail || 'Portfolio <onboarding@resend.dev>';
+
     // Envía email si Resend está configurado
     if (resendClient && TO_EMAIL) {
       const subject = `Nuevo mensaje de ${name}`;
-      const html = `<p><strong>Nombre:</strong> ${name}</p><p><strong>Email:</strong> ${email}</p><hr/><div>${message}</div>`;
+      const html = `<p><strong>Nombre:</strong> ${escapeHtml(name)}</p><p><strong>Email:</strong> ${escapeHtml(email)}</p><hr/><div style="white-space:pre-wrap">${escapeHtml(message)}</div>`;
 
-      await resendClient.emails.send({
-        from: TO_EMAIL,
+      const { error } = await resendClient.emails.send({
+        from: FROM_EMAIL,
         to: TO_EMAIL,
+        replyTo: email,
         subject,
         html,
       });
+      if (error) {
+        console.error('[contact] Resend error:', error);
+        return fail('Email not sent', 502);
+      }
 
       return new Response(JSON.stringify({ ok: true }), { status: 200 });
     }

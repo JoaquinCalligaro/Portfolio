@@ -1,0 +1,65 @@
+---
+import '../styles/base/global.css';
+import '../styles/admin.css';
+import AdminNav from '../components/admin/react/AdminNav';
+import AdminToaster from '../components/admin/react/AdminToaster';
+
+interface Props {
+  title?: string;
+  showNav?: boolean;
+}
+
+const { title = 'Admin', showNav = true } = Astro.props as Props;
+const path = Astro.url.pathname.replace(/\/$/, '') || '/admin';
+---
+
+<!doctype html>
+<html lang="es" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title} | Admin Portfolio</title>
+    <script is:inline>
+      try {
+        if (localStorage.getItem('admin-nav-collapsed') === '1')
+          document.documentElement.setAttribute('data-nav-collapsed', '');
+      } catch {}
+    </script>
+  </head>
+  <body class="admin-root admin-bg min-h-screen text-gray-100 antialiased">
+    <a
+      href="#admin-main"
+      class="sr-only z-50 rounded-lg bg-cyan-500 px-4 py-2 text-gray-950 focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+    >
+      Saltar al contenido
+    </a>
+    {showNav && <AdminNav client:load path={path} />}
+    <div class:list={[showNav && 'admin-shell md:pl-64']}>
+      <main
+        id="admin-main"
+        class:list={[
+          'mx-auto px-4 pb-16',
+          showNav ? 'max-w-4xl pt-20 md:pt-10' : 'max-w-md pt-16',
+        ]}
+      >
+        <slot />
+      </main>
+    </div>
+    <AdminToaster client:load />
+    <script>
+      // La vista previa guardó los borradores: se descartan acá y se recarga
+      // para ver lo publicado (si no, un "Guardar" duplicaría lo nuevo).
+      try {
+        const channel = new BroadcastChannel('admin-preview');
+        channel.onmessage = () => {
+          sessionStorage.removeItem('admin-preview-drafts');
+          window.location.reload();
+        };
+      } catch {
+        // Navegador sin BroadcastChannel.
+      }
+    </script>
+  </body>
+</html>

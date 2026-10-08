@@ -1,0 +1,51 @@
+---
+// Ícono de una red social: imagen subida, ícono de Simple Icons (SVG en línea,
+// toma el color del texto) o la inicial del nombre.
+import { findIcon } from '../../lib/icons';
+
+interface Props {
+  label: string;
+  iconSlug?: string;
+  iconUrl?: string;
+  class?: string;
+}
+
+const {
+  label,
+  iconSlug = '',
+  iconUrl = '',
+  class: className = 'h-4 w-4',
+} = Astro.props as Props;
+const icon = !iconUrl && iconSlug ? findIcon(iconSlug) : null;
+---
+
+{
+  iconUrl ? (
+    <img
+      src={iconUrl}
+      alt=""
+      class:list={[className, 'object-contain']}
+      loading="lazy"
+    />
+  ) : icon ? (
+    <svg
+      class={className}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path d={icon.path} />
+    </svg>
+  ) : (
+    <span
+      class:list={[
+        className,
+        'inline-flex items-center justify-center text-xs font-bold',
+      ]}
+      aria-hidden="true"
+    >
+      {label.slice(0, 1).toUpperCase()}
+    </span>
+  )
+}

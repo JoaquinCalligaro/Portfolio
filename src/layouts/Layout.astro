@@ -1,27 +1,49 @@
 ---
 // Layout principal del sitio - estructura base de todas las páginas
 import Footer from '../components/Footer.astro';
+import type { ProfileRow, SocialLinkRow } from '../db/schema';
 import GoToTopBtn from '../components/ui/GoToTopBtn.astro';
 import Navbar from '../components/navbar/Navbar.astro';
+import PreviewBanner from '../components/preview/PreviewBanner';
 import SmoothBackgroundSwitcher from '../components/ui/background/SmoothBackgroundSwitcher';
 
 import '../styles/base/global.css';
+
+interface Props {
+  profile?: ProfileRow | null;
+  socialLinks?: SocialLinkRow[];
+  // Vista previa del admin: borrador sin publicar
+  preview?: boolean;
+  // Borradores crudos que el botón "Guardar cambios" de la barra aplica.
+  previewDrafts?: unknown[];
+}
+
+const {
+  profile = null,
+  socialLinks = [],
+  preview = false,
+  previewDrafts = [],
+} = Astro.props as Props;
+if (preview) Astro.response.headers.set('Cache-Control', 'no-store');
+const siteName = profile?.name?.trim() ?? '';
+const pageTitle = siteName ? `Portfolio | ${siteName}` : 'Portfolio';
+const description =
+  profile?.headlineEs?.trim() ||
+  'A small minimalist web developer portfolio built with Astro and TailwindCSS';
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="ES">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
-    <title>Portfolio | Joaquin Calligaro</title>
+    <title>{pageTitle}</title>
 
     <!-- Metas -->
-    <meta
-      name="description"
-      content="A small minimalist web developer portfolio built with Astro and TailwindCSS"
-    />
+    <meta name="description" content={description} />
+    {preview && <meta name="robots" content="noindex, nofollow" />}
     <!-- Script de inicialización del tema para evitar parpadeo -->
     <script>
       (function () {
@@ -54,7 +76,8 @@ import '../styles/base/global.css';
     </script>
     <!-- Turnstile script is injected only on pages that need it (Contact.astro) -->
   </head>
-  <body class="page-root min-h-screen">
+  <body class:list={['page-root min-h-screen', { 'is-preview': preview }]}>
+    {preview && <PreviewBanner client:load drafts={previewDrafts as never} />}
     <!-- Background dinámico dark/light con transición suave -->
     <SmoothBackgroundSwitcher
       client:only="react"
@@ -69,9 +92,35 @@ import '../styles/base/global.css';
       <slot />
     </main>
     <GoToTopBtn />
-    <Footer />
+    <Footer profile={profile} socialLinks={socialLinks} />
+
+    <!-- Aplica el idioma actual a todos los textos que vienen de la base (ES/EN) -->
+    <script is:inline>
+      (function () {
+        const apply = (lang) => {
+          const en = String(lang).toUpperCase() === 'EN';
+          document
+            .querySelectorAll('[data-i18n-es][data-i18n-en]')
+            .forEach((node) => {
+              const value = en ? node.dataset.i18nEn : node.dataset.i18nEs;
+              if (typeof value === 'string') node.textContent = value;
+            });
+        };
+        window.addEventListener('langChange', (e) =>
+          apply((e && e.detail) || document.documentElement.lang || 'ES')
+        );
+        apply(document.documentElement.lang || 'ES');
+      })();
+    </script>
   </body>
   <style is:global>
+    /* Deja lugar a la barra de vista previa (2.75rem) sin tapar el nav */
+    body.is-preview {
+      padding-top: 2.75rem;
+    }
+    body.is-preview #navbar-header {
+      top: 2.75rem;
+    }
     * {
       scroll-behavior: smooth;
     }

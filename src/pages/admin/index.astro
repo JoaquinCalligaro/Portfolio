@@ -1,0 +1,81 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import PageHeader from '../../components/admin/PageHeader.astro';
+import DbWarning from '../../components/admin/DbWarning.astro';
+import DashboardCards from '../../components/admin/DashboardCards.astro';
+import { maskEmail } from '../../lib/admin-auth/email-change-policy';
+import {
+  getProfile,
+  listEducation,
+  listProjects,
+  listSocialLinks,
+  listTechCategoriesWithTechs,
+} from '../../db/queries';
+
+export const prerender = false;
+
+const [profile, projects, categories, education, socials] = await Promise.all([
+  getProfile(),
+  listProjects(),
+  listTechCategoriesWithTechs(),
+  listEducation(),
+  listSocialLinks(),
+]);
+const techCount = categories.reduce((sum, c) => sum + c.techs.length, 0);
+
+const sections = [
+  {
+    href: '/admin/profile',
+    icon: 'user',
+    title: 'Perfil',
+    text: 'Nombre, foto, presentación, CV, biografía y redes sociales.',
+    meta: `${profile?.name ? profile.name : 'Sin completar'}, ${socials.length} redes`,
+  },
+  {
+    href: '/admin/tech-stack',
+    icon: 'layers',
+    title: 'Tech Stack',
+    text: 'Categorías y tecnologías con su ícono.',
+    meta: `${categories.length} categorías, ${techCount} tecnologías`,
+  },
+  {
+    href: '/admin/education',
+    icon: 'book',
+    title: 'Educación',
+    text: 'Línea de tiempo de estudios, trabajos y certificados.',
+    meta: `${education.length} entradas`,
+  },
+  {
+    href: '/admin/projects',
+    icon: 'folder',
+    title: 'Proyectos',
+    text: 'Tus proyectos, su orden y cuáles se destacan.',
+    meta: `${projects.length} proyectos`,
+  },
+  {
+    href: '/admin/contact',
+    icon: 'mail',
+    title: 'Contacto',
+    text: 'A qué mail te llegan los mensajes del formulario.',
+    meta: profile?.contactToEmail
+      ? maskEmail(profile.contactToEmail)
+      : 'Sin configurar',
+  },
+  {
+    href: '/admin/security',
+    icon: 'shield',
+    title: 'Seguridad',
+    text: 'Dispositivos con huella o Face ID y sesiones abiertas.',
+    meta: 'Acceso sin contraseña',
+  },
+] as const;
+---
+
+<AdminLayout title="Inicio">
+  <PageHeader
+    title="Panel del portfolio"
+    description="Todo lo que se ve en tu portfolio se edita desde acá. Escribí solo en español: el inglés se traduce solo al guardar."
+  />
+  <DbWarning />
+  <DashboardCards sections={[...sections]} />
+</AdminLayout>

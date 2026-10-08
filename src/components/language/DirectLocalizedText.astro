@@ -1,0 +1,14 @@
+---
+// Igual que LocalizedText, pero para texto que ya viene en ambos idiomas
+// (todo lo que se edita desde el panel), sin pasar por el diccionario de
+// traducciones. El cambio de idioma lo aplica un único script en Layout.astro.
+interface Props {
+  es: string;
+  en: string;
+  class?: string;
+}
+
+const { es, en, class: className = '' } = Astro.props as Props;
+---
+
+<span class={className} data-i18n-es={es} data-i18n-en={en}>{es}</span>

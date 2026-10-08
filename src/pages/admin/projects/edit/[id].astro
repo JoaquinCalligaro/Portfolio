@@ -1,0 +1,33 @@
+---
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+import PageHeader from '../../../../components/admin/PageHeader.astro';
+import ProjectForm from '../../../../components/admin/react/ProjectForm';
+import { getProjectById } from '../../../../db/queries';
+import { isDbConfigured } from '../../../../db/client';
+
+export const prerender = false;
+
+const { id } = Astro.params;
+const row = id && isDbConfigured ? await getProjectById(id) : null;
+
+if (!row) {
+  return Astro.redirect('/admin/projects');
+}
+
+const project = {
+  id: row.id,
+  titleEs: row.titleEs ?? '',
+  descriptionEs: row.descriptionEs ?? '',
+  repo: row.repo ?? '',
+  live: row.live ?? '',
+  technologies: row.technologies ?? [],
+  images: row.images ?? [],
+  featured: row.featured ?? false,
+  hidden: row.hidden ?? false,
+};
+---
+
+<AdminLayout title="Editar proyecto">
+  <PageHeader title="Editar proyecto" />
+  <ProjectForm client:load mode="edit" project={project} />
+</AdminLayout>
