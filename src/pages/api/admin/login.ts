@@ -18,6 +18,9 @@ import {
 } from '../../../lib/admin-auth/rate-limit-policy';
 import { logSecurityEvent } from '../../../lib/admin-auth/security-log';
 import { createSession } from '../../../lib/admin-auth/session';
+import { isTrustedDevice } from '../../../lib/admin-auth/trusted-device';
+import { createPending } from '../../../lib/admin-auth/twofa-pending';
+import { isTwoFactorEnabled } from '../../../lib/admin-auth/twofa-store';
 import { verifyAdminTurnstile } from '../../../lib/admin-auth/turnstile';
 
 const BAD_LOGIN = 'Usuario o contraseña incorrectos';
@@ -63,10 +66,20 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
       return json({ ok: false, error: BAD_LOGIN }, 401);
     }
 
-    await createSession(cookies, request.headers.get('user-agent') ?? '');
     await resetAttempts(ipKey(ip));
     await resetAttempts(GLOBAL_KEY);
-    logSecurityEvent('login-ok', { ip, method: 'password' });
+
+    // Con 2FA activo, un dispositivo nuevo todavía no tiene sesión: falta el código.
+    const requires2fa = await isTwoFactorEnabled();
+    const trusted = requires2fa && (await isTrustedDevice(cookies));
+    if (requires2fa && !trusted) {
+      await createPending(cookies);
+      logSecurityEvent('login-2fa-required', { ip });
+      return json({ ok: true, needs2fa: true });
+    }
+
+    await createSession(cookies, request.headers.get('user-agent') ?? '');
+    logSecurityEvent('login-ok', { ip, method: trusted ? 'password+trusted' : 'password' });
     return json({ ok: true });
   } catch (err) {
     return fail(err);

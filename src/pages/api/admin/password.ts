@@ -22,6 +22,7 @@ import {
   createSession,
   revokeAllSessions,
 } from '../../../lib/admin-auth/session';
+import { revokeAllTrustedDevices } from '../../../lib/admin-auth/trusted-device';
 
 const BAD_CURRENT = 'La contraseña actual es incorrecta';
 
@@ -86,6 +87,7 @@ export const POST: APIRoute = async ({
     // La contraseña cambió: se cierran todas las sesiones y se abre una nueva
     // solo para este dispositivo.
     await revokeAllSessions();
+    await revokeAllTrustedDevices();
     await createSession(cookies, request.headers.get('user-agent') ?? '');
     await resetAttempts(ipKey(ip));
     await resetAttempts(GLOBAL_KEY);

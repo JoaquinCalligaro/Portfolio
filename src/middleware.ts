@@ -7,6 +7,7 @@ import { SESSION_COOKIE_NAME, validateSession } from './lib/admin-auth/session';
 const PUBLIC_PATHS = new Set([
   '/admin/login',
   '/api/admin/login',
+  '/api/admin/2fa/verify',
   '/api/admin/passkeys/login/options',
   '/api/admin/passkeys/login/verify',
 ]);
