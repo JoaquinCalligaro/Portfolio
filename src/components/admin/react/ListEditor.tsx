@@ -4,7 +4,12 @@ import { Button } from '@/components/ui/shadcn/button';
 import { ItemCard } from './ItemCard';
 import { MorphGlyph } from './MorphGlyph';
 import { statusTransition } from './motion';
-import { openPreview, readDrafts, syncDrafts, type PreviewDraft } from './preview';
+import {
+  openPreview,
+  readDrafts,
+  syncDrafts,
+  type PreviewDraft,
+} from './preview';
 import {
   isDirty,
   useListEditor,
@@ -67,7 +72,10 @@ export function ListEditor({
     initial,
   });
 
-  const toDraft = (item: EditorItem, items: EditorItem[]): PreviewDraft | null =>
+  const toDraft = (
+    item: EditorItem,
+    items: EditorItem[]
+  ): PreviewDraft | null =>
     buildPreview
       ? buildPreview(item, items)
       : previewSection
@@ -85,11 +93,14 @@ export function ListEditor({
   const restored = useRef(false);
 
   useEffect(() => {
-    // Con borrador armado a mano (biografía) no hay valores por tarjeta que restaurar.
-    const drafts = buildPreview ? [] : Object.values(readDrafts(prefix));
+    // Con borrador armado a mano (biografía) las tarjetas viajan en `items`.
+    const drafts = Object.values(readDrafts(prefix));
+    const entries = buildPreview
+      ? (drafts.find((d) => d.items)?.items ?? [])
+      : drafts;
     restored.current = true;
     editor.restore(
-      drafts.map((d) => ({
+      entries.map((d) => ({
         id: d.id ?? '',
         values: d.values as Values,
         hidden: d.hidden,
@@ -102,13 +113,21 @@ export function ListEditor({
     if (!restored.current) return;
     const pending: Record<string, PreviewDraft> = {};
     const blankKey = JSON.stringify(blank);
-    for (const item of editor.items) {
-      const touched = item.fresh
-        ? JSON.stringify(item.values) !== blankKey
-        : isDirty(item);
-      if (!touched) continue;
+    const touched = editor.items.filter((item) =>
+      item.fresh ? JSON.stringify(item.values) !== blankKey : isDirty(item)
+    );
+    const items = touched.map((item) => ({
+      id: item.id,
+      values: item.values,
+      hidden: item.hidden,
+    }));
+    for (const item of touched) {
       const draft = toDraft(item, editor.items);
-      if (draft) pending[item.id || item.key] = draft;
+      if (draft) {
+        pending[item.id || item.key] = buildPreview
+          ? { ...draft, items }
+          : draft;
+      }
     }
     syncDrafts(prefix, pending);
     // eslint-disable-next-line react-hooks/exhaustive-deps
