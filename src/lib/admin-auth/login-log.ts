@@ -1,8 +1,16 @@
-import { desc, notInArray } from 'drizzle-orm';
+import { and, desc, ne, notInArray, notLike } from 'drizzle-orm';
 import { db } from '../../db/client';
 import { adminLoginLog } from '../../db/schema';
 
 export const LOGIN_LOG_LIMIT = 10;
+
+// Ingresos desde `astro dev` (::1 / 127.x): no aportan datos y llenarían el historial.
+const LOCAL_IP = /^(::1|127\.|::ffff:127\.)/;
+const notLocal = and(
+  ne(adminLoginLog.ip, '::1'),
+  notLike(adminLoginLog.ip, '127.%'),
+  notLike(adminLoginLog.ip, '::ffff:127.%')
+);
 
 // Vercel manda la ubicación aproximada de la IP en estos headers (sin librerías).
 function geoHeader(request: Request, name: string): string {
@@ -21,7 +29,7 @@ export async function recordLogin(
   ip: string,
   method: string
 ): Promise<void> {
-  if (!db) return;
+  if (!db || LOCAL_IP.test(ip)) return;
   try {
     await db.insert(adminLoginLog).values({
       ip: ip.slice(0, 64),
@@ -53,6 +61,7 @@ export async function listLogins() {
     return await db
       .select()
       .from(adminLoginLog)
+      .where(notLocal)
       .orderBy(desc(adminLoginLog.createdAt))
       .limit(LOGIN_LOG_LIMIT);
   } catch (err) {
