@@ -142,10 +142,10 @@ export const adminSessions = pgTable('admin_sessions', {
   userAgent: text('user_agent').notNull().default(''),
 });
 
-// Contraseña del admin cambiada desde el panel (una sola fila). Si no hay fila,
-// se usa el hash inicial de la variable de entorno ADMIN_PASSWORD_HASH.
+// Usuario y contraseña del admin (una sola fila). Se crea con `pnpm admin:init`.
 export const adminCredentials = pgTable('admin_credentials', {
   id: text('id').primaryKey().default('admin'),
+  username: text('username').notNull().default(''),
   passwordHash: text('password_hash').notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
@@ -188,3 +188,13 @@ export const admin2faPending = pgTable('admin_2fa_pending', {
 
 export type AdminPasskeyRow = typeof adminPasskeys.$inferSelect;
 export type AdminTrustedDeviceRow = typeof adminTrustedDevices.$inferSelect;
+
+// Cambio de mail de contacto pendiente de confirmar (una sola fila).
+export const adminEmailChange = pgTable('admin_email_change', {
+  id: text('id').primaryKey().default('admin'),
+  newEmail: text('new_email').notNull(),
+  codeHash: text('code_hash').notNull(),
+  failCount: integer('fail_count').notNull().default(0),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});

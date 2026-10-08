@@ -1,9 +1,11 @@
 import type { APIRoute } from 'astro';
 import { UserError, fail, json, readBody } from '../../../lib/admin-api';
 import { hashPassword } from '../../../lib/auth';
-import { env } from '../../../lib/env';
 import { getClientIp } from '../../../lib/admin-auth/client-ip';
-import { isPasswordValid } from '../../../lib/admin-auth/credentials';
+import {
+  getAdminUsername,
+  isPasswordValid,
+} from '../../../lib/admin-auth/credentials';
 import { evaluatePassword } from '../../../lib/admin-auth/password-strength';
 import { setStoredPasswordHash } from '../../../lib/admin-auth/password-store';
 import {
@@ -55,7 +57,7 @@ export const POST: APIRoute = async ({
       throw new UserError('Las contraseñas nuevas no coinciden');
     }
     const strength = evaluatePassword(newPassword, {
-      username: env('ADMIN_USERNAME'),
+      username: (await getAdminUsername()) || undefined,
     });
     if (!strength.acceptable) {
       throw new UserError(strength.problem ?? 'La contraseña nueva es demasiado débil');

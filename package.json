@@ -11,8 +11,8 @@
     "lint:css": "stylelint \"src/styles/**/*.css\" --config .stylelintrc.json",
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
-    "test": "node --test tests/admin-auth.test.ts tests/preview.test.ts tests/password-strength.test.ts tests/twofa.test.ts",
-    "hash-password": "node scripts/hash-password.mjs",
+    "test": "node --test tests/admin-auth.test.ts tests/preview.test.ts tests/password-strength.test.ts tests/twofa.test.ts tests/email-change.test.ts",
+    "admin:init": "node --env-file=.env scripts/admin-init.mjs",
     "migrate-site-content": "node --env-file=.env scripts/migrate-site-content.mjs"
   },
   "dependencies": {

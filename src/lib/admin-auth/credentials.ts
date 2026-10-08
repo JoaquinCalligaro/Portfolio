@@ -1,7 +1,6 @@
 import { createHash, timingSafeEqual } from 'node:crypto';
-import { env } from '../env';
 import { verifyPassword } from '../auth';
-import { getStoredPasswordHash } from './password-store';
+import { getStoredCredentials } from './password-store';
 
 const digest = (value: string) => createHash('sha256').update(value).digest();
 
@@ -9,24 +8,27 @@ function safeEqual(a: string, b: string): boolean {
   return timingSafeEqual(digest(a), digest(b));
 }
 
-// El hash guardado desde el panel manda; el de la variable de entorno es el inicial.
-async function currentPasswordHash(): Promise<string> {
-  return (await getStoredPasswordHash()) ?? env('ADMIN_PASSWORD_HASH') ?? '';
+export async function getAdminUsername(): Promise<string> {
+  return (await getStoredCredentials())?.username ?? '';
 }
 
 export async function isAdminConfigured(): Promise<boolean> {
-  return Boolean(env('ADMIN_USERNAME') && (await currentPasswordHash()));
+  const row = await getStoredCredentials();
+  return Boolean(row?.username && row?.passwordHash);
 }
 
 export async function isPasswordValid(password: string): Promise<boolean> {
-  return verifyPassword(password, await currentPasswordHash());
+  const row = await getStoredCredentials();
+  return verifyPassword(password, row?.passwordHash ?? '');
 }
 
 export async function areLoginValid(
   username: string,
   password: string
 ): Promise<boolean> {
-  const userOk = safeEqual(username, env('ADMIN_USERNAME') ?? '');
-  const passwordOk = await isPasswordValid(password);
+  const row = await getStoredCredentials();
+  // Se calculan ambos (sin cortocircuito) para no filtrar tiempos.
+  const userOk = safeEqual(username, row?.username ?? '');
+  const passwordOk = verifyPassword(password, row?.passwordHash ?? '');
   return userOk && passwordOk;
 }

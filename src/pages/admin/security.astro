@@ -3,16 +3,18 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 import PageHeader from '../../components/admin/PageHeader.astro';
 import DbWarning from '../../components/admin/DbWarning.astro';
 import SecurityPanel from '../../components/admin/react/SecurityPanel';
-import { env } from '../../lib/env';
+import { getAdminUsername } from '../../lib/admin-auth/credentials';
 
 export const prerender = false;
+
+const username = (await getAdminUsername()) || 'admin';
 ---
 
 <AdminLayout title="Seguridad">
   <PageHeader
     title="Seguridad"
-    description="Contraseña, verificación en dos pasos, dispositivos con acceso sin contraseña y sesiones abiertas."
+    description="Usuario y mail de contacto, contraseña, verificación en dos pasos, dispositivos con acceso sin contraseña y sesiones abiertas."
   />
   <DbWarning />
-  <SecurityPanel client:load username={env('ADMIN_USERNAME')} />
+  <SecurityPanel client:load username={username} />
 </AdminLayout>

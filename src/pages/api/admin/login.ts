@@ -28,7 +28,13 @@ const BAD_LOGIN = 'Usuario o contraseña incorrectos';
 export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
   try {
     if (!(await isAdminConfigured())) {
-      return json({ ok: false, error: 'El panel de admin no está configurado' }, 500);
+      return json(
+        {
+          ok: false,
+          error: 'El panel de admin no está configurado. Corré pnpm admin:init',
+        },
+        500
+      );
     }
 
     const ip = getClientIp(request, clientAddress);
