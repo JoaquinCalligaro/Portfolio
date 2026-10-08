@@ -31,7 +31,11 @@ const adapter: Adapter = {
       : result;
   },
   remove: (item, items) =>
-    persist(items.filter((i) => i.key !== item.key).map((i) => (i.id ? savedText(i) : ''))),
+    persist(
+      items
+        .filter((i) => i.key !== item.key)
+        .map((i) => (i.id ? savedText(i) : ''))
+    ),
   reorder: (items) => persist(items.map((i) => (i.id ? savedText(i) : ''))),
   toggleHidden: async () => ({ ok: true, status: 200 }),
 };
@@ -41,6 +45,15 @@ export default function BioEditor({ paragraphs }: { paragraphs: string[] }) {
     <MotionRoot>
       <ListEditor
         adapter={adapter}
+        buildPreview={(item, items) => ({
+          section: 'profile',
+          // Todos los párrafos, con el de esta tarjeta tal como está escrito.
+          values: {
+            bioEs: items
+              .map((i) => String(i.values.text ?? '').trim())
+              .filter(Boolean),
+          },
+        })}
         itemLabel="párrafo"
         addLabel="Agregar párrafo"
         emptyText="Todavía no escribiste ningún párrafo."

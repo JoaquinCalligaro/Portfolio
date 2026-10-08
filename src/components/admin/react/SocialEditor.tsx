@@ -19,6 +19,7 @@ export default function SocialEditor({ items }: { items: SocialEntry[] }) {
     <MotionRoot>
       <ListEditor
         endpoint="/api/admin/social-links"
+        previewSection="socialLinks"
         itemLabel="red social"
         addLabel="Agregar red social"
         emptyText="Todavía no agregaste ninguna red social."

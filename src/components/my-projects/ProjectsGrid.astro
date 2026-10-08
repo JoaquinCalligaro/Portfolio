@@ -7,9 +7,10 @@ import type { ProjectRow } from '../../db/schema';
 
 interface Props {
   projects: ProjectRow[];
+  preview?: boolean;
 }
 
-const { projects } = Astro.props as Props;
+const { projects, preview = false } = Astro.props as Props;
 
 // Los destacados van primero (el orden dentro de cada grupo es el del panel).
 const allProjects = [...projects].sort(
@@ -70,4 +71,4 @@ const toCard = (project: ProjectRow) => ({
   }
 </div>
 
-<RealtimeSiteSync />
+{!preview && <RealtimeSiteSync />}

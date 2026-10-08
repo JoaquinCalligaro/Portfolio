@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/shadcn/label';
 import { MotionRoot } from './MotionRoot';
 import { TextAreaField, TextField } from './fields';
 import { MorphGlyph } from './MorphGlyph';
+import { openPreview } from './preview';
 import { announceChange, request, uploadFile } from './api';
 
 type ProfileValues = {
@@ -89,7 +90,9 @@ export default function ProfileForm({ profile }: { profile: ProfileValues }) {
                     <Button
                       variant="outline"
                       disabled={uploading === 'photo'}
-                      onClick={() => document.getElementById('profile-photo')?.click()}
+                      onClick={() =>
+                        document.getElementById('profile-photo')?.click()
+                      }
                     >
                       <MorphGlyph name="upload" />
                       {uploading === 'photo' ? 'Subiendo…' : 'Cambiar foto'}
@@ -128,12 +131,16 @@ export default function ProfileForm({ profile }: { profile: ProfileValues }) {
                         Ver CV actual
                       </a>
                     ) : (
-                      <span className="text-sm text-gray-300">Todavía no subiste un CV.</span>
+                      <span className="text-sm text-gray-300">
+                        Todavía no subiste un CV.
+                      </span>
                     )}
                     <Button
                       variant="outline"
                       disabled={uploading === 'cv'}
-                      onClick={() => document.getElementById('profile-cv')?.click()}
+                      onClick={() =>
+                        document.getElementById('profile-cv')?.click()
+                      }
                     >
                       <MorphGlyph name="upload" />
                       {uploading === 'cv' ? 'Subiendo…' : 'Cambiar CV'}
@@ -156,9 +163,18 @@ export default function ProfileForm({ profile }: { profile: ProfileValues }) {
             </div>
 
             <div className="flex flex-wrap items-center gap-3 border-t border-white/10 pt-5">
-              <Button type="submit" disabled={!dirty || busy}>
-                {busy ? 'Guardando…' : 'Guardar'}
-              </Button>
+              <div className="flex w-full flex-col-reverse gap-2 sm:w-auto sm:flex-row">
+                <Button
+                  variant="outline"
+                  onClick={() => openPreview({ section: 'profile', values })}
+                >
+                  <MorphGlyph name="preview" />
+                  Previsualizar
+                </Button>
+                <Button type="submit" disabled={!dirty || busy}>
+                  {busy ? 'Guardando…' : 'Guardar'}
+                </Button>
+              </div>
               <span role="status" className="text-sm text-gray-300">
                 {dirty ? 'Cambios sin guardar' : ''}
               </span>

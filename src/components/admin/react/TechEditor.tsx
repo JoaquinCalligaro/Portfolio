@@ -28,6 +28,7 @@ function TechList({ parentId, techs }: { parentId: string; techs: TechEntry[] })
   return (
     <ListEditor
       endpoint="/api/admin/techs"
+      previewSection="techs"
       parentField="categoryId"
       parentId={parentId}
       itemLabel="tecnología"
@@ -88,6 +89,7 @@ export default function TechEditor({
     <MotionRoot>
       <ListEditor
         endpoint="/api/admin/tech-categories"
+        previewSection="techCategories"
         itemLabel="categoría"
         addLabel="Agregar categoría"
         emptyText="Todavía no agregaste ninguna categoría."

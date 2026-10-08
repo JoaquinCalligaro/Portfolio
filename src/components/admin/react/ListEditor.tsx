@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/shadcn/button';
 import { ItemCard } from './ItemCard';
 import { MorphGlyph } from './MorphGlyph';
 import { statusTransition } from './motion';
+import { openPreview, type PreviewDraft } from './preview';
 import {
   useListEditor,
   type Adapter,
@@ -32,6 +33,10 @@ type ListEditorProps = {
   compact?: boolean;
   renderFields: (context: FieldContext) => ReactNode;
   renderAfter?: (item: EditorItem) => ReactNode;
+  // Sección que se previsualiza con el botón "Previsualizar" de cada tarjeta.
+  previewSection?: PreviewDraft['section'];
+  // Arma el borrador a mano (cuando una tarjeta no equivale a un registro).
+  buildPreview?: (item: EditorItem, items: EditorItem[]) => PreviewDraft;
 };
 
 export function ListEditor({
@@ -49,6 +54,8 @@ export function ListEditor({
   compact,
   renderFields,
   renderAfter,
+  previewSection,
+  buildPreview,
 }: ListEditorProps) {
   const editor = useListEditor({
     endpoint,
@@ -88,6 +95,22 @@ export function ListEditor({
               showHide={showHide}
               compact={compact}
               after={renderAfter?.(item)}
+              onPreview={
+                previewSection || buildPreview
+                  ? () =>
+                      openPreview(
+                        buildPreview
+                          ? buildPreview(item, editor.items)
+                          : {
+                              section: previewSection!,
+                              id: item.id || undefined,
+                              parentId: parentId || undefined,
+                              values: item.values,
+                              hidden: item.hidden,
+                            }
+                      )
+                  : undefined
+              }
               onSave={() => void editor.save(item.key)}
               onMove={(direction) => void editor.move(item.key, direction)}
               onToggleHidden={() => void editor.toggleHidden(item.key)}

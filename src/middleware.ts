@@ -17,9 +17,17 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   if (!pathname.startsWith('/admin') && !isAdminApi) return next();
 
-  if (isAdminApi && !hasValidOrigin(context.request, context.url)) {
+  // La vista previa recibe un POST desde el panel: mismo chequeo de origen.
+  const isPreview = pathname === '/admin/preview';
+
+  if (
+    (isAdminApi || isPreview) &&
+    !hasValidOrigin(context.request, context.url)
+  ) {
     logSecurityEvent('origin-rejected', { path: pathname });
-    return json({ ok: false, error: 'Origen no permitido' }, 403);
+    return isPreview
+      ? new Response('Origen no permitido', { status: 403 })
+      : json({ ok: false, error: 'Origen no permitido' }, 403);
   }
 
   if (PUBLIC_PATHS.has(pathname)) return next();

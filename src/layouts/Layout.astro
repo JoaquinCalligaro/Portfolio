@@ -4,6 +4,7 @@ import Footer from '../components/Footer.astro';
 import type { ProfileRow, SocialLinkRow } from '../db/schema';
 import GoToTopBtn from '../components/ui/GoToTopBtn.astro';
 import Navbar from '../components/navbar/Navbar.astro';
+import PreviewBanner from '../components/preview/PreviewBanner';
 import SmoothBackgroundSwitcher from '../components/ui/background/SmoothBackgroundSwitcher';
 
 import '../styles/base/global.css';
@@ -11,9 +12,12 @@ import '../styles/base/global.css';
 interface Props {
   profile?: ProfileRow | null;
   socialLinks?: SocialLinkRow[];
+  // Vista previa del admin: borrador sin publicar
+  preview?: boolean;
 }
 
-const { profile = null, socialLinks = [] } = Astro.props as Props;
+const { profile = null, socialLinks = [], preview = false } = Astro.props as Props;
+if (preview) Astro.response.headers.set('Cache-Control', 'no-store');
 const siteName = profile?.name?.trim() ?? '';
 const pageTitle = siteName ? `Portfolio | ${siteName}` : 'Portfolio';
 const description =
@@ -32,6 +36,7 @@ const description =
 
     <!-- Metas -->
     <meta name="description" content={description} />
+    {preview && <meta name="robots" content="noindex, nofollow" />}
     <!-- Script de inicialización del tema para evitar parpadeo -->
     <script>
       (function () {
@@ -64,7 +69,8 @@ const description =
     </script>
     <!-- Turnstile script is injected only on pages that need it (Contact.astro) -->
   </head>
-  <body class="page-root min-h-screen">
+  <body class:list={['page-root min-h-screen', { 'is-preview': preview }]}>
+    {preview && <PreviewBanner client:load />}
     <!-- Background dinámico dark/light con transición suave -->
     <SmoothBackgroundSwitcher
       client:only="react"
@@ -101,6 +107,13 @@ const description =
     </script>
   </body>
   <style is:global>
+    /* Deja lugar a la barra de vista previa (2.75rem) sin tapar el nav */
+    body.is-preview {
+      padding-top: 2.75rem;
+    }
+    body.is-preview #navbar-header {
+      top: 2.75rem;
+    }
     * {
       scroll-behavior: smooth;
     }

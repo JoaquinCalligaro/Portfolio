@@ -7,6 +7,8 @@ import FormStatus from './FormStatus.astro';
 import CooldownDisplay from './CooldownDisplay.astro';
 import CharacterCounter from './CharacterCounter.astro';
 const TURNSTILE_SITE_KEY = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
+// En la vista previa del admin el formulario no envía mails reales.
+const { preview = false } = Astro.props as { preview?: boolean };
 ---
 
 <div
@@ -144,11 +146,33 @@ const TURNSTILE_SITE_KEY = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
       </div>
 
       <div class="flex items-center justify-start gap-3">
-        <SubmitBtn id="submit-btn" translationKey="contact.send" />
+        {
+          preview ? (
+            <SubmitBtn
+              id="submit-btn"
+              text="Desactivado en vista previa"
+              disabled
+            />
+          ) : (
+            <SubmitBtn id="submit-btn" translationKey="contact.send" />
+          )
+        }
       </div>
     </form>
 
-    <script type="module" src="/src/components/scripts/contact/contact-form.ts"
-    ></script>
+    {
+      preview ? (
+        <script is:inline>
+          document
+            .getElementById('contactForm')
+            ?.addEventListener('submit', (e) => e.preventDefault(), true);
+        </script>
+      ) : (
+        <script
+          type="module"
+          src="/src/components/scripts/contact/contact-form.ts"
+        />
+      )
+    }
   </div>
 </div>

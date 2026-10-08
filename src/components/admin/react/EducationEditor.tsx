@@ -30,6 +30,7 @@ export default function EducationEditor({ items }: { items: EducationEntry[] }) 
     <MotionRoot>
       <ListEditor
         endpoint="/api/admin/education"
+        previewSection="education"
         itemLabel="estudio"
         addLabel="Agregar estudio"
         emptyText="Todavía no agregaste ningún estudio."

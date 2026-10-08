@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { MotionRoot } from './MotionRoot';
 import { Fieldset, TextAreaField, TextField } from './fields';
 import { MorphGlyph } from './MorphGlyph';
+import { openPreview } from './preview';
 import { announceChange, request, uploadFile } from './api';
 import { SPRING, statusTransition } from './motion';
 
@@ -101,9 +102,12 @@ export default function ProjectForm({ mode, project }: ProjectFormProps) {
     }
     toast.success(mode === 'create' ? 'Proyecto creado' : 'Cambios guardados');
     announceChange(result);
-    window.setTimeout(() => {
-      window.location.href = '/admin/projects';
-    }, result.warning ? 1800 : 900);
+    window.setTimeout(
+      () => {
+        window.location.href = '/admin/projects';
+      },
+      result.warning ? 1800 : 900
+    );
   };
 
   return (
@@ -171,7 +175,9 @@ export default function ProjectForm({ mode, project }: ProjectFormProps) {
                 <Button
                   variant="outline"
                   disabled={uploading}
-                  onClick={() => document.getElementById('project-images')?.click()}
+                  onClick={() =>
+                    document.getElementById('project-images')?.click()
+                  }
                 >
                   <MorphGlyph name="upload" />
                   {uploading ? 'Subiendo…' : 'Subir imágenes'}
@@ -261,13 +267,30 @@ export default function ProjectForm({ mode, project }: ProjectFormProps) {
             </AnimatePresence>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
-              <Button type="submit" disabled={busy || uploading}>
-                {busy
-                  ? 'Guardando…'
-                  : mode === 'create'
-                    ? 'Crear proyecto'
-                    : 'Guardar cambios'}
-              </Button>
+              <div className="flex w-full flex-col-reverse gap-2 sm:w-auto sm:flex-row">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const { id, ...draft } = values;
+                    openPreview({
+                      section: 'projects',
+                      id: mode === 'edit' ? id : undefined,
+                      values: draft,
+                      hidden: values.hidden,
+                    });
+                  }}
+                >
+                  <MorphGlyph name="preview" />
+                  Previsualizar
+                </Button>
+                <Button type="submit" disabled={busy || uploading}>
+                  {busy
+                    ? 'Guardando…'
+                    : mode === 'create'
+                      ? 'Crear proyecto'
+                      : 'Guardar cambios'}
+                </Button>
+              </div>
               <ButtonLink href="/admin/projects" variant="ghost">
                 Cancelar
               </ButtonLink>

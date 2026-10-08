@@ -41,6 +41,7 @@ type ItemCardProps = {
   children: ReactNode;
   after?: ReactNode;
   onSave: () => void;
+  onPreview?: () => void;
   onMove: (direction: -1 | 1) => void;
   onToggleHidden: () => void;
   onRemove: () => void;
@@ -63,6 +64,7 @@ export function ItemCard({
   children,
   after,
   onSave,
+  onPreview,
   onMove,
   onToggleHidden,
   onRemove,
@@ -74,9 +76,11 @@ export function ItemCard({
     if (!item.fresh) return;
     const el = body.current;
     el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    el?.querySelector<HTMLElement>('input:not([type=hidden]), textarea')?.focus({
-      preventScroll: true,
-    });
+    el?.querySelector<HTMLElement>('input:not([type=hidden]), textarea')?.focus(
+      {
+        preventScroll: true,
+      }
+    );
   }, [item.fresh]);
 
   return (
@@ -101,9 +105,17 @@ export function ItemCard({
         </div>
         {after}
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          <Button onClick={onSave} disabled={!dirty || item.busy}>
-            Guardar
-          </Button>
+          <span className="flex w-full flex-col-reverse gap-2 sm:w-auto sm:flex-row">
+            {onPreview && (
+              <Button variant="outline" onClick={onPreview} className="group">
+                <MorphGlyph name="preview" />
+                Previsualizar
+              </Button>
+            )}
+            <Button onClick={onSave} disabled={!dirty || item.busy}>
+              Guardar
+            </Button>
+          </span>
           <span
             role="status"
             aria-live="polite"
@@ -152,7 +164,9 @@ export function ItemCard({
                     variant="outline"
                     size="icon"
                     aria-pressed={item.hidden}
-                    aria-label={item.hidden ? 'Mostrar en el sitio' : 'Ocultar del sitio'}
+                    aria-label={
+                      item.hidden ? 'Mostrar en el sitio' : 'Ocultar del sitio'
+                    }
                     onClick={onToggleHidden}
                   >
                     <MorphGlyph name={item.hidden ? 'eyeOff' : 'eye'} />
@@ -178,12 +192,15 @@ export function ItemCard({
                 <AlertDialogHeader>
                   <AlertDialogTitle>Borrar {itemLabel}</AlertDialogTitle>
                   <AlertDialogDescription>
-                    {confirmText ?? `¿Borrar este ${itemLabel}? No se puede deshacer.`}
+                    {confirmText ??
+                      `¿Borrar este ${itemLabel}? No se puede deshacer.`}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                  <AlertDialogAction onClick={onRemove}>Borrar</AlertDialogAction>
+                  <AlertDialogAction onClick={onRemove}>
+                    Borrar
+                  </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
