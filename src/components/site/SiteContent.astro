@@ -1,0 +1,136 @@
+---
+// Cuerpo de la home; lo usan la página pública y la vista previa del admin
+import TechStack from '../tech-stack/TechStack.astro';
+import PersonalPresentation from '../personal-presentation/PersonalPresentation.astro';
+import ProjectTitle from '../my-projects/ProyectsTitle.astro';
+import ProjectsGrid from '../my-projects/ProjectsGrid.astro';
+import AboutMeTitle from '../about-me/AboutMeTitle.astro';
+import ShortBio from '../about-me/ShortBio.astro';
+import Experience from '../about-me/Experience.astro';
+import Contact from '../contact/Contact.astro';
+import ContactTitle from '../contact/ContactTitle.astro';
+import type { SiteData } from '../../lib/site-data';
+
+interface Props {
+  data: SiteData;
+}
+
+const { profile, socialLinks, techCategories, education, projects } =
+  Astro.props.data;
+---
+
+  <!-- Sección Hero -->
+  <div id="home" class="pt-40">
+    <PersonalPresentation profile={profile} />
+  </div>
+  <section class="flex flex-col">
+    <article>
+      <!-- Tech Stack  -->
+      <div id="tech-stack">
+        <TechStack categories={techCategories} />
+      </div>
+      <div id="projects">
+        <ProjectTitle />
+        <ProjectsGrid projects={projects} />
+      </div>
+
+      <!-- Sección Sobre Mí -->
+      <section id="about" class="py-16">
+        <div><AboutMeTitle /></div>
+        <div class="mx-auto w-full max-w-6xl">
+          <div
+            class="flex flex-col gap-8 md:flex-row md:items-start md:space-x-8"
+          >
+            <div class="md:w-1/2">
+              <ShortBio profile={profile} socialLinks={socialLinks} />
+            </div>
+            <div class="md:w-1/2">
+              <Experience items={education} />
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="py-16" id="contact">
+        <div><ContactTitle /></div>
+        <div>
+          <Contact />
+        </div>
+      </section>
+    </article>
+  </section>
+
+  <script>
+    import { animate, inView, stagger } from 'motion';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // (services section removed) no-op
+
+      // Animación para tech stack
+      inView('.tech-stack-card', () => {
+        animate(
+          '.tech-card-enter',
+          {
+            opacity: [0, 1],
+            transform: ['translateY(30px)', 'translateY(0px)'],
+          },
+          {
+            delay: stagger(0.1),
+            duration: 0.5,
+            easing: [0.4, 0, 0.2, 1],
+          }
+        );
+      });
+
+      // Animación para proyectos
+      inView('#projects', () => {
+        animate(
+          '#projects .grid > *',
+          {
+            opacity: [0, 1],
+            transform: ['translateY(40px)', 'translateY(0px)'],
+          },
+          {
+            delay: stagger(0.2),
+            duration: 0.6,
+            easing: [0.4, 0, 0.2, 1],
+          }
+        );
+      });
+    });
+
+    // Inicializar show-more button usando el nuevo módulo TypeScript
+    (function ensureInitShowMore() {
+      async function run() {
+        try {
+          if (typeof window === 'undefined') return;
+
+          // Intentar usar la función global si ya existe
+          if (Object.prototype.hasOwnProperty.call(window, 'initShowMore')) {
+            const fn = (window as unknown)['initShowMore'];
+            if (typeof fn === 'function') {
+              fn('show-more-projects', {
+                targetId: 'extra-projects',
+                hiddenClass: 'hidden',
+              });
+              return;
+            }
+          }
+
+          // Importar y usar el nuevo módulo TypeScript
+          const { initShowMore } =
+            await import('../scripts/show-more/index.js');
+          if (typeof initShowMore === 'function') {
+            initShowMore('show-more-projects', {
+              targetId: 'extra-projects',
+              hiddenClass: 'hidden',
+            });
+          }
+        } catch (error) {
+          console.warn('Error initializing show-more:', error);
+        }
+      }
+
+      // Ejecutar la inicialización
+      run();
+    })();
+  </script>
