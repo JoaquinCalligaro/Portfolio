@@ -9,8 +9,9 @@ import { announceChange, request } from './api';
 type ContactValues = { contactToEmail: string; contactFromEmail: string };
 
 export default function ContactForm({ settings }: { settings: ContactValues }) {
-  const [values, setValues] = useState(settings);
-  const [saved, setSaved] = useState(JSON.stringify(settings));
+  const initial = { contactFromEmail: settings.contactFromEmail };
+  const [values, setValues] = useState(initial);
+  const [saved, setSaved] = useState(JSON.stringify(initial));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const dirty = JSON.stringify(values) !== saved;
@@ -35,17 +36,15 @@ export default function ContactForm({ settings }: { settings: ContactValues }) {
       <Card>
         <CardContent>
           <form onSubmit={submit} className="space-y-5" noValidate>
-            <TextField
-              label="Mail donde recibís los mensajes"
-              type="email"
-              value={values.contactToEmail}
-              onValueChange={(v) =>
-                setValues((c) => ({ ...c, contactToEmail: v }))
-              }
-              placeholder="tumail@gmail.com"
-              hint="Sin dominio propio en Resend, tiene que ser el mismo mail con el que creaste tu cuenta de Resend."
-              error={error}
-            />
+            <p className="text-sm text-gray-300">
+              Los mensajes llegan a{' '}
+              <strong>{settings.contactToEmail || 'sin configurar'}</strong>.
+              Para cambiarlo andá a{' '}
+              <a href="/admin/security#account" className="text-cyan-300 underline">
+                Seguridad → Cuenta
+              </a>
+              .
+            </p>
             <TextField
               label="Remitente (opcional)"
               value={values.contactFromEmail}
@@ -54,6 +53,7 @@ export default function ContactForm({ settings }: { settings: ContactValues }) {
               }
               placeholder="Portfolio <contacto@tudominio.com>"
               hint="Dejalo vacío si no tenés dominio propio: se usa el de prueba de Resend."
+              error={error}
             />
             <p className="text-xs text-gray-400">
               La clave de Resend (<code>RESEND_API_KEY</code>) se queda en las

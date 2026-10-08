@@ -16,8 +16,6 @@ import {
 
 // Variables de entorno para el servicio de email
 const RESEND_API_KEY = env('RESEND_API_KEY');
-const ENV_TO_EMAIL = env('CONTACT_TO_EMAIL');
-const ENV_FROM_EMAIL = env('CONTACT_FROM_EMAIL');
 
 // Cliente de Resend para envío de emails
 const resendClient = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
@@ -83,19 +81,17 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       );
     }
 
-    // El mail configurado en el panel gana; si no hay, se usa el de las variables
+    // Destino y remitente salen solo del panel (base de datos)
     let profile = null;
     try {
       profile = await getProfile();
     } catch {
-      // sin base de datos se usan las variables de entorno
+      // sin base de datos no hay mail configurado
     }
-    const TO_EMAIL = profile?.contactToEmail || ENV_TO_EMAIL;
+    const TO_EMAIL = profile?.contactToEmail || '';
     // Sin dominio propio verificado en Resend se usa el remitente de prueba
     const FROM_EMAIL =
-      profile?.contactFromEmail ||
-      ENV_FROM_EMAIL ||
-      'Portfolio <onboarding@resend.dev>';
+      profile?.contactFromEmail || 'Portfolio <onboarding@resend.dev>';
 
     // Envía email si Resend está configurado
     if (resendClient && TO_EMAIL) {

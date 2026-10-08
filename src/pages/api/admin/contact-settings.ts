@@ -26,12 +26,8 @@ export const PATCH: APIRoute = async ({ request }) => {
   if (!isDbConfigured) return dbMissing();
   try {
     const body = await readBody(request);
-    const to = text(body, 'contactToEmail');
     const from = text(body, 'contactFromEmail');
 
-    if (to && !isValidEmail(to)) {
-      throw new UserError('El mail de destino no es válido');
-    }
     // El remitente puede ser "Nombre <mail@dominio.com>" o solo el mail.
     if (from) {
       const address = from.match(/<([^>]+)>$/)?.[1] ?? from;
@@ -41,7 +37,7 @@ export const PATCH: APIRoute = async ({ request }) => {
     }
 
     await upsertProfile(
-      defined({ contactToEmail: to, contactFromEmail: from })
+      defined({ contactFromEmail: from })
     );
     return json({ ok: true });
   } catch (err) {
