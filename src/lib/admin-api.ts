@@ -13,15 +13,30 @@ export const json = (data: unknown, status = 200) =>
 // Error con mensaje apto para mostrarle al admin (en español).
 export class UserError extends Error {
   status: number;
-  constructor(message: string, status = 400) {
+  retryAfterSeconds?: number;
+  constructor(message: string, status = 400, retryAfterSeconds?: number) {
     super(message);
     this.status = status;
+    this.retryAfterSeconds = retryAfterSeconds;
   }
+}
+
+// Bloqueo temporal por fuerza bruta: el cliente usa retryAfterSeconds para
+// congelar el formulario hasta que pase el tiempo.
+export function tooManyAttempts(lockedMs: number): UserError {
+  return new UserError(
+    'Demasiados intentos. Probá más tarde.',
+    429,
+    Math.ceil(lockedMs / 1000)
+  );
 }
 
 export function fail(err: unknown) {
   if (err instanceof UserError) {
-    return json({ ok: false, error: err.message }, err.status);
+    const extra = err.retryAfterSeconds
+      ? { retryAfterSeconds: err.retryAfterSeconds }
+      : {};
+    return json({ ok: false, error: err.message, ...extra }, err.status);
   }
   console.error(err);
   return json({ ok: false, error: 'Error interno del servidor' }, 500);

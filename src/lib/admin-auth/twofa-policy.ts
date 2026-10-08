@@ -10,6 +10,8 @@ const RECOVERY_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 
 export const twofaIpKey = (ip: string) => `2fa:ip:${ip}`;
 export const TWOFA_GLOBAL_KEY = '2fa:global';
+export const twofaGenerateKey = (ip: string) => `2fa:gen:${ip}`;
+export const TWOFA_GENERATE_GLOBAL_KEY = '2fa:gen:global';
 
 export function generateRecoveryCode(): string {
   const bytes = randomBytes(10);

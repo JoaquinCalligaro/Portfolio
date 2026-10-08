@@ -27,6 +27,7 @@ import { TextField } from './fields';
 import { MorphGlyph } from './MorphGlyph';
 import { needsReauth, request, type ApiResult } from './api';
 import { usePasswordPrompt } from './usePasswordPrompt';
+import { formatWait, useCooldown } from './useCooldown';
 
 type Device = {
   id: string;
@@ -76,6 +77,7 @@ export function TwoFactorPanel() {
   const [busy, setBusy] = useState(false);
   const [recoveryCodes, setRecoveryCodes] = useState<string[] | null>(null);
   const prompt = usePasswordPrompt();
+  const enableLock = useCooldown('admin-2fa-enable-lock');
 
   const load = useCallback(async () => {
     const result = await request('/api/admin/2fa', 'GET');
@@ -129,10 +131,15 @@ export function TwoFactorPanel() {
 
   const confirm = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (enableLock.locked) return;
     setBusy(true);
     const result = await request('/api/admin/2fa/enable', 'POST', { code });
     setBusy(false);
     if (!result.ok) {
+      if (result.status === 429) {
+        enableLock.start(result.retryAfterSeconds);
+        setCode('');
+      }
       toast.error(result.error ?? 'No se pudo activar el 2FA');
       return;
     }
@@ -338,6 +345,7 @@ export function TwoFactorPanel() {
                   autoComplete="one-time-code"
                   maxLength={7}
                   autoFocus
+                  disabled={enableLock.locked}
                   value={code}
                   onValueChange={setCode}
                   placeholder="123456"
@@ -352,8 +360,15 @@ export function TwoFactorPanel() {
               >
                 Cancelar
               </Button>
-              <Button type="submit" disabled={busy || code.trim().length < 6}>
-                {busy ? 'Verificando…' : 'Activar'}
+              <Button
+                type="submit"
+                disabled={busy || enableLock.locked || code.trim().length < 6}
+              >
+                {busy
+                  ? 'Verificando…'
+                  : enableLock.locked
+                    ? `Bloqueado ${formatWait(enableLock.seconds)}`
+                    : 'Activar'}
               </Button>
             </DialogFooter>
           </form>

@@ -10,14 +10,11 @@ import { postForm, request } from './api';
 import { loginWithPasskey, supportsPasskeys } from './passkeyClient';
 import { useTurnstile } from './useTurnstile';
 import { statusTransition } from './motion';
+import { formatWait, useCooldown } from './useCooldown';
 
 const BAD_CAPTCHA = 'Completá la verificación antes de entrar.';
 
-function lockedMessage(seconds?: number) {
-  if (!seconds) return 'Demasiados intentos. Probá más tarde.';
-  const minutes = Math.ceil(seconds / 60);
-  return `Demasiados intentos. Probá de nuevo en ${minutes} ${minutes === 1 ? 'minuto' : 'minutos'}.`;
-}
+const LOCKED = 'Demasiados intentos. Probá más tarde.';
 
 export default function LoginCard({ siteKey }: { siteKey?: string }) {
   const [username, setUsername] = useState('');
@@ -30,6 +27,24 @@ export default function LoginCard({ siteKey }: { siteKey?: string }) {
   const [trust, setTrust] = useState(true);
   const [recovery, setRecovery] = useState(false);
   const turnstile = useTurnstile(siteKey);
+  // Contraseña y código tienen bloqueos separados en el servidor.
+  const passwordLock = useCooldown('admin-login-lock');
+  const codeLock = useCooldown('admin-2fa-lock');
+  const lock = step === 'code' ? codeLock : passwordLock;
+
+  // Error de un bloqueo: congela el formulario el tiempo que indica el servidor.
+  const showError = (
+    result: { status: number; error?: string; retryAfterSeconds?: number },
+    target: typeof passwordLock,
+    fallback: string
+  ) => {
+    if (result.status === 429) {
+      target.start(result.retryAfterSeconds);
+      setError(LOCKED);
+      return;
+    }
+    setError(result.error ?? fallback);
+  };
 
   useEffect(() => setPasskeys(supportsPasskeys()), []);
 
@@ -39,6 +54,7 @@ export default function LoginCard({ siteKey }: { siteKey?: string }) {
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (passwordLock.locked) return;
     if (siteKey && !turnstile.token) {
       setError(BAD_CAPTCHA);
       return;
@@ -60,11 +76,7 @@ export default function LoginCard({ siteKey }: { siteKey?: string }) {
     setBusy(null);
     setPassword('');
     turnstile.reset();
-    setError(
-      result.status === 429
-        ? lockedMessage(result.retryAfterSeconds)
-        : (result.error ?? 'Error al iniciar sesión')
-    );
+    showError(result, passwordLock, 'Error al iniciar sesión');
   };
 
   const backToPassword = () => {
@@ -77,6 +89,7 @@ export default function LoginCard({ siteKey }: { siteKey?: string }) {
 
   const verify = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (codeLock.locked) return;
     setError('');
     setBusy('password');
     const result = await request('/api/admin/2fa/verify', 'POST', { code, trust });
@@ -88,11 +101,7 @@ export default function LoginCard({ siteKey }: { siteKey?: string }) {
       setError(result.error ?? '');
       return;
     }
-    setError(
-      result.status === 429
-        ? lockedMessage(result.retryAfterSeconds)
-        : (result.error ?? 'No pudimos verificar el código')
-    );
+    showError(result, codeLock, 'No pudimos verificar el código');
   };
 
   const usePasskey = async () => {
@@ -101,11 +110,7 @@ export default function LoginCard({ siteKey }: { siteKey?: string }) {
     const result = await loginWithPasskey();
     if (result.ok) return enter();
     setBusy(null);
-    setError(
-      result.status === 429
-        ? lockedMessage(result.retryAfterSeconds)
-        : (result.error ?? 'No pudimos verificar tu dispositivo.')
-    );
+    showError(result, passwordLock, 'No pudimos verificar tu dispositivo.');
   };
 
   return (
@@ -143,6 +148,7 @@ export default function LoginCard({ siteKey }: { siteKey?: string }) {
                     maxLength={recovery ? 16 : 7}
                     autoFocus
                     required
+                    disabled={codeLock.locked}
                     value={code}
                     onValueChange={setCode}
                     placeholder={recovery ? 'XXXXX-XXXXX' : '123456'}
@@ -163,15 +169,25 @@ export default function LoginCard({ siteKey }: { siteKey?: string }) {
                       className="rounded-lg border border-red-400/30 bg-red-950/40 px-3 py-2 text-sm text-red-200"
                     >
                       {error}
+                      {lock.locked && (
+                        <span className="mt-0.5 block text-xs text-red-200/80">
+                          Podés volver a intentar en{' '}
+                          <span className="tabular-nums">{formatWait(lock.seconds)}</span>.
+                        </span>
+                      )}
                     </p>
                   )}
 
                   <Button
                     type="submit"
                     className="w-full"
-                    disabled={busy !== null || !code.trim()}
+                    disabled={busy !== null || codeLock.locked || !code.trim()}
                   >
-                    {busy === 'password' ? 'Verificando…' : 'Verificar'}
+                    {busy === 'password'
+                      ? 'Verificando…'
+                      : codeLock.locked
+                        ? `Bloqueado ${formatWait(codeLock.seconds)}`
+                        : 'Verificar'}
                   </Button>
                   <div className="flex justify-between text-sm">
                     <button
@@ -209,6 +225,7 @@ export default function LoginCard({ siteKey }: { siteKey?: string }) {
                   type="password"
                   autoComplete="current-password"
                   required
+                  disabled={passwordLock.locked}
                   value={password}
                   onValueChange={setPassword}
                 />
@@ -229,12 +246,26 @@ export default function LoginCard({ siteKey }: { siteKey?: string }) {
                       className="rounded-lg border border-red-400/30 bg-red-950/40 px-3 py-2 text-sm text-red-200"
                     >
                       {error}
+                      {lock.locked && (
+                        <span className="mt-0.5 block text-xs text-red-200/80">
+                          Podés volver a intentar en{' '}
+                          <span className="tabular-nums">{formatWait(lock.seconds)}</span>.
+                        </span>
+                      )}
                     </m.p>
                   )}
                 </AnimatePresence>
 
-                <Button type="submit" className="w-full" disabled={busy !== null}>
-                  {busy === 'password' ? 'Entrando…' : 'Entrar'}
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={busy !== null || passwordLock.locked}
+                >
+                  {busy === 'password'
+                    ? 'Entrando…'
+                    : passwordLock.locked
+                      ? `Bloqueado ${formatWait(passwordLock.seconds)}`
+                      : 'Entrar'}
                 </Button>
               </form>
               )}
@@ -248,7 +279,7 @@ export default function LoginCard({ siteKey }: { siteKey?: string }) {
                   <Button
                     variant="outline"
                     className="w-full"
-                    disabled={busy !== null}
+                    disabled={busy !== null || passwordLock.locked}
                     onClick={() => void usePasskey()}
                   >
                     <MorphGlyph name="fingerprint" />
