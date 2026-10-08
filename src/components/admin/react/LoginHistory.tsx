@@ -22,7 +22,11 @@ const METHODS: Record<string, string> = {
   passkey: 'Passkey',
 };
 
+// ::1 / 127.x = ingreso desde `astro dev`, donde Vercel no manda ubicación.
+const LOCAL_IP = /^(::1|127\.|::ffff:127\.)/;
+
 function place(entry: LoginEntry): string {
+  if (LOCAL_IP.test(entry.ip)) return 'Entorno local (localhost)';
   return (
     [entry.city, entry.region, entry.country].filter(Boolean).join(', ') ||
     'Ubicación desconocida'
