@@ -22,9 +22,6 @@ const METHODS: Record<string, string> = {
   passkey: 'Passkey',
 };
 
-// ::1 / 127.x = ingreso desde `astro dev`, donde Vercel no manda ubicación.
-const LOCAL_IP = /^(::1|127\.|::ffff:127\.)/;
-
 // Vercel manda la provincia como código ISO 3166-2 (sin el "AR-").
 const AR_PROVINCES: Record<string, string> = {
   A: 'Salta',
@@ -77,11 +74,6 @@ function place(entry: LoginEntry): string {
 }
 
 function Location({ entry }: { entry: LoginEntry }) {
-  if (LOCAL_IP.test(entry.ip)) {
-    return (
-      <p className="font-medium text-gray-100">Entorno local (localhost)</p>
-    );
-  }
   const code = /^[A-Z]{2}$/.test(entry.country) ? entry.country : '';
   const detail = place(entry);
   if (!code && !detail) {
