@@ -13,7 +13,7 @@ import { PasswordPanel } from './PasswordPanel';
 import { SessionsPanel } from './SessionsPanel';
 import { TwoFactorPanel } from './TwoFactorPanel';
 
-const TABS = ['account', 'password', 'twofa', 'devices', 'sessions'];
+const TABS = ['account', 'twofa', 'devices', 'sessions', 'password'];
 
 export default function SecurityPanel({ username }: { username?: string }) {
   const [tab, setTab] = useState('account');
