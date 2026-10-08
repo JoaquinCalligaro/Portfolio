@@ -8,9 +8,10 @@ interface Props {
   date: { es: string; en: string };
   description: { es: string; en: string };
   iconKey?: string; // university | work | certificate
+  certificateUrl?: string;
 }
 
-const { title, date, description, iconKey = 'default' } = Astro.props as Props;
+const { title, date, description, iconKey = 'default', certificateUrl } = Astro.props as Props;
 const icon = timelineIcons[iconKey] ?? timelineIcons.default;
 ---
 
@@ -35,4 +36,16 @@ const icon = timelineIcons[iconKey] ?? timelineIcons.default;
       en={description.en || description.es}
     />
   </p>
+  {
+    certificateUrl && (
+      <a
+        href={certificateUrl}
+        target="_blank"
+        rel="noopener"
+        class="inline-flex items-center gap-1 text-sm font-semibold text-cyan-700 underline-offset-4 hover:underline dark:text-cyan-400"
+      >
+        <DirectLocalizedText es="Ver certificado" en="View certificate" />
+      </a>
+    )
+  }
 </li>

@@ -13,6 +13,7 @@ const items = (await listEducation()).map((item) => ({
   datesEs: item.datesEs ?? '',
   descriptionEs: item.descriptionEs ?? '',
   iconKey: item.iconKey ?? 'university',
+  certificateMime: item.certificateMime ?? '',
   hidden: item.hidden ?? false,
 }));
 ---

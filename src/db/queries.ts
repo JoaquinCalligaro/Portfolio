@@ -1,6 +1,6 @@
 // Funciones de acceso a datos del portfolio (solo funcionan si hay DB configurada).
 // Las lecturas devuelven vacío/null sin DB; las escrituras lanzan un error claro.
-import { asc, eq, sql } from 'drizzle-orm';
+import { asc, eq, getTableColumns, sql } from 'drizzle-orm';
 import type { PgTable, PgColumn } from 'drizzle-orm/pg-core';
 import { db } from './client';
 import {
@@ -243,9 +243,29 @@ export const reorderTechs = (ids: string[]) => reorder(techs, ids);
 
 // ---------------------------------------------------------------- Educación
 
+// Columnas de Educación sin el archivo del certificado (pesado).
+function educationColumns() {
+  const { certificateData: _data, ...columns } = getTableColumns(education);
+  return columns;
+}
+
+// Lista sin el archivo del certificado (pesado); se sirve aparte.
 export async function listEducation() {
   if (!db) return [];
-  return db.select().from(education).orderBy(asc(education.position));
+  return db.select(educationColumns()).from(education).orderBy(asc(education.position));
+}
+
+export async function getEducationCertificate(id: string) {
+  if (!db) return null;
+  const rows = await db
+    .select({
+      mime: education.certificateMime,
+      data: education.certificateData,
+      hidden: education.hidden,
+    })
+    .from(education)
+    .where(eq(education.id, id));
+  return rows[0] ?? null;
 }
 
 export async function createEducation(
@@ -256,7 +276,11 @@ export async function createEducation(
   const rows = await database
     .insert(education)
     .values({ ...data, position })
-    .returning();
+    .returning({
+      ...educationColumns(),
+      // Limpia el borrador del archivo en el editor después de guardar.
+      certificate: sql<string>`''`,
+    });
   return rows[0];
 }
 
@@ -268,7 +292,11 @@ export async function updateEducation(
     .update(education)
     .set({ ...data, updatedAt: new Date() })
     .where(eq(education.id, id))
-    .returning();
+    .returning({
+      ...educationColumns(),
+      // Limpia el borrador del archivo en el editor después de guardar.
+      certificate: sql<string>`''`,
+    });
   return rows[0] ?? null;
 }
 

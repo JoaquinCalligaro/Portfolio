@@ -30,6 +30,11 @@ const t = getAboutMe('ES');
               date={{ es: item.datesEs, en: item.datesEn }}
               description={{ es: item.descriptionEs, en: item.descriptionEn }}
               iconKey={item.iconKey}
+              certificateUrl={
+                item.certificateMime
+                  ? `/api/education/${item.id}/certificate`
+                  : undefined
+              }
             />
           ))}
         </ol>

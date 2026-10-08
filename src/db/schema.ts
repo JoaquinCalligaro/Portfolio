@@ -94,6 +94,9 @@ export const education = pgTable('education', {
   descriptionEs: text('description_es').notNull().default(''),
   descriptionEn: text('description_en').notNull().default(''),
   iconKey: text('icon_key').notNull().default('university'),
+  // Certificado (imagen o PDF) guardado como base64; vacío si no hay.
+  certificateMime: text('certificate_mime').notNull().default(''),
+  certificateData: text('certificate_data').notNull().default(''),
   hidden: boolean('hidden').notNull().default(false),
   position: integer('position').notNull().default(0),
   createdAt: timestamp('created_at').notNull().defaultNow(),
@@ -104,7 +107,7 @@ export type ProfileRow = typeof siteProfile.$inferSelect;
 export type SocialLinkRow = typeof socialLinks.$inferSelect;
 export type TechCategoryRow = typeof techCategories.$inferSelect;
 export type TechRow = typeof techs.$inferSelect;
-export type EducationRow = typeof education.$inferSelect;
+export type EducationRow = Omit<typeof education.$inferSelect, 'certificateData'>;
 
 export const adminPasskeys = pgTable('admin_passkeys', {
   id: uuid('id').primaryKey().defaultRandom(),

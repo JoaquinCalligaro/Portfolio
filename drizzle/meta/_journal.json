@@ -57,6 +57,13 @@
       "when": 1791428599304,
       "tag": "0007_spotty_thunderbolt_ross",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791429775719,
+      "tag": "0008_ordinary_vermin",
+      "breakpoints": true
     }
   ]
 }
