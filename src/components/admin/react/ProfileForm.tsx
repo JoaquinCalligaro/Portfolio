@@ -177,6 +177,7 @@ export default function ProfileForm({ profile }: { profile: ProfileValues }) {
               <div className="flex w-full flex-col-reverse gap-2 sm:w-auto sm:flex-row">
                 <Button
                   variant="outline"
+                  className={dirty ? 'preview-pending' : ''}
                   onClick={() => openPreview({ section: 'profile', values })}
                 >
                   <MorphGlyph name="preview" />

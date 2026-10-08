@@ -299,6 +299,7 @@ export default function ProjectForm({ mode, project }: ProjectFormProps) {
               <div className="flex w-full flex-col-reverse gap-2 sm:w-auto sm:flex-row">
                 <Button
                   variant="outline"
+                  className={dirty ? 'preview-pending' : ''}
                   onClick={() => {
                     const { id, ...draft } = values;
                     openPreview({

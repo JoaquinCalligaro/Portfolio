@@ -107,7 +107,12 @@ export function ItemCard({
         <div className="mt-4 flex flex-wrap items-center gap-2">
           <span className="flex w-full flex-col-reverse gap-2 sm:w-auto sm:flex-row">
             {onPreview && (
-              <Button variant="outline" onClick={onPreview} className="group">
+              <Button
+                variant="outline"
+                onClick={onPreview}
+                className={`group ${dirty ? 'preview-pending' : ''}`}
+                title={dirty ? 'Tenés cambios sin guardar: previsualizalos antes de guardar' : undefined}
+              >
                 <MorphGlyph name="preview" />
                 Previsualizar
               </Button>

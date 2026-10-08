@@ -227,3 +227,32 @@
     overflow: hidden;
   }
 }
+
+/* Botón "Previsualizar" con cambios sin guardar: naranja y latiendo. */
+@keyframes preview-pending-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(251 146 60 / 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgb(251 146 60 / 0);
+  }
+}
+
+.preview-pending {
+  border-color: rgb(251 146 60 / 0.7);
+  background-color: rgb(251 146 60 / 0.12);
+  color: rgb(253 186 116);
+  animation: preview-pending-pulse 1.8s ease-in-out infinite;
+}
+
+.preview-pending:hover {
+  background-color: rgb(251 146 60 / 0.22);
+  color: rgb(254 215 170);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preview-pending {
+    animation: none;
+  }
+}
