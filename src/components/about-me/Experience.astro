@@ -31,9 +31,10 @@ const t = getAboutMe('ES');
               description={{ es: item.descriptionEs, en: item.descriptionEn }}
               iconKey={item.iconKey}
               certificateUrl={
-                item.certificateMime
+                (item as { certificatePreview?: string }).certificatePreview ??
+                (item.certificateMime
                   ? `/api/education/${item.id}/certificate`
-                  : undefined
+                  : undefined)
               }
             />
           ))}

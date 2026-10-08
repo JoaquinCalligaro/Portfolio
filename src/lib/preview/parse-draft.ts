@@ -4,7 +4,8 @@ import { findIcon } from '../icons.ts';
 import { DRAFT_SECTIONS, DraftError } from './types.ts';
 import type { Draft, DraftSection } from './types.ts';
 
-export const MAX_DRAFT_BYTES = 256 * 1024;
+// Incluye el certificado (hasta 3 MB) codificado en base64.
+export const MAX_DRAFT_BYTES = 6 * 1024 * 1024;
 
 const EDUCATION_ICONS = ['university', 'work', 'certificate'];
 const HEX = /^#[0-9a-f]{6}$/i;
@@ -125,7 +126,18 @@ const parsers: Record<DraftSection, (b: Body, isNew: boolean) => Body> = {
     if (iconKey !== undefined && !EDUCATION_ICONS.includes(iconKey)) {
       throw new DraftError('El tipo de ícono no es válido');
     }
+    // Certificado sin guardar: llega como data: URL (imagen o PDF).
+    const cert = text(b, 'certificate');
+    const certMatch = cert?.match(
+      /^data:(application\/pdf|image\/(?:png|jpeg|webp|gif));base64,/
+    );
     return defined({
+      certificatePreview: certMatch ? cert : undefined,
+      certificateMime: certMatch
+        ? certMatch[1]
+        : cert === 'remove'
+          ? ''
+          : undefined,
       institution,
       datesEs: text(b, 'datesEs'),
       descriptionEs: text(b, 'descriptionEs'),

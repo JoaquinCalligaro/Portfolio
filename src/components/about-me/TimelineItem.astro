@@ -39,7 +39,8 @@ const icon = timelineIcons[iconKey] ?? timelineIcons.default;
   {
     certificateUrl && (
       <a
-        href={certificateUrl}
+        href={certificateUrl.startsWith('data:') ? '#' : certificateUrl}
+        data-data-url={certificateUrl.startsWith('data:') ? certificateUrl : undefined}
         target="_blank"
         rel="noopener"
         class="inline-flex items-center gap-1 text-sm font-semibold text-cyan-700 underline-offset-4 hover:underline dark:text-cyan-400"
@@ -49,3 +50,16 @@ const icon = timelineIcons[iconKey] ?? timelineIcons.default;
     )
   }
 </li>
+
+<script>
+  // Vista previa: el navegador bloquea abrir data: URLs, así que se abre como blob.
+  document.addEventListener('click', (event) => {
+    const link = (event.target as Element).closest<HTMLAnchorElement>('a[data-data-url]');
+    if (!link) return;
+    event.preventDefault();
+    const [head, body] = (link.dataset.dataUrl ?? '').split(',');
+    const mime = head.slice(5, head.indexOf(';'));
+    const bytes = Uint8Array.from(atob(body), (c) => c.charCodeAt(0));
+    window.open(URL.createObjectURL(new Blob([bytes], { type: mime })), '_blank');
+  });
+</script>

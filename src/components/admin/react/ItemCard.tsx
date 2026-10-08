@@ -126,10 +126,15 @@ export function ItemCard({
             aria-live="polite"
             className={cn(
               'text-sm',
-              item.status ? TONE[item.status.tone] : 'text-gray-300'
+              item.status
+                ? TONE[item.status.tone]
+                : dirty
+                  ? 'text-orange-300'
+                  : 'text-gray-300'
             )}
           >
-            {item.status?.text ?? (dirty ? 'Cambios sin guardar' : '')}
+            {item.status?.text ??
+              (dirty ? 'Cambios sin guardar · podés previsualizarlos antes de guardar' : '')}
           </span>
           <span className="ml-auto flex flex-wrap gap-2">
             <Tooltip>

@@ -71,6 +71,6 @@ test('parseDraft rejects bad input', () => {
     /https/
   );
   assert.throws(() => draft({ section: 'projects', values: { titleEs: '' } }), /título/);
-  assert.throws(() => parseDraft('x'.repeat(300 * 1024)), (e: any) => e.status === 413);
+  assert.throws(() => parseDraft('x'.repeat(7 * 1024 * 1024)), (e: any) => e.status === 413);
   assert.throws(() => parseDraft('{no json'), /no es válido/);
 });

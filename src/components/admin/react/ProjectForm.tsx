@@ -321,6 +321,9 @@ export default function ProjectForm({ mode, project }: ProjectFormProps) {
                       : 'Guardar cambios'}
                 </Button>
               </div>
+              <span role="status" className="text-sm text-orange-300">
+                {dirty ? 'Cambios sin guardar · podés previsualizarlos antes de guardar' : ''}
+              </span>
               <ButtonLink href="/admin/projects" variant="ghost">
                 Cancelar
               </ButtonLink>

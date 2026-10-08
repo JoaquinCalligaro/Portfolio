@@ -187,8 +187,8 @@ export default function ProfileForm({ profile }: { profile: ProfileValues }) {
                   {busy ? 'Guardando…' : 'Guardar'}
                 </Button>
               </div>
-              <span role="status" className="text-sm text-gray-300">
-                {dirty ? 'Cambios sin guardar' : ''}
+              <span role="status" className="text-sm text-orange-300">
+                {dirty ? 'Cambios sin guardar · podés previsualizarlos antes de guardar' : ''}
               </span>
             </div>
           </form>

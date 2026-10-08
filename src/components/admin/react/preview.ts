@@ -48,7 +48,13 @@ export function syncDrafts(prefix: string, drafts: Record<string, PreviewDraft>)
     if (key.startsWith(prefix)) delete store[key];
   }
   for (const [key, draft] of Object.entries(drafts)) {
-    store[`${prefix}${key}`] = draft;
+    // Los archivos (data:) pesan demasiado para sessionStorage: no se guardan.
+    const values = Object.fromEntries(
+      Object.entries(draft.values).filter(
+        ([, v]) => !(typeof v === 'string' && v.startsWith('data:'))
+      )
+    );
+    store[`${prefix}${key}`] = { ...draft, values };
   }
   writeStore(store);
 }
